@@ -1,0 +1,79 @@
+<Window x:Class="EduSyncAI.StudentMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:EduSyncAI"
+        Title="EduSyncAI - Student Dashboard" Height="700" Width="1200"
+        Icon="edusync_icon.ico"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        
+        <!-- Navigation Button Style -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,15"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#34495E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#2C3E50" Padding="0">
+            <StackPanel>
+                <Border Background="#34495E" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="📚 EduSyncAI" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock x:Name="StudentNameText" Text="Student Dashboard" FontSize="12" Foreground="#BDC3C7" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Margin="0,20,0,0">
+                    <TextBlock Text="MY COURSES" FontSize="11" FontWeight="Bold" Foreground="#95A5A6" Margin="15,0,0,10"/>
+                    
+                    <Button Content="📖 Browse Courses" Click="ShowBrowseCourses_Click"
+                            Style="{StaticResource NavButtonStyle}"/>
+                    
+                    <Button Content="✓ My Enrolled Courses" Click="ShowMyCourses_Click"
+                            Style="{StaticResource NavButtonStyle}"/>
+                    
+                    <Button Content="📊 My Attendance" Click="ShowMyAttendance_Click"
+                            Style="{StaticResource NavButtonStyle}"/>
+                </StackPanel>
+
+                <Button Content="🚪 Logout" Click="Logout_Click"
+                        Background="#E74C3C" Foreground="White" Margin="15,350,15,0" Padding="15,10"
+                        BorderThickness="0" Cursor="Hand" FontWeight="SemiBold"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Column="1" Background="#ECF0F1">
+            <ContentControl x:Name="MainContent"/>
+        </Grid>
+    </Grid>
+</Window>

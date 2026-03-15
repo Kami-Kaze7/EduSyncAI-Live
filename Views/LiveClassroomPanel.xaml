@@ -1,0 +1,60 @@
+<UserControl x:Class="EduSyncAI.LiveClassroomPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Bar -->
+        <Border Grid.Row="0" Background="#1a1a2e" Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Live Indicator -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10" Fill="#FF4444" Margin="0,0,8,0" x:Name="LiveDot"/>
+                    <TextBlock Text="LIVE" FontWeight="Bold" Foreground="#FF4444" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="ViewerCountText" Text=" • 0 viewers" Foreground="#888" FontSize="12" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                </StackPanel>
+
+                <!-- Session Info -->
+                <TextBlock Grid.Column="1" x:Name="SessionInfoText" 
+                           Text="Connecting..." Foreground="White" FontSize="13"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <!-- Controls -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button x:Name="EndBroadcastBtn" Content="🔴 End Broadcast" 
+                            Click="EndBroadcast_Click"
+                            Background="#FF4444" Foreground="White" FontWeight="Bold"
+                            Padding="12,6" Cursor="Hand" BorderThickness="0">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Jitsi Meet WebView -->
+        <wv2:WebView2 Grid.Row="1" x:Name="JitsiWebView" 
+                      DefaultBackgroundColor="#1a1a2e"/>
+
+        <!-- Bottom Status Bar -->
+        <Border Grid.Row="2" Background="#16213e" Padding="8,4">
+            <TextBlock x:Name="StatusText" Text="Initializing video conference..." 
+                       Foreground="#aaa" FontSize="11" HorizontalAlignment="Center"/>
+        </Border>
+    </Grid>
+</UserControl>

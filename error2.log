@@ -1,0 +1,120 @@
+﻿dotnet : Unhandled 
+exception. System.NullReferen
+ceException: Object 
+reference not set to an 
+instance of an object.
+At line:1 char:1
++ dotnet run 2>&1 | Out-File 
+-FilePath "error2.log" 
+-Encoding UTF8
++ ~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Unhandl  
+  ed excep...e of an objec   
+ t.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+   at EduSyncAI.LoginViewMode
+l.AddPinDigit(String digit) 
+in C:\EduSyncAI\ViewModels\Lo
+ginViewModel.cs:line 169
+   at EduSyncAI.LoginViewMode
+l.<.ctor>b__58_1(Object 
+param) in C:\EduSyncAI\ViewMo
+dels\LoginViewModel.cs:line 
+86
+   at EduSyncAI.RelayCommand.
+Execute(Object parameter) in 
+C:\EduSyncAI\Helpers\RelayCom
+mand.cs:line 30
+   at System.Windows.Controls
+.Button.OnClick()
+   at System.Windows.Controls
+.Primitives.ButtonBase.OnMous
+eLeftButtonUp(MouseButtonEven
+tArgs e)
+   at System.Windows.RoutedEv
+entArgs.InvokeHandler(Delegat
+e handler, Object target)
+   at System.Windows.EventRou
+te.InvokeHandlersImpl(Object 
+source, RoutedEventArgs 
+args, Boolean reRaised)
+   at System.Windows.UIElemen
+t.ReRaiseEventAs(DependencyOb
+ject sender, RoutedEventArgs 
+args, RoutedEvent newEvent)
+   at System.Windows.RoutedEv
+entArgs.InvokeHandler(Delegat
+e handler, Object target)
+   at System.Windows.EventRou
+te.InvokeHandlersImpl(Object 
+source, RoutedEventArgs 
+args, Boolean reRaised)
+   at System.Windows.UIElemen
+t.RaiseEventImpl(DependencyOb
+ject sender, RoutedEventArgs 
+args)
+   at System.Windows.UIElemen
+t.RaiseTrustedEvent(RoutedEve
+ntArgs args)
+   at System.Windows.Input.In
+putManager.ProcessStagingArea
+()
+   at System.Windows.Interop.
+HwndMouseInputProvider.Report
+Input(IntPtr hwnd, InputMode 
+mode, Int32 timestamp, 
+RawMouseActions actions, 
+Int32 x, Int32 y, Int32 
+wheel)
+   at System.Windows.Interop.
+HwndMouseInputProvider.Filter
+Message(IntPtr hwnd, 
+WindowMessage msg, IntPtr 
+wParam, IntPtr lParam, 
+Boolean& handled)
+   at System.Windows.Interop.
+HwndSource.InputFilterMessage
+(IntPtr hwnd, Int32 msg, 
+IntPtr wParam, IntPtr 
+lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.Wn
+dProc(IntPtr hwnd, Int32 
+msg, IntPtr wParam, IntPtr 
+lParam, Boolean& handled)
+   at System.Windows.Threadin
+g.ExceptionWrapper.InternalRe
+alCall(Delegate callback, 
+Object args, Int32 numArgs)
+   at System.Windows.Threadin
+g.ExceptionWrapper.TryCatchWh
+en(Object source, Delegate 
+callback, Object args, Int32 
+numArgs, Delegate 
+catchHandler)
+   at System.Windows.Threadin
+g.Dispatcher.LegacyInvokeImpl
+(DispatcherPriority 
+priority, TimeSpan timeout, 
+Delegate method, Object 
+args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.S
+ubclassWndProc(IntPtr hwnd, 
+Int32 msg, IntPtr wParam, 
+IntPtr lParam)
+   at MS.Win32.UnsafeNativeMe
+thods.DispatchMessage(MSG& 
+msg)
+   at System.Windows.Threadin
+g.Dispatcher.PushFrameImpl(Di
+spatcherFrame frame)
+   at System.Windows.Applicat
+ion.RunDispatcher(Object 
+ignore)
+   at System.Windows.Applicat
+ion.RunInternal(Window 
+window)
+   at EduSyncAI.App.Main()

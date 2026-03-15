@@ -1,0 +1,41 @@
+<Window x:Class="EduSyncAI.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EduSync AI — Starting Up"
+        Width="480" Height="320"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Border CornerRadius="16" Background="#1a1a2e" BorderBrush="#3b82f6" BorderThickness="1.5">
+        <Grid Margin="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Logo / Title -->
+            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,10,0,20">
+                <TextBlock Text="🎓" FontSize="42" HorizontalAlignment="Center"/>
+                <TextBlock Text="EduSync AI" FontSize="26" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                <TextBlock Text="Smart Classroom • Smart Learning" FontSize="12" Foreground="#888" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Progress Bar -->
+            <ProgressBar Grid.Row="1" x:Name="ProgressBar" Height="4" Minimum="0" Maximum="100" Value="0"
+                         Background="#2a2a4a" Foreground="#3b82f6" BorderThickness="0" Margin="0,0,0,16"/>
+
+            <!-- Status Messages -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="StatusPanel"/>
+            </ScrollViewer>
+
+            <!-- Current Status -->
+            <TextBlock Grid.Row="3" x:Name="CurrentStatus" Text="Initializing..." FontSize="12"
+                       Foreground="#6b7280" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,41 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+
+# Node.js
+node_modules/
+.next/
+out/
+
+# Python
+__pycache__/
+venv/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
+
+# Installer staging & output
+installer/staging/
+installer/Output/
+installer/runtimes/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Environment (keep .env.production for server)
+.env.local
+
+# Database files (will be created on server)
+*.db
+
+# Temporary files
+/tmp/
+
+# Build artifacts
+publish/

@@ -1,0 +1,97 @@
+<UserControl x:Class="EduSyncAI.AttendanceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:EduSyncAI">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    
+    <Grid Background="#ECF0F1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel: Check-in -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="30">
+                <!-- Session Info -->
+                <Border Background="#2C3E50" Padding="20" CornerRadius="5" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="📚 Active Session" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="{Binding SessionInfo}" FontSize="14" Foreground="#BDC3C7" Margin="0,5,0,0"/>
+                        <TextBlock Text="{Binding AttendanceStatus}" FontSize="12" Foreground="#95A5A6" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Fingerprint Check-in -->
+                <Border Background="White" Padding="30" CornerRadius="5" Margin="0,0,0,20" BorderBrush="#BDC3C7" BorderThickness="1">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="👆" FontSize="96" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                        <TextBlock Text="{Binding FingerprintMessage}" FontSize="16" HorizontalAlignment="Center" 
+                                   TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,20"/>
+                        <Button Content="🔍 Scan Fingerprint" Command="{Binding CheckInWithFingerprintCommand}"
+                                Background="#3498DB" Foreground="White" Padding="30,15" FontSize="16" FontWeight="Bold"
+                                BorderThickness="0" Cursor="Hand" IsEnabled="{Binding IsFingerprintReady}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Student Selection -->
+                <Border Background="White" Padding="20" CornerRadius="5" BorderBrush="#BDC3C7" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Select Student" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
+                        
+                        <TextBlock Text="Search:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 Padding="10" FontSize="14" Margin="0,0,0,15"/>
+                        
+                        <ListBox ItemsSource="{Binding EnrolledStudents}" SelectedItem="{Binding SelectedStudent}"
+                                 Height="200" Margin="0,0,0,15">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding FullName}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding MatricNumber}" FontSize="11" Foreground="#7F8C8D"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        
+                        <Button Content="✓ Mark Present" Command="{Binding MarkManuallyCommand}"
+                                Background="#27AE60" Foreground="White" Padding="20,12" FontSize="14" FontWeight="Bold"
+                                BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Right Panel: Attendance List -->
+        <Border Grid.Column="1" Background="White" Margin="0,30,30,30" Padding="20" CornerRadius="5" BorderBrush="#BDC3C7" BorderThickness="1">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <TextBlock Text="✓ Present Students" FontSize="16" FontWeight="Bold"/>
+                    <Button Content="🔄" Command="{Binding RefreshCommand}"
+                            Background="#95A5A6" Foreground="White" Padding="8,5" FontSize="12"
+                            BorderThickness="0" Cursor="Hand" Margin="10,0,0,0"/>
+                </StackPanel>
+                
+                <TextBlock Text="{Binding PresentCount, StringFormat='{}Total: {0}'}" FontSize="14" 
+                           Foreground="#27AE60" FontWeight="SemiBold" Margin="0,0,0,15"/>
+                
+                <ListBox ItemsSource="{Binding AttendanceList}" Height="500">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,5">
+                                <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding MatricNumber}" FontSize="11" Foreground="#7F8C8D"/>
+                                <TextBlock Text="{Binding CheckInTime, StringFormat='{}{0:HH:mm:ss}'}" 
+                                           FontSize="10" Foreground="#95A5A6"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

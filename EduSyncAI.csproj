@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>edusync_icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+    <PackageReference Include="Emgu.CV" Version="4.12.0.5764" />
+    <PackageReference Include="Emgu.CV.Bitmap" Version="4.12.0.5764" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.12.0.5764" />
+    <PackageReference Include="EPPlus" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3800.47" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.3" />
+    <PackageReference Include="Xabe.FFmpeg" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="EduSyncAI.WebAPI\**;edusync-web\**;backend\**;CheckDb\**;DatabaseMigration\**;DbMigration\**;FixDb\**;DbChecker\**;DbChecker2\**;installer\**" />
+    <EmbeddedResource Remove="EduSyncAI.WebAPI\**;edusync-web\**;backend\**;CheckDb\**;DatabaseMigration\**;DbMigration\**;FixDb\**;DbChecker\**;DbChecker2\**;installer\**" />
+    <None Remove="EduSyncAI.WebAPI\**;edusync-web\**;backend\**;CheckDb\**;DatabaseMigration\**;DbMigration\**;FixDb\**;DbChecker\**;DbChecker2\**;installer\**" />
+    <Page Remove="EduSyncAI.WebAPI\**;edusync-web\**;backend\**;CheckDb\**;DatabaseMigration\**;DbMigration\**;FixDb\**;DbChecker\**;DbChecker2\**;installer\**" />
+  </ItemGroup>
+
+</Project>

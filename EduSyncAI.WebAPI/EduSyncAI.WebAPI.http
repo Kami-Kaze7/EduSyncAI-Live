@@ -1,0 +1,6 @@
+@EduSyncAI.WebAPI_HostAddress = http://localhost:5152
+
+GET {{EduSyncAI.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

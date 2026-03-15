@@ -1,0 +1,59 @@
+Week 1: Introduction to Computer Basics
+- Understanding computer hardware
+- Basic software concepts
+- Introduction to operating systems
+
+Week 2: File Management
+- Creating and organizing folders
+- File types and extensions
+- Basic file operations
+
+Week 3: Word Processing Fundamentals
+- Introduction to Microsoft Word
+- Document formatting
+- Basic editing techniques
+
+Week 4: Spreadsheet Basics
+- Introduction to Excel
+- Creating simple spreadsheets
+- Basic formulas
+
+Week 5: Presentation Skills
+- PowerPoint basics
+- Creating slides
+- Adding multimedia
+
+Week 6: Internet Fundamentals
+- Web browsing
+- Email basics
+- Online safety
+
+Week 7: Social Media
+- Understanding social platforms
+- Professional networking
+- Digital citizenship
+
+Week 8: Cloud Storage
+- Introduction to cloud services
+- File sharing
+- Collaboration tools
+
+Week 9: Basic Troubleshooting
+- Common computer problems
+- Simple solutions
+- When to seek help
+
+Week 10: Digital Communication
+- Video conferencing
+- Instant messaging
+- Professional communication
+
+Week 11: Cybersecurity Basics
+- Password management
+- Recognizing threats
+- Safe browsing practices
+
+Week 12: Course Review and Final Project
+- Comprehensive review
+- Final project presentation
+- Course wrap-up

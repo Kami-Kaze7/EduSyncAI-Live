@@ -1,0 +1,219 @@
+Step 1 — Class Session Engine (Foundation)
+
+Goal: Everything in Phase 2 must attach to a “Class Session”.
+
+What you implement
+
+Create a Class Session for a selected course/lecture
+
+Session states: Ready → Live → Ended
+
+Store:
+
+course + lecture + date/time
+
+lecturer id
+
+session code (optional)
+
+file paths (audio/video/board)
+
+attendance status
+
+Why this is first
+
+No session object = nowhere to store attendance, recordings, exports.
+
+Step 2 — Lecturer Authentication (Tier A + Tier B)
+
+Goal: Lecturer can start a class session securely and fast.
+
+Tier A (must-have)
+
+Lecturer logs in with:
+
+username/email + password OR
+
+PIN (recommended for speed on smartboard)
+
+Tier B (nice upgrade, still in scope)
+
+Fingerprint login using Windows Hello
+
+Your app does NOT store fingerprints
+
+Windows returns “verified / not verified”
+
+Output
+
+Once lecturer is authenticated → “Start Class” becomes available
+
+Starting class auto-switches app into Class Session Mode
+
+Step 3 — Student Attendance via Fingerprint (Core Feature)
+
+Goal: Students mark attendance using fingerprint during the session.
+
+How it works (workflow)
+
+Lecturer starts session
+
+App switches to Attendance Mode (Open) for first X minutes
+
+Students come one-by-one to the smartboard or attached scanner
+
+Student places finger → system validates → marks present
+
+What you must implement
+
+Student fingerprint enrollment (one-time, admin/registration phase)
+
+Attendance capture screen:
+
+“Place finger to check in”
+
+shows success/fail + student name (optional)
+
+Attendance record stored against:
+
+StudentId
+
+SessionId
+
+Timestamp
+
+Important considerations
+
+This creates a physical queue — still faster than roll call, but plan the UI for speed.
+
+You must support “fallback” for failed fingerprint (e.g., manual override by lecturer/admin).
+
+Step 4 — Holistic Recording (Audio + One Camera + Board)
+
+This runs while the session is live.
+
+4A — Audio Recording (Implement first)
+
+Select microphone input
+
+Start recording when session starts
+
+Stop when session ends
+
+Store file path in session record
+
+4B — Video Recording (One camera facing lecturer)
+
+Use a single camera feed
+
+Start/stop tied to session state
+
+Store video file path in session record
+
+Reliability rule
+
+If video fails, audio must continue (audio is priority).
+
+Step 5 — Digital Board Capture (Option B + Option C)
+
+You chose two complementary approaches:
+
+Option C (during class, fallback capture)
+
+Screen snapshots
+
+Every X seconds or on lecturer action
+
+Stores images in a session folder
+
+Useful even if export fails
+
+Option B (after class, best quality)
+
+Export board notes/pages
+
+After “End Session”, lecturer clicks:
+
+“Export Board Notes”
+
+System saves exported file(s) into the session folder
+
+PDF recommended
+
+image pages also ok
+
+Output
+
+Students will later view:
+
+exported board file (primary)
+
+snapshots (backup)
+
+Step 6 — End Session & Produce “Lecture Package”
+
+When lecturer ends class:
+
+The system should
+
+Stop audio/video recording
+
+Close attendance
+
+Finalize storage folder
+
+Save summary:
+
+attendance count
+
+recording status
+
+board export status
+
+session duration
+
+This “lecture package” becomes the main input for Phase 3 rewatch/indexing later.
+
+Final Phase 2 Module List (Based on Your Scope)
+
+Class Session Module
+
+Lecturer Login Module (PIN/password + Windows Hello fingerprint)
+
+Student Fingerprint Attendance Module
+
+Audio Capture Module
+
+Single-Camera Video Capture Module
+
+Board Capture Module
+
+Snapshot capture (during)
+
+Board export (after)
+
+Session Finalization Module
+
+Recommended Build Order (to avoid complexity traps)
+
+Build in this order:
+
+Class Session Engine
+
+Lecturer Tier A login
+
+Audio recording
+
+Session end + lecture package save
+
+Student attendance fingerprint (enroll + check-in)
+
+Video recording (one camera)
+
+Board snapshots (Option C)
+
+Board export workflow (Option B)
+
+Lecturer Tier B (Windows Hello fingerprint)
+
+That order ensures you always have a working system even if later pieces delay.

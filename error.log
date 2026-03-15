@@ -1,0 +1,160 @@
+﻿dotnet : Unhandled 
+exception. System.Windows.Mar
+kup.XamlParseException: 
+'Provide value on 'System.Win
+dows.StaticResourceExtension'
+ threw an exception.' Line 
+number '26' and line 
+position '25'.
+At line:1 char:1
++ dotnet run 2>&1 | Out-File 
+-FilePath "error.log" 
+-Encoding UTF8
++ ~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Unhandl  
+  ed excep... position '25   
+ '.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+ ---> System.Exception: 
+Cannot find resource named 
+'BoolToVisibilityConverter'. 
+Resource names are case 
+sensitive.
+   at System.Windows.StaticRe
+sourceExtension.ProvideValueI
+nternal(IServiceProvider 
+serviceProvider, Boolean 
+allowDeferredReference)
+   at MS.Internal.Xaml.Runtim
+e.ClrObjectRuntime.CallProvid
+eValue(MarkupExtension me, 
+IServiceProvider 
+serviceProvider)
+   --- End of inner 
+exception stack trace ---
+   at System.Windows.Markup.X
+amlReader.RewrapException(Exc
+eption e, IXamlLineInfo 
+lineInfo, Uri baseUri)
+   at System.Windows.Markup.W
+pfXamlLoader.Load(XamlReader 
+xamlReader, 
+IXamlObjectWriterFactory 
+writerFactory, Boolean 
+skipJournaledProperties, 
+Object rootObject, 
+XamlObjectWriterSettings 
+settings, Uri baseUri)
+   at System.Windows.Markup.W
+pfXamlLoader.LoadBaml(XamlRea
+der xamlReader, Boolean 
+skipJournaledProperties, 
+Object rootObject, 
+XamlAccessLevel accessLevel, 
+Uri baseUri)
+   at System.Windows.Markup.X
+amlReader.LoadBaml(Stream 
+stream, ParserContext 
+parserContext, Object 
+parent, Boolean closeStream)
+   at System.Windows.Applicat
+ion.LoadBamlStreamWithSyncInf
+o(Stream stream, 
+ParserContext pc)
+   at System.Windows.Applicat
+ion.DoStartup()
+   at System.Windows.Applicat
+ion.<.ctor>b__1_0(Object 
+unused)
+   at System.Windows.Threadin
+g.ExceptionWrapper.InternalRe
+alCall(Delegate callback, 
+Object args, Int32 numArgs)
+   at System.Windows.Threadin
+g.ExceptionWrapper.TryCatchWh
+en(Object source, Delegate 
+callback, Object args, Int32 
+numArgs, Delegate 
+catchHandler)
+   at System.Windows.Threadin
+g.DispatcherOperation.InvokeI
+mpl()
+   at MS.Internal.CulturePres
+ervingExecutionContext.Callba
+ckWrapper(Object obj)
+   at System.Threading.Execut
+ionContext.RunInternal(Execut
+ionContext executionContext, 
+ContextCallback callback, 
+Object state)
+--- End of stack trace from 
+previous location ---
+   at System.Threading.Execut
+ionContext.RunInternal(Execut
+ionContext executionContext, 
+ContextCallback callback, 
+Object state)
+   at MS.Internal.CulturePres
+ervingExecutionContext.Run(Cu
+lturePreservingExecutionConte
+xt executionContext, 
+ContextCallback callback, 
+Object state)
+   at System.Windows.Threadin
+g.DispatcherOperation.Invoke(
+)
+   at System.Windows.Threadin
+g.Dispatcher.ProcessQueue()
+   at System.Windows.Threadin
+g.Dispatcher.WndProcHook(IntP
+tr hwnd, Int32 msg, IntPtr 
+wParam, IntPtr lParam, 
+Boolean& handled)
+   at MS.Win32.HwndWrapper.Wn
+dProc(IntPtr hwnd, Int32 
+msg, IntPtr wParam, IntPtr 
+lParam, Boolean& handled)
+   at MS.Win32.HwndSubclass.D
+ispatcherCallbackOperation(Ob
+ject o)
+   at System.Windows.Threadin
+g.ExceptionWrapper.InternalRe
+alCall(Delegate callback, 
+Object args, Int32 numArgs)
+   at System.Windows.Threadin
+g.ExceptionWrapper.TryCatchWh
+en(Object source, Delegate 
+callback, Object args, Int32 
+numArgs, Delegate 
+catchHandler)
+   at System.Windows.Threadin
+g.Dispatcher.LegacyInvokeImpl
+(DispatcherPriority 
+priority, TimeSpan timeout, 
+Delegate method, Object 
+args, Int32 numArgs)
+   at System.Windows.Threadin
+g.Dispatcher.Invoke(Dispatche
+rPriority priority, Delegate 
+method, Object arg)
+   at MS.Win32.HwndSubclass.S
+ubclassWndProc(IntPtr hwnd, 
+Int32 msg, IntPtr wParam, 
+IntPtr lParam)
+   at MS.Win32.UnsafeNativeMe
+thods.DispatchMessage(MSG& 
+msg)
+   at System.Windows.Threadin
+g.Dispatcher.PushFrameImpl(Di
+spatcherFrame frame)
+   at System.Windows.Applicat
+ion.RunDispatcher(Object 
+ignore)
+   at System.Windows.Applicat
+ion.RunInternal(Window 
+window)
+   at EduSyncAI.App.Main()
