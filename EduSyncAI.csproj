@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="edusync_icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Docnet.Core" Version="2.6.0" />
     <PackageReference Include="Emgu.CV" Version="4.12.0.5764" />
     <PackageReference Include="Emgu.CV.Bitmap" Version="4.12.0.5764" />

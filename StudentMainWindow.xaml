@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:EduSyncAI"
         Title="EduSyncAI - Student Dashboard" Height="700" Width="1200"
-        Icon="edusync_icon.ico"
         WindowStartupLocation="CenterScreen">
     
     <Window.Resources>

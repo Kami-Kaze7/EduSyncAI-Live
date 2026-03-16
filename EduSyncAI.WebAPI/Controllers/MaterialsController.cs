@@ -23,6 +23,27 @@ namespace EduSyncAI.WebAPI.Controllers
             _environment = environment;
         }
 
+        /// <summary>
+        /// Resolves a stored file path (which may be a Windows or Linux absolute path)
+        /// to the correct location on the current server.
+        /// </summary>
+        private string ResolveFilePath(string storedPath)
+        {
+            // Extract the relative portion after "Data" directory
+            // e.g., "C:\EduSyncAI\Data\LectureMaterials\file.mp4" -> "LectureMaterials/file.mp4"
+            // e.g., "/opt/edusyncai/publish/Data/LectureMaterials/file.mp4" -> "LectureMaterials/file.mp4"
+            var normalized = storedPath.Replace('\\', '/');
+            var dataIndex = normalized.IndexOf("/Data/", StringComparison.OrdinalIgnoreCase);
+            if (dataIndex >= 0)
+            {
+                var relativePart = normalized.Substring(dataIndex + "/Data/".Length);
+                var dataDir = Path.Combine(_environment.ContentRootPath, "..", "Data");
+                return Path.GetFullPath(Path.Combine(dataDir, relativePart));
+            }
+            // Fallback: just use the stored path as-is
+            return storedPath;
+        }
+
         // GET: api/materials/session/5
         [HttpGet("session/{sessionId}")]
         public async Task<ActionResult<IEnumerable<LectureMaterial>>> GetMaterials(int sessionId)
@@ -162,7 +183,7 @@ namespace EduSyncAI.WebAPI.Controllers
                 {
                     SessionId = sessionId,
                     FileName = file.FileName,
-                    FilePath = filePath,
+                    FilePath = Path.GetFullPath(filePath),
                     FileType = Path.GetExtension(file.FileName),
                     FileSize = file.Length,
                     UploadedAt = DateTime.UtcNow
@@ -215,9 +236,11 @@ namespace EduSyncAI.WebAPI.Controllers
                     return NotFound(new { error = "Material not found" });
                 }
 
-                if (!System.IO.File.Exists(material.FilePath))
+                var resolvedPath = ResolveFilePath(material.FilePath);
+                _logger.LogInformation("Resolved path: {StoredPath} -> {ResolvedPath}", material.FilePath, resolvedPath);
+                if (!System.IO.File.Exists(resolvedPath))
                 {
-                    return NotFound(new { error = "File not found on server" });
+                    return NotFound(new { error = $"File not found on server. Path: {resolvedPath}" });
                 }
 
                 var contentType = material.FileType.ToLower() switch
@@ -237,7 +260,7 @@ namespace EduSyncAI.WebAPI.Controllers
 
                 // Use PhysicalFile with enableRangeProcessing for proper video streaming
                 // Range processing enables HTTP 206 Partial Content which HTML5 video needs
-                return PhysicalFile(material.FilePath, contentType, enableRangeProcessing: true);
+                return PhysicalFile(resolvedPath, contentType, enableRangeProcessing: true);
             }
             catch (Exception ex)
             {
@@ -259,9 +282,10 @@ namespace EduSyncAI.WebAPI.Controllers
                 }
 
                 // Delete file from disk
-                if (System.IO.File.Exists(material.FilePath))
+                var deletePath = ResolveFilePath(material.FilePath);
+                if (System.IO.File.Exists(deletePath))
                 {
-                    System.IO.File.Delete(material.FilePath);
+                    System.IO.File.Delete(deletePath);
                 }
 
                 // Delete database record

@@ -336,7 +336,7 @@ namespace EduSyncAI
             {
                 using (var client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri("http://localhost:5152/");
+                    client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
                     
                     using (var content = new MultipartFormDataContent())
                     {

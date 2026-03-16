@@ -281,7 +281,7 @@ namespace EduSyncAI
                 using (var client = new HttpClient())
                 {
                     // Update this to your local API URL
-                    client.BaseAddress = new Uri("http://localhost:5152/");
+                    client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
                     var json = JsonSerializer.Serialize(uploadData);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 

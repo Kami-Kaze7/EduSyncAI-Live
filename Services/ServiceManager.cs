@@ -34,6 +34,24 @@ namespace EduSyncAI
         /// </summary>
         public async Task StartAllAsync()
         {
+            // When using remote server, skip starting local services
+            if (AppConfig.UseRemoteServer)
+            {
+                StatusChanged?.Invoke("Using remote server mode...");
+                
+                // Just verify the remote API is reachable
+                var healthy = await WaitForHealthAsync($"{AppConfig.ApiUrl}/sessions", 10);
+                if (healthy)
+                {
+                    StatusChanged?.Invoke($"Connected to remote server at {AppConfig.ServerUrl} ✓");
+                }
+                else
+                {
+                    ErrorOccurred?.Invoke($"Cannot reach remote server at {AppConfig.ServerUrl}. Check your internet connection.");
+                }
+                return;
+            }
+
             await StartWebApiAsync();
             await StartNextJsAsync();
             await StartPythonBackendAsync();
@@ -66,7 +84,7 @@ namespace EduSyncAI
             }
 
             // Wait for WebAPI to be healthy
-            var healthy = await WaitForHealthAsync("http://localhost:5152/api/sessions", 30);
+            var healthy = await WaitForHealthAsync($"{AppConfig.ApiUrl}/sessions", 30);
             if (healthy)
             {
                 StatusChanged?.Invoke("Web API started ✓");

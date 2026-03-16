@@ -4,7 +4,6 @@
         xmlns:local="clr-namespace:EduSyncAI"
         Title="EduSync AI - Login" 
         Height="600" Width="450"
-        Icon="edusync_icon.ico"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
     

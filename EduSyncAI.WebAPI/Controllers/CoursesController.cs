@@ -32,6 +32,23 @@ namespace EduSyncAI.WebAPI.Controllers
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
+        /// <summary>
+        /// Resolves a stored file path (which may be a Windows or Linux absolute path)
+        /// to the correct location on the current server.
+        /// </summary>
+        private string ResolveFilePath(string storedPath)
+        {
+            var normalized = storedPath.Replace('\\', '/');
+            var dataIndex = normalized.IndexOf("/Data/", StringComparison.OrdinalIgnoreCase);
+            if (dataIndex >= 0)
+            {
+                var relativePart = normalized.Substring(dataIndex + "/Data/".Length);
+                var dataDir = Path.Combine(_environment.ContentRootPath, "..", "Data");
+                return Path.GetFullPath(Path.Combine(dataDir, relativePart));
+            }
+            return storedPath;
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
         {
@@ -290,20 +307,21 @@ namespace EduSyncAI.WebAPI.Controllers
                 }
                 // Students should be checked if they are enrolled, but let's stick to the lecturer isolation for now as requested.
 
-                if (!System.IO.File.Exists(course.SyllabusPath))
+                var resolvedPath = ResolveFilePath(course.SyllabusPath);
+                if (!System.IO.File.Exists(resolvedPath))
                 {
                     return NotFound(new { error = "Syllabus file not found" });
                 }
 
                 var memory = new MemoryStream();
-                using (var stream = new FileStream(course.SyllabusPath, FileMode.Open))
+                using (var stream = new FileStream(resolvedPath, FileMode.Open))
                 {
                     await stream.CopyToAsync(memory);
                 }
                 memory.Position = 0;
 
-                var contentType = GetContentType(course.SyllabusPath);
-                var fileName = Path.GetFileName(course.SyllabusPath);
+                var contentType = GetContentType(resolvedPath);
+                var fileName = Path.GetFileName(resolvedPath);
 
                 return File(memory, contentType, fileName);
             }

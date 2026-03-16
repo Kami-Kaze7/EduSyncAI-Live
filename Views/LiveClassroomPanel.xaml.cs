@@ -99,7 +99,7 @@ namespace EduSyncAI
         private async Task<string> NotifyStreamStartAsync(int sessionId, int lecturerId, string courseName, string lecturerName)
         {
             using var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5152/");
+            client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
 
             var payload = new
             {
@@ -131,7 +131,7 @@ namespace EduSyncAI
             try
             {
                 using var client = new HttpClient();
-                client.BaseAddress = new Uri("http://localhost:5152/");
+                client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
 
                 var payload = new { SessionId = _sessionId };
                 var json = JsonSerializer.Serialize(payload);

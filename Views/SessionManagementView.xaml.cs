@@ -445,7 +445,7 @@ namespace EduSyncAI
                     bitmap.Save(ms, ImageFormat.Jpeg);
                     var content = new ByteArrayContent(ms.ToArray());
                     content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-                    await _streamClient.PostAsync($"http://localhost:5152/api/stream/{_liveSessionId}/frame", content);
+                    await _streamClient.PostAsync($"{AppConfig.ApiUrl}/stream/{_liveSessionId}/frame", content);
                 }
             }
             catch
@@ -630,7 +630,7 @@ namespace EduSyncAI
                 using (var client = new HttpClient())
                 {
                     client.Timeout = TimeSpan.FromMinutes(10);
-                    client.BaseAddress = new Uri("http://localhost:5152/");
+                    client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
 
                     using (var content = new MultipartFormDataContent())
                     {

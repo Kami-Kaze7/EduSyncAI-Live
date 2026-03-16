@@ -4,7 +4,6 @@
         xmlns:local="clr-namespace:EduSyncAI"
         Title="EduSync AI - Lecture Preparation System" 
         Height="700" Width="1200"
-        Icon="edusync_icon.ico"
         WindowStartupLocation="CenterScreen">
     
     <!-- Window Resources - MUST be defined BEFORE Grid -->

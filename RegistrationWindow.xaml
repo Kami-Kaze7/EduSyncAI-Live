@@ -2,7 +2,6 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Register - EduSyncAI" Height="600" Width="500"
-        Icon="edusync_icon.ico"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     
     <Grid Background="#ECF0F1">
