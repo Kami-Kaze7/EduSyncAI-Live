@@ -12,7 +12,7 @@ namespace EduSyncAI
         public static bool UseRemoteServer = true;
 
         private const string LocalServer = "http://localhost:5152";
-        private const string RemoteServer = "http://173.212.248.253";
+        private const string RemoteServer = "https://173-212-248-253.nip.io";
 
         /// <summary>
         /// Base server URL (e.g., "http://173.212.248.253" or "http://localhost:5152")
