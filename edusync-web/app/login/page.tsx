@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/lib/auth';
 import { useAuthStore } from '@/lib/store';
-import { AcademicCapIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('');
@@ -31,26 +31,28 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center px-4">
-            <div className="max-w-md w-full">
-                {/* Logo and Title */}
-                <div className="text-center mb-8">
-                    <div className="flex items-center justify-center mb-4">
-                        <div className="bg-white p-4 rounded-full shadow-lg">
-                            <AcademicCapIcon className="h-12 w-12 text-indigo-600" />
-                        </div>
+        <div className="min-h-screen flex">
+            {/* Left — Form Side */}
+            <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white">
+                <div className="w-full max-w-md">
+                    {/* Logo */}
+                    <div className="mb-10">
+                        <Link href="/" className="inline-flex items-center gap-2 group">
+                            <div className="w-9 h-9 rounded-lg bg-[#FF6B35] flex items-center justify-center text-white text-sm font-bold shadow-md">
+                                E
+                            </div>
+                            <span className="text-lg font-bold text-[#1A1A2E] group-hover:text-[#FF6B35] transition-colors">EduSync AI</span>
+                        </Link>
                     </div>
-                    <h1 className="text-4xl font-bold text-white mb-2">EduSync AI</h1>
-                    <p className="text-indigo-100">Lecturer Dashboard</p>
-                </div>
 
-                {/* Login Card */}
-                <div className="bg-white rounded-2xl shadow-2xl p-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
+                    {/* Heading */}
+                    <h1 className="text-3xl font-extrabold text-[#1A1A2E] mb-2">Sign In</h1>
+                    <p className="text-[#9CA3AF] mb-8">Welcome back! Sign in to your Lecturer Dashboard.</p>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="username" className="block text-sm font-medium text-[#374151] mb-1.5">
                                 Username
                             </label>
                             <input
@@ -59,14 +61,14 @@ export default function LoginPage() {
                                 required
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-[#F9FAFB] border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-all outline-none text-[#1A1A2E] placeholder-[#9CA3AF]"
                                 placeholder="Enter your username"
                                 disabled={isLoading}
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="password" className="block text-sm font-medium text-[#374151] mb-1.5">
                                 Password
                             </label>
                             <input
@@ -75,7 +77,7 @@ export default function LoginPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-[#F9FAFB] border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-all outline-none text-[#1A1A2E] placeholder-[#9CA3AF]"
                                 placeholder="Enter your password"
                                 disabled={isLoading}
                             />
@@ -84,7 +86,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                            className="w-full bg-gradient-to-r from-[#FF6B35] to-[#FFA07A] text-white py-3.5 px-4 rounded-xl hover:shadow-lg hover:shadow-[#FF6B35]/25 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center">
@@ -95,25 +97,52 @@ export default function LoginPage() {
                                     Signing in...
                                 </span>
                             ) : (
-                                'Sign In'
+                                'SIGN IN'
                             )}
                         </button>
                     </form>
 
-                    {/* Test Credentials Info */}
-                    <div className="mt-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                        <p className="text-sm font-semibold text-indigo-900 mb-2">Test Credentials:</p>
-                        <div className="text-sm text-indigo-700 space-y-1">
+                    {/* Test Credentials */}
+                    <div className="mt-6 p-4 bg-[#FFF3E0] rounded-xl border border-[#FFE4D6]">
+                        <p className="text-sm font-semibold text-[#1A1A2E] mb-1">Test Credentials:</p>
+                        <div className="text-sm text-[#6B7280] space-y-0.5">
                             <p><span className="font-medium">Username:</span> testlecturer</p>
                             <p><span className="font-medium">Password:</span> password123</p>
                         </div>
                     </div>
-                </div>
 
-                {/* Footer */}
-                <p className="text-center text-indigo-100 text-sm mt-6">
-                    © 2026 EduSync AI. All rights reserved.
-                </p>
+                    {/* Footer link */}
+                    <p className="text-center text-sm text-[#9CA3AF] mt-8">
+                        Not a lecturer?{' '}
+                        <Link href="/student/login" className="text-[#FF6B35] font-semibold hover:underline">Student Login</Link>
+                        {' '}or{' '}
+                        <Link href="/admin/login" className="text-[#FF6B35] font-semibold hover:underline">Admin Login</Link>
+                    </p>
+                </div>
+            </div>
+
+            {/* Right — Illustration Side */}
+            <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#FF6B35] to-[#FFA07A] items-center justify-center relative overflow-hidden">
+                {/* Decorative shapes */}
+                <div className="absolute top-20 left-10 w-24 h-24 bg-white/10 rounded-full" />
+                <div className="absolute bottom-32 right-16 w-32 h-32 bg-white/10 rounded-full" />
+                <div className="absolute top-1/3 right-10 w-16 h-16 bg-white/15 rounded-lg rotate-45" />
+                <div className="absolute bottom-20 left-20 w-20 h-20 bg-white/10 rounded-lg rotate-12" />
+
+                <div className="text-center relative z-10 px-12">
+                    <div className="text-8xl mb-8">👨‍🏫</div>
+                    <h2 className="text-3xl font-extrabold text-white mb-4">Lecturer Dashboard</h2>
+                    <p className="text-white/80 text-sm leading-relaxed max-w-sm mx-auto">
+                        Manage courses, conduct live sessions, use interactive whiteboards, and track attendance — all from one place.
+                    </p>
+                    <div className="flex items-center justify-center gap-6 mt-10">
+                        {['📚 Courses', '📡 Live', '🖊️ Board'].map((item, i) => (
+                            <div key={i} className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2.5 text-white text-xs font-medium">
+                                {item}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -57,6 +57,40 @@ namespace EduSyncAI.WebAPI
                 Console.WriteLine($"   Username: admin");
                 Console.WriteLine($"   Password: admin123");
             }
+
+            // Check if test student already exists
+            var testStudent = context.Students.FirstOrDefault(s => s.MatricNumber == "2017/123456");
+
+            if (testStudent == null)
+            {
+                var student = new Student
+                {
+                    MatricNumber = "2017/123456",
+                    FullName = "Test Student",
+                    Email = "student@edusync.ai",
+                    PasswordHash = HashPassword("password123"),
+                    IsActive = true
+                };
+
+                context.Students.Add(student);
+                context.SaveChanges();
+
+                Console.WriteLine("✅ Test student created:");
+                Console.WriteLine($"   Matric Number: 2017/123456");
+                Console.WriteLine($"   Password: password123");
+            }
+            else
+            {
+                // Ensure password hash matches web API format (SHA256 base64)
+                var expectedHash = HashPassword("password123");
+                if (testStudent.PasswordHash != expectedHash)
+                {
+                    testStudent.PasswordHash = expectedHash;
+                    testStudent.IsActive = true;
+                    context.SaveChanges();
+                    Console.WriteLine("✅ Test student password updated to web format");
+                }
+            }
         }
 
         private static void EnsureTablesCreated(EduSyncDbContext context)

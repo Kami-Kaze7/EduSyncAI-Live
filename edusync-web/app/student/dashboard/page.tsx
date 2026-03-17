@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { studentApi } from '@/lib/studentApi';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import DashboardLayout from '@/components/DashboardLayout';
 
 export default function StudentDashboard() {
     const router = useRouter();
@@ -130,12 +131,36 @@ export default function StudentDashboard() {
         router.push('/student/login');
     };
 
+    const studentUser = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('studentUser') || '{"fullName":"Student"}') : { fullName: 'Student' };
+
+    const { data: profile } = useQuery<any>({
+        queryKey: ['student-profile'],
+        queryFn: studentApi.getProfile,
+    });
+
+    const studentNav = [
+        { id: 'courses', label: 'Courses', icon: '📚' },
+        { id: 'summaries', label: 'Summaries', icon: '📄' },
+        { id: 'whiteboards', label: 'Whiteboards', icon: '🖊️' },
+        { id: 'attendance', label: 'Attendance', icon: '📋' },
+        { id: 'profile', label: 'Profile', icon: '👤' },
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <DashboardLayout
+            role="student"
+            userName={studentUser?.fullName || 'Student'}
+            profileImage={profile?.photoPath ? `${API_SERVER_URL}${profile.photoPath}` : undefined}
+            navItems={studentNav}
+            activeNav={activeTab}
+            onNavChange={(id) => setActiveTab(id as any)}
+            onLogout={handleLogout}
+        >
+            <div>
             {/* Live Now Banner */}
             {liveStreams.length > 0 && (
-                <div className="bg-gradient-to-r from-red-600 to-pink-600 text-white">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div className="bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-2xl mb-6 overflow-hidden">
+                    <div className="px-6 py-3">
                         {liveStreams.map((stream: any) => (
                             <div key={stream.sessionId} className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -157,76 +182,6 @@ export default function StudentDashboard() {
                     </div>
                 </div>
             )}
-            {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
-                        <p className="text-sm text-gray-600">Welcome back!</p>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </header>
-
-            {/* Tabs */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-                <div className="border-b border-gray-200">
-                    <nav className="-mb-px flex space-x-8">
-                        <button
-                            onClick={() => setActiveTab('courses')}
-                            className={`${activeTab === 'courses'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Courses
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('summaries')}
-                            className={`${activeTab === 'summaries'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Class Summaries
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('whiteboards')}
-                            className={`${activeTab === 'whiteboards'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Whiteboards
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('attendance')}
-                            className={`${activeTab === 'attendance'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Attendance
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('profile')}
-                            className={`${activeTab === 'profile'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Profile
-                        </button>
-                    </nav>
-                </div>
-
-                {/* Content */}
-                <div className="mt-8">
                     {activeTab === 'courses' && <CoursesTab />}
                     {activeTab === 'summaries' && <SummariesTab setSelectedSummary={setSelectedSummary} setShowSummaryView={setShowSummaryView} />}
                     {activeTab === 'profile' && <ProfileTab />}
@@ -249,7 +204,7 @@ export default function StudentDashboard() {
                                         };
                                         fetchAllWhiteboards();
                                     }}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center text-sm font-medium"
+                                    className="p-2 text-[#FF6B35] hover:bg-[#FFF3E0] rounded-lg transition-colors flex items-center text-sm font-medium"
                                 >
                                     <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -260,7 +215,7 @@ export default function StudentDashboard() {
 
                             {isFetchingAllWhiteboards ? (
                                 <div className="flex justify-center py-20">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B35]"></div>
                                 </div>
                             ) : allWhiteboards.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -296,14 +251,14 @@ export default function StudentDashboard() {
                                                             )}
                                                             <h3 className="text-base font-bold text-gray-900 truncate" title={wb.fileName}>{wb.fileName}</h3>
                                                         </div>
-                                                        <p className="text-xs font-medium text-blue-600 uppercase tracking-wider mt-1">{wb.courseCode} • {wb.courseName}</p>
+                                                        <p className="text-xs font-medium text-[#FF6B35] uppercase tracking-wider mt-1">{wb.courseCode} • {wb.courseName}</p>
                                                     </div>
                                                     <a
                                                         href={`${API_BASE_URL}/materials/${wb.id}/download`}
                                                         download={wb.fileName}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                        className="p-2 bg-[#FFF3E0] text-[#FF6B35] rounded-xl hover:bg-[#FF6B35] hover:text-white transition-all shadow-sm"
                                                         title="Download"
                                                     >
                                                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -338,7 +293,7 @@ export default function StudentDashboard() {
 
                             {isFetchingAttendance ? (
                                 <div className="flex justify-center py-20">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B35]"></div>
                                 </div>
                             ) : attendanceRecords.length > 0 ? (
                                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -367,7 +322,7 @@ export default function StudentDashboard() {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${record.checkInMethod === 'Fingerprint'
-                                                                ? 'bg-blue-100 text-blue-800'
+                                                                ? 'bg-[#FFF3E0] text-[#FF6B35]'
                                                                 : 'bg-indigo-100 text-indigo-800'
                                                             }`}>
                                                             {record.checkInMethod}
@@ -388,8 +343,8 @@ export default function StudentDashboard() {
                                 </div>
                             ) : (
                                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
-                                    <div className="bg-blue-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <svg className="h-10 w-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="bg-[#FFF3E0] h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <svg className="h-10 w-10 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                     </div>
@@ -652,8 +607,7 @@ export default function StudentDashboard() {
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
+        </DashboardLayout>
     );
 }
 
@@ -727,7 +681,7 @@ function CoursesTab() {
                             <button
                                 onClick={() => enrollMutation.mutate(course.id)}
                                 disabled={enrollMutation.isPending}
-                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                className="w-full px-4 py-2 bg-[#FF6B35] text-white rounded-lg hover:bg-[#E55A2B] transition-colors disabled:opacity-50"
                             >
                                 {enrollMutation.isPending ? 'Enrolling...' : 'Enroll'}
                             </button>
@@ -788,7 +742,7 @@ function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedS
                     <h2 className="text-2xl font-bold text-gray-900">Weekly AI Teaching Summaries</h2>
                     <p className="text-sm text-gray-500 mt-1">Review your AI-generated summaries organized by course.</p>
                 </div>
-                <div className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full">
+                <div className="text-xs font-semibold text-[#FF6B35] bg-[#FFF3E0] border border-[#FFD0B0] px-3 py-1.5 rounded-full">
                     {summaries.length} Total Summaries
                 </div>
             </div>
@@ -799,8 +753,8 @@ function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedS
                     <button
                         onClick={() => setSelectedCourseId('all')}
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${selectedCourseId === 'all'
-                            ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
-                            : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                            ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FFF3E0]'
+                            : 'bg-white text-gray-600 border border-gray-200 hover:border-[#FF6B35] hover:text-[#FF6B35]'
                             }`}
                     >
                         All Courses
@@ -810,8 +764,8 @@ function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedS
                             key={course.id}
                             onClick={() => setSelectedCourseId(course.id)}
                             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${selectedCourseId === course.id
-                                ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                                ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FFF3E0]'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:border-[#FF6B35] hover:text-[#FF6B35]'
                                 }`}
                         >
                             {course.code}
@@ -839,13 +793,13 @@ function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedS
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredSummaries.map((summary: any) => (
-                                    <tr key={`${summary.type}-${summary.id}`} className="hover:bg-blue-50/50 transition-colors">
+                                    <tr key={`${summary.type}-${summary.id}`} className="hover:bg-[#FFF3E0]/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-bold text-gray-900">{summary.courseCode}</div>
                                             <div className="text-[10px] text-gray-500 uppercase tracking-tight">{summary.courseName}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-full ${summary.type === 'Weekly' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                                            <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-full ${summary.type === 'Weekly' ? 'bg-purple-100 text-purple-700' : 'bg-[#FFF3E0] text-[#FF6B35]'}`}>
                                                 {summary.type === 'Weekly' ? `Week ${summary.weekNumber}` : 'Day Summary'}
                                             </span>
                                         </td>
@@ -862,7 +816,7 @@ function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedS
                                                     setSelectedSummary(summary);
                                                     setShowSummaryView(true);
                                                 }}
-                                                className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transform active:scale-95 transition-all shadow-sm hover:shadow-md"
+                                                className="px-4 py-2 bg-[#FF6B35] text-white text-xs font-bold rounded-lg hover:bg-[#E55A2B] transform active:scale-95 transition-all shadow-sm hover:shadow-md"
                                             >
                                                 View Teaching
                                             </button>
@@ -960,7 +914,7 @@ function ProfileTab() {
                     {!editing && (
                         <button
                             onClick={() => setEditing(true)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            className="px-4 py-2 bg-[#FF6B35] text-white rounded-lg hover:bg-[#E55A2B] transition-colors"
                         >
                             Edit Profile
                         </button>
@@ -993,7 +947,7 @@ function ProfileTab() {
                                         type="file"
                                         accept="image/*"
                                         onChange={handlePhotoChange}
-                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#FFF3E0] file:text-[#FF6B35] hover:file:bg-[#FFF3E0]"
                                     />
                                 </label>
                             </div>
@@ -1008,7 +962,7 @@ function ProfileTab() {
                                     type="text"
                                     value={formData.fullName}
                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]"
                                 />
                             </div>
 
@@ -1020,7 +974,7 @@ function ProfileTab() {
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]"
                                 />
                             </div>
 
@@ -1032,7 +986,7 @@ function ProfileTab() {
                                     type="number"
                                     value={formData.age}
                                     onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]"
                                 />
                             </div>
 
@@ -1045,7 +999,7 @@ function ProfileTab() {
                                     value={formData.hobbies}
                                     onChange={(e) => setFormData({ ...formData, hobbies: e.target.value })}
                                     placeholder="e.g., Reading, Sports, Music"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]"
                                 />
                             </div>
                         </div>
@@ -1059,7 +1013,7 @@ function ProfileTab() {
                                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                                 rows={4}
                                 placeholder="Tell us about yourself..."
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]"
                             />
                         </div>
 
@@ -1077,7 +1031,7 @@ function ProfileTab() {
                             <button
                                 type="submit"
                                 disabled={updateMutation.isPending}
-                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                className="flex-1 px-4 py-2 bg-[#FF6B35] text-white rounded-lg hover:bg-[#E55A2B] disabled:opacity-50"
                             >
                                 {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                             </button>
@@ -1132,3 +1086,5 @@ function ProfileTab() {
         </div>
     );
 }
+
+

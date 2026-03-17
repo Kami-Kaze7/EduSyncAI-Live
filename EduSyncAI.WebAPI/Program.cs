@@ -5,6 +5,16 @@ using EduSyncAI.WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Increase upload size limits for video recordings
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 250 * 1024 * 1024; // 250MB
+});
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 250 * 1024 * 1024; // 250MB
+});
+
 // Add services to the container
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

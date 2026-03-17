@@ -638,10 +638,20 @@ namespace EduSyncAI
                         fileContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("video/mp4");
                         content.Add(fileContent, "file", fileName);
 
+                        System.Diagnostics.Debug.WriteLine($"Uploading recording to {AppConfig.ServerUrl}/api/materials/session/{sessionId}...");
                         var response = await client.PostAsync($"api/materials/session/{sessionId}", content);
                         if (response.IsSuccessStatusCode)
                         {
                             System.Diagnostics.Debug.WriteLine($"Recording uploaded: {fileName}");
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                                System.Windows.MessageBox.Show($"Recording uploaded successfully!\n{fileName}", "Upload Complete", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information));
+                        }
+                        else
+                        {
+                            var errorBody = await response.Content.ReadAsStringAsync();
+                            System.Diagnostics.Debug.WriteLine($"Upload failed: {response.StatusCode} - {errorBody}");
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                                System.Windows.MessageBox.Show($"Recording upload failed!\nStatus: {response.StatusCode}\n{errorBody}", "Upload Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning));
                         }
                     }
                 }
@@ -649,6 +659,8 @@ namespace EduSyncAI
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error uploading recording: {ex.Message}");
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    System.Windows.MessageBox.Show($"Recording upload error:\n{ex.Message}", "Upload Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning));
             }
         }
 

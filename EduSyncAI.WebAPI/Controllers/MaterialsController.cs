@@ -164,6 +164,26 @@ namespace EduSyncAI.WebAPI.Controllers
                     return BadRequest(new { error = "File size exceeds 200MB limit" });
                 }
 
+                // Ensure the session exists on the server (desktop app creates sessions locally)
+                var session = await _context.ClassSessions.FindAsync(sessionId);
+                if (session == null)
+                {
+                    _logger.LogInformation("Session {SessionId} not found on server, creating placeholder.", sessionId);
+                    var placeholder = new ClassSession
+                    {
+                        Id = sessionId,
+                        CourseId = 1,
+                        LectureId = 1,
+                        SessionState = "Ended",
+                        StartTime = DateTime.UtcNow.ToString("O"),
+                        EndTime = DateTime.UtcNow.ToString("O"),
+                        CreatedAt = DateTime.UtcNow.ToString("O"),
+                        Topic = "Desktop Recording Session"
+                    };
+                    _context.ClassSessions.Add(placeholder);
+                    await _context.SaveChangesAsync();
+                }
+
                 // Create materials directory
                 var materialsPath = Path.Combine(_environment.ContentRootPath, "..", "Data", "LectureMaterials");
                 Directory.CreateDirectory(materialsPath);
@@ -197,7 +217,8 @@ namespace EduSyncAI.WebAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error uploading material for session {SessionId}", sessionId);
-                return StatusCode(500, new { error = "Failed to upload material" });
+                var innerMsg = ex.InnerException?.Message ?? "No inner exception";
+                return StatusCode(500, new { error = $"Failed to upload material: {ex.Message} | Inner: {innerMsg}" });
             }
         }
 

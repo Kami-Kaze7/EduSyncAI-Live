@@ -57,7 +57,12 @@ export default function LiveClassroomPage() {
         return () => clearInterval(interval);
     }, [streamInfo]);
 
-    const jitsiUrl = streamInfo ? `https://meet.jit.si/${streamInfo.roomName}` : '';
+    const studentUser = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('studentUser') || '{"fullName":"Student"}') : { fullName: 'Student' };
+    const safeDisplayName = encodeURIComponent(studentUser.fullName);
+
+    const jitsiUrl = streamInfo 
+        ? `https://meet.jit.si/${streamInfo.roomName}#config.prejoinPageEnabled=false&config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.disableDeepLinking=true&config.hideConferenceSubject=true&userInfo.displayName=%22${safeDisplayName}%22&interfaceConfig.SHOW_JITSI_WATERMARK=false&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false&interfaceConfig.TOOLBAR_BUTTONS=%5B%22microphone%22,%22camera%22,%22chat%22,%22raisehand%22,%22tileview%22%5D` 
+        : '';
     const mjpegUrl = streamInfo ? `/api/stream/${streamInfo.sessionId}/video` : '';
 
     if (isLoading) {
@@ -171,85 +176,23 @@ export default function LiveClassroomPage() {
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Main Content - Embedded Jitsi */}
             <div style={{
                 flex: 1,
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '24px'
+                flexDirection: 'column',
+                position: 'relative'
             }}>
-                <div style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '20px',
-                    padding: '48px 40px',
-                    maxWidth: '500px',
-                    width: '100%',
-                    textAlign: 'center'
-                }}>
-                    {/* Course Info */}
-                    <div style={{ fontSize: '48px', marginBottom: '20px' }}>🎓</div>
-                    <h1 style={{
-                        color: 'white',
-                        fontSize: '24px',
-                        fontWeight: 700,
-                        margin: '0 0 8px 0'
-                    }}>
-                        {streamInfo.courseName}
-                    </h1>
-                    <p style={{ color: '#888', fontSize: '14px', margin: '0 0 32px 0' }}>
-                        Session #{sessionId} • Live since {elapsed}
-                    </p>
-
-                    {/* Join Button */}
-                    <a
-                        href={jitsiUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '16px 36px',
-                            background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                            color: 'white',
-                            textDecoration: 'none',
-                            borderRadius: '12px',
-                            fontSize: '18px',
-                            fontWeight: 700,
-                            boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)',
-                            transition: 'transform 0.2s, box-shadow 0.2s'
-                        }}
-                    >
-                        📹 Join Live Class
-                    </a>
-
-                    <p style={{ color: '#666', fontSize: '13px', marginTop: '20px', lineHeight: 1.6 }}>
-                        Opens Jitsi Meet in a new tab.<br/>
-                        Sign in with your Google or GitHub account to join.
-                    </p>
-
-                    {/* Room Info */}
-                    <div style={{
-                        marginTop: '32px',
-                        padding: '16px',
-                        background: 'rgba(255,255,255,0.03)',
-                        borderRadius: '10px',
-                        border: '1px solid rgba(255,255,255,0.06)'
-                    }}>
-                        <p style={{ color: '#555', fontSize: '12px', margin: '0 0 4px 0' }}>Room Name</p>
-                        <p style={{
-                            color: '#aaa',
-                            fontSize: '14px',
-                            fontFamily: 'monospace',
-                            margin: 0,
-                            wordBreak: 'break-all'
-                        }}>
-                            {streamInfo.roomName}
-                        </p>
-                    </div>
-                </div>
+                <iframe
+                    src={jitsiUrl}
+                    allow="camera; microphone; display-capture; autoplay; clipboard-write"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                    }}
+                    title="Live Class"
+                />
             </div>
 
             {/* PiP Lecturer Camera Overlay */}

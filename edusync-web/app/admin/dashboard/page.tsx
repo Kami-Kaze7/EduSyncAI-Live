@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/adminApi';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import DashboardLayout from '@/components/DashboardLayout';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -27,55 +28,27 @@ export default function AdminDashboard() {
         router.push('/admin/login');
     };
 
+    const adminUser = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('adminUser') || '{"fullName":"Admin"}') : { fullName: 'Admin' };
+
+    const adminNav = [
+        { id: 'lecturers', label: 'Lecturers', icon: '👨‍🏫' },
+        { id: 'students', label: 'Students', icon: '👨‍🎓' },
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-                        <p className="text-sm text-gray-600">Manage lecturers and students</p>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </header>
-
-            {/* Tabs */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-                <div className="border-b border-gray-200">
-                    <nav className="-mb-px flex space-x-8">
-                        <button
-                            onClick={() => setActiveTab('lecturers')}
-                            className={`${activeTab === 'lecturers'
-                                    ? 'border-indigo-500 text-indigo-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Lecturers
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('students')}
-                            className={`${activeTab === 'students'
-                                    ? 'border-indigo-500 text-indigo-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            Students
-                        </button>
-                    </nav>
-                </div>
-
-                {/* Content */}
-                <div className="mt-8">
-                    {activeTab === 'lecturers' ? <LecturersTab /> : <StudentsTab />}
-                </div>
+        <DashboardLayout
+            role="admin"
+            userName={adminUser?.fullName || 'Admin'}
+            navItems={adminNav}
+            activeNav={activeTab}
+            onNavChange={(id) => setActiveTab(id as any)}
+            onLogout={handleLogout}
+        >
+            {/* Content */}
+            <div>
+                {activeTab === 'lecturers' ? <LecturersTab /> : <StudentsTab />}
             </div>
-        </div>
+        </DashboardLayout>
     );
 }
 
