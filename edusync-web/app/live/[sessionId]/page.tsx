@@ -61,7 +61,7 @@ export default function LiveClassroomPage() {
     const safeDisplayName = encodeURIComponent(studentUser.fullName);
 
     const jitsiUrl = streamInfo 
-        ? `https://meet.jit.si/${streamInfo.roomName}#config.prejoinPageEnabled=false&config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.disableDeepLinking=true&config.hideConferenceSubject=true&userInfo.displayName=%22${safeDisplayName}%22&interfaceConfig.SHOW_JITSI_WATERMARK=false&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false&interfaceConfig.TOOLBAR_BUTTONS=%5B%22microphone%22,%22camera%22,%22chat%22,%22raisehand%22,%22tileview%22%5D` 
+        ? `https://meet.jit.si/${streamInfo.roomName}#config.prejoinConfig.enabled=false&config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.disableDeepLinking=true&config.hideConferenceSubject=true&userInfo.displayName=%22${safeDisplayName}%22&interfaceConfig.SHOW_JITSI_WATERMARK=false&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false&interfaceConfig.TOOLBAR_BUTTONS=%5B%22microphone%22,%22camera%22,%22chat%22,%22raisehand%22,%22tileview%22%5D` 
         : '';
     const mjpegUrl = streamInfo ? `/api/stream/${streamInfo.sessionId}/video` : '';
 

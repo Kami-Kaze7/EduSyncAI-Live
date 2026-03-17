@@ -81,7 +81,7 @@ namespace EduSyncAI
             var safeSubject = Uri.EscapeDataString(_courseName + " — Live Class");
 
             return $"https://meet.jit.si/{roomName}" +
-                   $"#config.prejoinPageEnabled=false" +
+                   $"#config.prejoinConfig.enabled=false" +
                    $"&config.startWithAudioMuted=false" +
                    $"&config.startWithVideoMuted=false" +
                    $"&config.disableDeepLinking=true" +
