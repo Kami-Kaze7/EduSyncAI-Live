@@ -91,7 +91,7 @@ namespace EduSyncAI
                    $"&interfaceConfig.SHOW_JITSI_WATERMARK=false" +
                    $"&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false" +
                    $"&interfaceConfig.TOOLBAR_ALWAYS_VISIBLE=true" +
-                   $"&interfaceConfig.TOOLBAR_BUTTONS=%5B%22microphone%22,%22camera%22,%22chat%22,%22raisehand%22,%22tileview%22%5D";
+                   $"&interfaceConfig.TOOLBAR_BUTTONS=%5B%22microphone%22,%22camera%22,%22desktop%22,%22chat%22,%22raisehand%22,%22tileview%22%5D";
         }
 
         /// <summary>
