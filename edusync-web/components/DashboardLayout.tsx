@@ -47,7 +47,7 @@ export default function DashboardLayout({
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-[#F5F6FA] flex">
+    <div className="h-screen bg-[#F5F6FA] flex overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -174,7 +174,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Page Content */}
-        <div className="flex-1 px-4 lg:px-8 py-6">
+        <div className="flex-1 px-4 lg:px-8 py-6 overflow-y-auto">
           {children}
         </div>
       </div>

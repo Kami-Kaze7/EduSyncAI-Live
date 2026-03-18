@@ -17,8 +17,7 @@ const lecturerNav = [
   { id: 'overview', label: 'Dashboard', icon: '📊' },
   { id: 'courses', label: 'Courses', icon: '🎓' },
   { id: 'schedule', label: 'Schedule', icon: '📅' },
-  { id: 'lectures', label: 'Preparation', icon: '📝' },
-  { id: 'whiteboards', label: 'Whiteboards', icon: '🖊️' },
+  { id: 'whiteboards', label: 'Recorded Lectures', icon: '🎥' },
   { id: 'attendance', label: 'Attendance', icon: '📋' },
 ];
 
@@ -68,82 +67,24 @@ function OverviewTab() {
 
 /* ─── Courses Tab ─── */
 function CoursesTab() {
-  const [isCreating, setIsCreating] = useState(false);
-  const [newCourse, setNewCourse] = useState({ courseCode: '', courseName: '', description: '', creditHours: 3, lecturerId: 1 });
-  const queryClient = useQueryClient();
-
   const { data: courses, isLoading } = useQuery({ queryKey: ['courses'], queryFn: () => courseApi.getAll() });
-
-  const createMutation = useMutation({
-    mutationFn: courseApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success('Course created successfully!');
-      setIsCreating(false);
-      setNewCourse({ courseCode: '', courseName: '', description: '', creditHours: 3, lecturerId: 1 });
-    },
-    onError: () => toast.error('Failed to create course'),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: courseApi.delete,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['courses'] }); toast.success('Course deleted!'); },
-    onError: () => toast.error('Failed to delete course'),
-  });
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-[#1A1A2E]">Course Management</h3>
-        <button onClick={() => setIsCreating(true)} className="flex items-center gap-2 bg-[#FF6B35] text-white px-4 py-2 rounded-lg hover:bg-[#e55a2b] transition-colors text-sm font-medium">
-          <PlusIcon className="h-4 w-4" /> New Course
-        </button>
+      <div className="mb-6">
+        <h3 className="text-lg font-bold text-[#1A1A2E]">My Courses</h3>
+        <p className="text-sm text-gray-400 mt-0.5">Courses assigned to you by the institution</p>
       </div>
 
-      {/* Create Course Modal */}
-      {isCreating && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Create New Course</h2>
-            <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(newCourse); }} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Course Code</label>
-                <input type="text" required value={newCourse.courseCode} onChange={(e) => setNewCourse({ ...newCourse, courseCode: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent" placeholder="e.g., CS101" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Course Name</label>
-                <input type="text" required value={newCourse.courseName} onChange={(e) => setNewCourse({ ...newCourse, courseName: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent" placeholder="e.g., Introduction to Programming" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea value={newCourse.description} onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent" placeholder="Course description..." />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Credit Hours</label>
-                <input type="number" required min="1" max="6" value={newCourse.creditHours} onChange={(e) => setNewCourse({ ...newCourse, creditHours: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent" />
-              </div>
-              <div className="flex space-x-4 pt-4">
-                <button type="submit" disabled={createMutation.isPending} className="flex-1 bg-[#FF6B35] text-white px-6 py-3 rounded-lg hover:bg-[#e55a2b] transition-colors disabled:opacity-50">{createMutation.isPending ? 'Creating...' : 'Create Course'}</button>
-                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Courses Grid */}
       {isLoading ? (
         <div className="text-center py-12"><div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B35]" /><p className="mt-4 text-gray-600">Loading courses...</p></div>
       ) : courses && courses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course: Course) => (
             <div key={course.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{course.courseCode}</h3>
-                  <p className="text-sm text-gray-600">{course.creditHours} Credit Hours</p>
-                </div>
-                <button onClick={() => { if (confirm('Delete this course?')) deleteMutation.mutate(course.id); }} className="text-red-500 hover:text-red-700 text-sm">Delete</button>
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-gray-900">{course.courseCode}</h3>
+                <p className="text-sm text-gray-600">{course.creditHours} Credit Hours</p>
               </div>
               <h4 className="text-xl font-semibold text-gray-800 mb-2">{course.courseName}</h4>
               {course.description && <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.description}</p>}
@@ -157,129 +98,186 @@ function CoursesTab() {
       ) : (
         <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
           <AcademicCapIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses yet</h3>
-          <p className="text-gray-600 mb-6">Get started by creating your first course</p>
-          <button onClick={() => setIsCreating(true)} className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-lg hover:bg-[#e55a2b] transition-colors"><PlusIcon className="h-5 w-5" /> Create Course</button>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses assigned</h3>
+          <p className="text-gray-600">Courses will appear here once assigned by the institution.</p>
         </div>
       )}
     </div>
   );
 }
 
-/* ─── Schedule Tab ─── */
+/* ─── Schedule Tab — Monthly Calendar Timetable ─── */
+const LECTURER_SEMESTER_START = new Date(2025, 0, 6);
+const LECTURER_SEMESTER_WEEKS = 12;
+
+interface LecturerCourseSlot {
+  code: string;
+  title: string;
+  days: number[]; // 0=Sun..6=Sat
+  startTime: string;
+  endTime: string;
+  room: string;
+  color: string;
+  bgColor: string;
+  dotColor: string;
+}
+
+const LECTURER_COURSES: LecturerCourseSlot[] = [
+  { code: 'CSC301', title: 'Data Structures', days: [1, 3, 5], startTime: '08:00', endTime: '09:00', room: 'LT-A', color: '#7c3aed', bgColor: '#f3e8ff', dotColor: '#7c3aed' },
+  { code: 'CSC307', title: 'Software Eng.', days: [1, 3, 5], startTime: '10:00', endTime: '11:00', room: 'LT-C', color: '#ea580c', bgColor: '#ffedd5', dotColor: '#ea580c' },
+  { code: 'CSC311', title: 'Artificial Intelligence', days: [1, 3], startTime: '11:30', endTime: '12:30', room: 'LT-B', color: '#059669', bgColor: '#d1fae5', dotColor: '#059669' },
+  { code: 'EEE301', title: 'Signal Processing', days: [1, 3, 5], startTime: '14:00', endTime: '15:00', room: 'Lab-2', color: '#db2777', bgColor: '#fce7f3', dotColor: '#db2777' },
+];
+
+const L_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const L_DAY_HEADERS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function getLecturerCoursesForDate(date: Date): LecturerCourseSlot[] {
+  const dayOfWeek = date.getDay();
+  const semEnd = new Date(LECTURER_SEMESTER_START);
+  semEnd.setDate(semEnd.getDate() + LECTURER_SEMESTER_WEEKS * 7);
+  if (date < LECTURER_SEMESTER_START || date >= semEnd) return [];
+  return LECTURER_COURSES.filter(c => c.days.includes(dayOfWeek));
+}
+
 function ScheduleTab() {
-  const [isCreating, setIsCreating] = useState(false);
-  const [newSession, setNewSession] = useState({ courseId: 0, scheduledDate: '', topic: '', location: '', durationMinutes: 60, status: 'Scheduled' as const });
-  const queryClient = useQueryClient();
+  const [viewMonth, setViewMonth] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const { data: sessions, isLoading } = useQuery({ queryKey: ['sessions'], queryFn: () => sessionApi.getAll() });
-  const { data: courses } = useQuery({ queryKey: ['courses'], queryFn: () => courseApi.getAll() });
+  const year = 2025;
+  const month = viewMonth;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const today = new Date();
+  const isToday = (d: number) => today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
 
-  const createMutation = useMutation({
-    mutationFn: sessionApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      toast.success('Session scheduled!');
-      setIsCreating(false);
-      setNewSession({ courseId: 0, scheduledDate: '', topic: '', location: '', durationMinutes: 60, status: 'Scheduled' });
-    },
-    onError: () => toast.error('Failed to create session'),
-  });
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
 
-  const deleteMutation = useMutation({
-    mutationFn: sessionApi.delete,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['sessions'] }); toast.success('Session deleted!'); },
-    onError: () => toast.error('Failed to delete session'),
-  });
-
-  const getCourseName = (courseId: number) => {
-    const c = courses?.find((c: Course) => c.id === courseId);
-    return c ? `${c.courseCode} - ${c.courseName}` : 'Unknown Course';
-  };
-
-  const formatDate = (d: string) => new Date(d).toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const selCourses = selectedDate ? getLecturerCoursesForDate(selectedDate) : [];
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-[#1A1A2E]">Lecture Schedule</h3>
-        <button onClick={() => setIsCreating(true)} className="flex items-center gap-2 bg-[#FF6B35] text-white px-4 py-2 rounded-lg hover:bg-[#e55a2b] transition-colors text-sm font-medium">
-          <PlusIcon className="h-4 w-4" /> New Session
-        </button>
+    <div className="space-y-5 pb-10">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Teaching Schedule 📅</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Your lecture timetable for the semester</p>
+        </div>
+        <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+          <button className="px-4 py-1.5 text-xs font-bold rounded-full bg-[#FF6B35] text-white shadow-sm">Month</button>
+          <button className="px-4 py-1.5 text-xs font-medium rounded-full text-gray-500 hover:text-gray-700 transition-colors">Week</button>
+          <button className="px-4 py-1.5 text-xs font-medium rounded-full text-gray-500 hover:text-gray-700 transition-colors">Day</button>
+        </div>
       </div>
 
-      {isCreating && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Schedule New Session</h2>
-            <form onSubmit={(e) => { e.preventDefault(); if (newSession.courseId === 0) { toast.error('Select a course'); return; } createMutation.mutate(newSession); }} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Course *</label>
-                <select required value={newSession.courseId} onChange={(e) => setNewSession({ ...newSession, courseId: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]">
-                  <option value={0}>Select a course...</option>
-                  {courses?.map((c: Course) => <option key={c.id} value={c.id}>{c.courseCode} - {c.courseName}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Date & Time *</label>
-                <input type="datetime-local" required value={newSession.scheduledDate} onChange={(e) => setNewSession({ ...newSession, scheduledDate: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Topic</label>
-                <input type="text" value={newSession.topic} onChange={(e) => setNewSession({ ...newSession, topic: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]" placeholder="e.g., Introduction to Variables" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                <input type="text" value={newSession.location} onChange={(e) => setNewSession({ ...newSession, location: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]" placeholder="e.g., Room 101" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Duration (min)</label>
-                <input type="number" required min="15" max="240" step="15" value={newSession.durationMinutes} onChange={(e) => setNewSession({ ...newSession, durationMinutes: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF6B35]" />
-              </div>
-              <div className="flex space-x-4 pt-4">
-                <button type="submit" disabled={createMutation.isPending} className="flex-1 bg-[#FF6B35] text-white px-6 py-3 rounded-lg hover:bg-[#e55a2b] disabled:opacity-50">{createMutation.isPending ? 'Scheduling...' : 'Schedule Session'}</button>
-                <button type="button" onClick={() => setIsCreating(false)} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300">Cancel</button>
-              </div>
-            </form>
+      <div className="flex flex-col lg:flex-row gap-5">
+        {/* Main Calendar */}
+        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <h3 className="text-lg font-bold text-gray-900">{L_MONTH_NAMES[month]} {year}</h3>
+              <span className="text-xs bg-orange-100 text-[#FF6B35] font-bold px-2 py-0.5 rounded-full">{LECTURER_COURSES.length} courses</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setViewMonth(m => Math.max(0, m - 1))} disabled={viewMonth === 0} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
+                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button onClick={() => setViewMonth(m => Math.min(2, m + 1))} disabled={viewMonth >= 2} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
+                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 border-b border-gray-100">
+            {L_DAY_HEADERS.map(d => (
+              <div key={d} className="px-2 py-3 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">{d}</div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7">
+            {cells.map((day, idx) => {
+              if (day === null) return <div key={`e-${idx}`} className="min-h-[100px] bg-gray-50/50 border-b border-r border-gray-50" />;
+              const date = new Date(year, month, day);
+              const courses = getLecturerCoursesForDate(date);
+              const dayIsToday = isToday(day);
+              const isSel = selectedDate?.getDate() === day && selectedDate?.getMonth() === month;
+              return (
+                <div key={day} onClick={() => setSelectedDate(date)} className={`min-h-[100px] p-1.5 border-b border-r border-gray-100 cursor-pointer transition-all hover:bg-orange-50/50 ${isSel ? 'bg-orange-50 ring-2 ring-[#FF6B35] ring-inset' : ''}`}>
+                  <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${dayIsToday ? 'bg-[#FF6B35] text-white' : 'text-gray-700'}`}>{day}</div>
+                  <div className="space-y-0.5">
+                    {courses.slice(0, 3).map(c => (
+                      <div key={c.code} className="rounded-md px-1.5 py-0.5 text-[10px] font-bold truncate leading-tight" style={{ backgroundColor: c.bgColor, color: c.color }} title={`${c.code} — ${c.title}\n${c.startTime} – ${c.endTime} • ${c.room}`}>
+                        {c.code} <span className="font-normal opacity-70">{c.startTime}</span>
+                      </div>
+                    ))}
+                    {courses.length > 3 && <div className="text-[9px] font-bold text-[#FF6B35] pl-1">+{courses.length - 3} more</div>}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
 
-      {isLoading ? (
-        <div className="text-center py-12"><div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B35]" /><p className="mt-4 text-gray-600">Loading schedule...</p></div>
-      ) : sessions && sessions.length > 0 ? (
-        <div className="space-y-4">
-          {sessions.map((session: ClassSession) => (
-            <div key={session.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${session.status === 'Scheduled' ? 'bg-blue-100 text-blue-800' : session.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{session.status}</span>
-                    <span className="text-sm text-gray-600">{session.durationMinutes} min</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{getCourseName(session.courseId)}</h3>
-                  {session.topic && <p className="text-gray-700 mb-2">Topic: {session.topic}</p>}
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <span>📅 {formatDate(session.scheduledDate)}</span>
-                    {session.location && <span>📍 {session.location}</span>}
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <Link href={`/lectures/${session.id}`} className="text-[#FF6B35] hover:text-[#e55a2b] text-sm font-medium">Prepare Lecture →</Link>
-                  <button onClick={() => { if (confirm('Delete this session?')) deleteMutation.mutate(session.id); }} className="text-red-500 hover:text-red-700 text-sm">Delete</button>
-                </div>
+        {/* Right Sidebar */}
+        <div className="w-full lg:w-[280px] space-y-5 flex-shrink-0">
+          {/* Mini Calendar */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-bold text-gray-900">{L_MONTH_NAMES[month]} {year}</h4>
+              <div className="flex gap-1">
+                <button onClick={() => setViewMonth(m => Math.max(0, m - 1))} disabled={viewMonth === 0} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+                <button onClick={() => setViewMonth(m => Math.min(2, m + 1))} disabled={viewMonth >= 2} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
               </div>
             </div>
-          ))}
+            <div className="grid grid-cols-7 gap-0.5 text-center">
+              {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => <div key={d} className="text-[10px] font-bold text-gray-400 py-1">{d}</div>)}
+              {cells.map((day, idx) => (
+                <button key={idx} onClick={() => day && setSelectedDate(new Date(year, month, day))} disabled={!day} className={`text-[11px] py-1 rounded-full font-medium transition-all ${!day ? 'invisible' : isToday(day!) ? 'bg-[#FF6B35] text-white font-bold' : selectedDate?.getDate() === day && selectedDate?.getMonth() === month ? 'bg-orange-100 text-[#FF6B35] font-bold' : 'text-gray-600 hover:bg-orange-50'}`}>{day || ''}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Day Detail */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-bold text-gray-900">{selectedDate ? `${L_DAY_HEADERS[selectedDate.getDay()]}, ${L_MONTH_NAMES[selectedDate.getMonth()]} ${selectedDate.getDate()}` : 'Today\'s Classes'}</h4>
+              <span className="text-[10px] font-bold text-[#FF6B35] bg-orange-50 px-2 py-0.5 rounded-full">{selCourses.length || getLecturerCoursesForDate(today).length} classes</span>
+            </div>
+            <div className="space-y-2">
+              {(selCourses.length > 0 ? selCourses : getLecturerCoursesForDate(today)).map(c => (
+                <div key={c.code} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                  <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-gray-900 truncate">{c.title}</p>
+                    <p className="text-[10px] text-gray-400">{c.startTime} – {c.endTime} • {c.room}</p>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.bgColor, color: c.color }}>{c.code}</span>
+                </div>
+              ))}
+              {selCourses.length === 0 && getLecturerCoursesForDate(today).length === 0 && (
+                <p className="text-xs text-gray-400 text-center py-4">No classes scheduled</p>
+              )}
+            </div>
+          </div>
+
+          {/* Course Legend */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <h4 className="text-sm font-bold text-gray-900 mb-3">My Teaching Load</h4>
+            <div className="space-y-2">
+              {LECTURER_COURSES.map(c => (
+                <div key={c.code} className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
+                  <span className="text-[11px] font-bold text-gray-700">{c.code}</span>
+                  <span className="text-[10px] text-gray-400 truncate">{c.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
-          <CalendarIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No sessions scheduled</h3>
-          <p className="text-gray-600 mb-6">Get started by scheduling your first lecture</p>
-          <button onClick={() => setIsCreating(true)} className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-lg hover:bg-[#e55a2b]"><PlusIcon className="h-5 w-5" /> Schedule Session</button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

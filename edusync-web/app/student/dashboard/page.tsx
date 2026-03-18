@@ -10,7 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 
 export default function StudentDashboard() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'courses' | 'summaries' | 'profile' | 'whiteboards' | 'attendance'>('courses');
+    const [activeTab, setActiveTab] = useState<'courses' | 'profile' | 'whiteboards' | 'attendance'>('courses');
     const [allWhiteboards, setAllWhiteboards] = useState<any[]>([]);
     const [isFetchingAllWhiteboards, setIsFetchingAllWhiteboards] = useState(false);
     const [attendanceRecords, setAttendanceRecords] = useState<any[]>([]);
@@ -140,8 +140,7 @@ export default function StudentDashboard() {
 
     const studentNav = [
         { id: 'courses', label: 'Courses', icon: '📚' },
-        { id: 'summaries', label: 'Summaries', icon: '📄' },
-        { id: 'whiteboards', label: 'Whiteboards', icon: '🖊️' },
+        { id: 'whiteboards', label: 'Recorded Lectures', icon: '🎥' },
         { id: 'attendance', label: 'Attendance', icon: '📋' },
         { id: 'profile', label: 'Profile', icon: '👤' },
     ];
@@ -183,7 +182,6 @@ export default function StudentDashboard() {
                 </div>
             )}
                     {activeTab === 'courses' && <CoursesTab />}
-                    {activeTab === 'summaries' && <SummariesTab setSelectedSummary={setSelectedSummary} setShowSummaryView={setShowSummaryView} />}
                     {activeTab === 'profile' && <ProfileTab />}
                     {activeTab === 'whiteboards' && (
                         <div className="space-y-6 pb-20">
@@ -611,87 +609,333 @@ export default function StudentDashboard() {
     );
 }
 
-// Courses Tab Component
+// ─── Dummy Course Timetable Data ─────────────────────────────────────────────
+const SEMESTER_START = new Date(2025, 0, 6); // Monday 6 Jan 2025
+const SEMESTER_WEEKS = 12;
+
+interface CourseEvent {
+    code: string;
+    title: string;
+    lecturer: string;
+    days: number[]; // 0=Sun,1=Mon,...6=Sat
+    startTime: string;
+    endTime: string;
+    color: string;   // text color class
+    bgColor: string; // background color (hex or tailwind)
+    dotColor: string; // dot/accent color (hex)
+}
+
+const DUMMY_COURSES: CourseEvent[] = [
+    { code: 'CSC301', title: 'Data Structures', lecturer: 'Dr. Adeyemi', days: [1, 3, 5], startTime: '08:00', endTime: '09:00', color: '#7c3aed', bgColor: '#f3e8ff', dotColor: '#7c3aed' },
+    { code: 'CSC303', title: 'Operating Systems', lecturer: 'Prof. Okafor', days: [1, 3], startTime: '09:00', endTime: '10:00', color: '#2563eb', bgColor: '#dbeafe', dotColor: '#2563eb' },
+    { code: 'CSC305', title: 'Computer Networks', lecturer: 'Dr. Bello', days: [2, 4, 5], startTime: '08:00', endTime: '09:30', color: '#0d9488', bgColor: '#ccfbf1', dotColor: '#0d9488' },
+    { code: 'CSC307', title: 'Software Eng.', lecturer: 'Dr. Nwankwo', days: [1, 3, 5], startTime: '10:00', endTime: '11:00', color: '#ea580c', bgColor: '#ffedd5', dotColor: '#ea580c' },
+    { code: 'CSC309', title: 'Database Systems', lecturer: 'Prof. Ibrahim', days: [2, 4], startTime: '10:00', endTime: '11:00', color: '#dc2626', bgColor: '#fee2e2', dotColor: '#dc2626' },
+    { code: 'MTH301', title: 'Numerical Methods', lecturer: 'Dr. Chukwu', days: [2, 4], startTime: '11:30', endTime: '12:30', color: '#4f46e5', bgColor: '#e0e7ff', dotColor: '#4f46e5' },
+    { code: 'CSC311', title: 'Artificial Intelligence', lecturer: 'Prof. Eze', days: [1, 3], startTime: '11:30', endTime: '12:30', color: '#059669', bgColor: '#d1fae5', dotColor: '#059669' },
+    { code: 'CSC313', title: 'Computer Arch.', lecturer: 'Dr. Abubakar', days: [2, 4, 5], startTime: '14:00', endTime: '15:00', color: '#d97706', bgColor: '#fef3c7', dotColor: '#d97706' },
+    { code: 'EEE301', title: 'Signal Processing', lecturer: 'Prof. Uche', days: [1, 3, 5], startTime: '14:00', endTime: '15:00', color: '#db2777', bgColor: '#fce7f3', dotColor: '#db2777' },
+    { code: 'GST301', title: 'Entrepreneurship', lecturer: 'Dr. Fashola', days: [2, 4], startTime: '15:30', endTime: '17:00', color: '#475569', bgColor: '#f1f5f9', dotColor: '#475569' },
+];
+
+function getCoursesForDate(date: Date): CourseEvent[] {
+    const dayOfWeek = date.getDay();
+    const semesterEnd = new Date(SEMESTER_START);
+    semesterEnd.setDate(semesterEnd.getDate() + SEMESTER_WEEKS * 7);
+    if (date < SEMESTER_START || date >= semesterEnd) return [];
+    return DUMMY_COURSES.filter(c => c.days.includes(dayOfWeek));
+}
+
+function getDaysInMonth(year: number, month: number) {
+    return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfMonth(year: number, month: number) {
+    return new Date(year, month, 1).getDay();
+}
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const DAY_HEADERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+// Courses Tab Component — Monthly Calendar Timetable
 function CoursesTab() {
-    const queryClient = useQueryClient();
+    const [viewMonth, setViewMonth] = useState(0); // 0 = January 2025
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [selectedCourse, setSelectedCourse] = useState<CourseEvent | null>(null);
+    const [summaryTab, setSummaryTab] = useState<'general' | 'personalized'>('general');
 
-    const { data: courses, isLoading } = useQuery({
-        queryKey: ['student-courses'],
-        queryFn: studentApi.getCourses,
-    });
+    const year = 2025;
+    const month = viewMonth; // 0-indexed
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDay = getFirstDayOfMonth(year, month);
+    const today = new Date();
+    const isToday = (d: number) => today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
 
-    const enrollMutation = useMutation({
-        mutationFn: studentApi.enrollInCourse,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['student-courses'] });
-            toast.success('Successfully enrolled in course!');
-        },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.error || 'Failed to enroll');
-        },
-    });
+    // Build calendar grid cells
+    const calendarCells: (number | null)[] = [];
+    for (let i = 0; i < firstDay; i++) calendarCells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) calendarCells.push(d);
+    while (calendarCells.length % 7 !== 0) calendarCells.push(null);
 
-    const unenrollMutation = useMutation({
-        mutationFn: studentApi.unenrollFromCourse,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['student-courses'] });
-            toast.success('Successfully unenrolled from course');
-        },
-        onError: () => {
-            toast.error('Failed to unenroll');
-        },
-    });
+    // Get courses for selected date (for detail panel)
+    const selectedCourses = selectedDate ? getCoursesForDate(selectedDate) : [];
 
-    if (isLoading) {
-        return <div className="text-center py-12">Loading courses...</div>;
+    const prevMonth = () => setViewMonth(m => Math.max(0, m - 1));
+    const nextMonth = () => setViewMonth(m => Math.min(2, m + 1)); // Jan-Mar 2025
+
+    const handleCourseClick = (course: CourseEvent) => {
+        setSelectedCourse(course);
+        setSummaryTab('general');
+    };
+
+    // ─── Course Detail View ─────────────────────────────────
+    if (selectedCourse) {
+        const dayNames = selectedCourse.days.map(d => DAY_HEADERS[d]).join(', ');
+        return (
+            <div className="space-y-5 pb-10">
+                {/* Back button + course header */}
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setSelectedCourse(null)}
+                        className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                        title="Back to Schedule"
+                    >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    </button>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-2xl font-bold text-gray-900">{selectedCourse.code}</h2>
+                            <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: selectedCourse.bgColor, color: selectedCourse.color }}>{selectedCourse.title}</span>
+                        </div>
+                        <p className="text-sm text-gray-400 mt-0.5">{selectedCourse.lecturer} • {dayNames} • {selectedCourse.startTime} – {selectedCourse.endTime}</p>
+                    </div>
+                </div>
+
+                {/* Course info card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black text-white" style={{ backgroundColor: selectedCourse.dotColor }}>
+                            {selectedCourse.code.slice(-3, -1)}
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900">{selectedCourse.title}</h3>
+                            <p className="text-sm text-gray-500">{selectedCourse.lecturer}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-xs font-bold text-gray-700">{dayNames}</p>
+                            <p className="text-xs text-gray-400">{selectedCourse.startTime} – {selectedCourse.endTime}</p>
+                            <p className="text-[10px] text-purple-500 font-bold mt-1">12-week semester</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sub-tabs: General Summaries / Personalized Summaries */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1 w-fit">
+                    <button
+                        onClick={() => setSummaryTab('general')}
+                        className={`px-5 py-2 text-sm font-bold rounded-full transition-all ${
+                            summaryTab === 'general' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                        📄 General Summaries
+                    </button>
+                    <button
+                        onClick={() => setSummaryTab('personalized')}
+                        className={`px-5 py-2 text-sm font-bold rounded-full transition-all ${
+                            summaryTab === 'personalized' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                        🎯 Personalized Summaries
+                    </button>
+                </div>
+
+                {/* Tab Content */}
+                {summaryTab === 'general' ? (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+                        <div className="text-4xl mb-3">📄</div>
+                        <h4 className="text-lg font-bold text-gray-900 mb-1">General Summaries</h4>
+                        <p className="text-sm text-gray-400">No summaries available yet for {selectedCourse.code}.</p>
+                    </div>
+                ) : (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+                        <div className="text-4xl mb-3">🎯</div>
+                        <h4 className="text-lg font-bold text-gray-900 mb-1">Personalized Summaries</h4>
+                        <p className="text-sm text-gray-400">No personalized summaries available yet for {selectedCourse.code}.</p>
+                    </div>
+                )}
+            </div>
+        );
     }
 
+    // ─── Calendar View (default) ─────────────────────────────────
     return (
-        <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Available Courses</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {courses?.map((course: any) => (
-                    <div
-                        key={course.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 className="font-semibold text-lg text-gray-900">{course.courseCode}</h3>
-                                <p className="text-sm text-gray-600 mt-1">{course.courseTitle}</p>
+        <div className="space-y-5 pb-10">
+            {/* Top header bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900">My Schedule 📅</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">You are doing great, stay consistent!</p>
+                </div>
+                {/* View toggle pills */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+                    <button className="px-4 py-1.5 text-xs font-bold rounded-full bg-[#7c3aed] text-white shadow-sm">Month</button>
+                    <button className="px-4 py-1.5 text-xs font-medium rounded-full text-gray-500 hover:text-gray-700 transition-colors">Week</button>
+                    <button className="px-4 py-1.5 text-xs font-medium rounded-full text-gray-500 hover:text-gray-700 transition-colors">Day</button>
+                </div>
+            </div>
+
+            <div className="flex flex-col lg:flex-row gap-5">
+                {/* ─── Main Calendar ─────────────────────────── */}
+                <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    {/* Month navigation */}
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-bold text-gray-900">{MONTH_NAMES[month]} {year}</h3>
+                            <span className="text-xs bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">{DUMMY_COURSES.length} courses</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <button onClick={prevMonth} disabled={viewMonth === 0} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
+                                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <button onClick={nextMonth} disabled={viewMonth >= 2} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
+                                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Day headers */}
+                    <div className="grid grid-cols-7 border-b border-gray-100">
+                        {DAY_HEADERS.map(d => (
+                            <div key={d} className="px-2 py-3 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">{d}</div>
+                        ))}
+                    </div>
+
+                    {/* Calendar grid */}
+                    <div className="grid grid-cols-7">
+                        {calendarCells.map((day, idx) => {
+                            if (day === null) {
+                                return <div key={`empty-${idx}`} className="min-h-[100px] bg-gray-50/50 border-b border-r border-gray-50" />;
+                            }
+                            const date = new Date(year, month, day);
+                            const courses = getCoursesForDate(date);
+                            const dayIsToday = isToday(day);
+                            const isSelected = selectedDate?.getDate() === day && selectedDate?.getMonth() === month;
+
+                            return (
+                                <div
+                                    key={day}
+                                    onClick={() => setSelectedDate(date)}
+                                    className={`min-h-[100px] p-1.5 border-b border-r border-gray-100 cursor-pointer transition-all hover:bg-purple-50/50 ${
+                                        isSelected ? 'bg-purple-50 ring-2 ring-[#7c3aed] ring-inset' : ''
+                                    }`}
+                                >
+                                    <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
+                                        dayIsToday ? 'bg-[#7c3aed] text-white' : 'text-gray-700'
+                                    }`}>
+                                        {day}
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        {courses.slice(0, 3).map(c => (
+                                            <div
+                                                key={c.code}
+                                                className="rounded-md px-1.5 py-0.5 text-[10px] font-bold truncate leading-tight"
+                                                style={{ backgroundColor: c.bgColor, color: c.color }}
+                                                title={`${c.code} — ${c.title}\n${c.startTime} – ${c.endTime}`}
+                                            >
+                                                {c.code} <span className="font-normal opacity-70">{c.startTime}</span>
+                                            </div>
+                                        ))}
+                                        {courses.length > 3 && (
+                                            <div className="text-[9px] font-bold text-purple-500 pl-1">+{courses.length - 3} more</div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* ─── Right Sidebar ─────────────────────────── */}
+                <div className="w-full lg:w-[280px] space-y-5 flex-shrink-0">
+                    {/* Mini Calendar */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-gray-900">{MONTH_NAMES[month]} {year}</h4>
+                            <div className="flex gap-1">
+                                <button onClick={prevMonth} disabled={viewMonth === 0} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+                                <button onClick={nextMonth} disabled={viewMonth >= 2} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
                             </div>
-                            {course.isEnrolled && (
-                                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded">
-                                    Enrolled
-                                </span>
+                        </div>
+                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                            {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+                                <div key={d} className="text-[10px] font-bold text-gray-400 py-1">{d}</div>
+                            ))}
+                            {calendarCells.map((day, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => day && setSelectedDate(new Date(year, month, day))}
+                                    disabled={!day}
+                                    className={`text-[11px] py-1 rounded-full font-medium transition-all ${
+                                        !day ? 'invisible' :
+                                        isToday(day!) ? 'bg-[#7c3aed] text-white font-bold' :
+                                        selectedDate?.getDate() === day && selectedDate?.getMonth() === month ? 'bg-purple-100 text-purple-700 font-bold' :
+                                        'text-gray-600 hover:bg-purple-50'
+                                    }`}
+                                >
+                                    {day || ''}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Selected Day Detail */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-gray-900">
+                                {selectedDate ? `${DAY_HEADERS[selectedDate.getDay()]}, ${MONTH_NAMES[selectedDate.getMonth()]} ${selectedDate.getDate()}` : 'Today\'s Classes'}
+                            </h4>
+                            <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+                                {selectedCourses.length || getCoursesForDate(today).length} classes
+                            </span>
+                        </div>
+                        <div className="space-y-2">
+                            {(selectedCourses.length > 0 ? selectedCourses : getCoursesForDate(today)).map(c => (
+                                <div key={c.code} onClick={() => handleCourseClick(c)} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-bold text-gray-900 truncate">{c.title}</p>
+                                        <p className="text-[10px] text-gray-400">{c.startTime} – {c.endTime}</p>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.bgColor, color: c.color }}>
+                                        {c.code}
+                                    </span>
+                                </div>
+                            ))}
+                            {selectedCourses.length === 0 && getCoursesForDate(today).length === 0 && (
+                                <p className="text-xs text-gray-400 text-center py-4">No classes scheduled</p>
                             )}
                         </div>
-                        <p className="text-sm text-gray-500 mb-4">
-                            Lecturer: {course.lecturerName}
-                        </p>
-                        {course.isEnrolled ? (
-                            <button
-                                onClick={() => unenrollMutation.mutate(course.id)}
-                                disabled={unenrollMutation.isPending}
-                                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-                            >
-                                {unenrollMutation.isPending ? 'Unenrolling...' : 'Unenroll'}
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => enrollMutation.mutate(course.id)}
-                                disabled={enrollMutation.isPending}
-                                className="w-full px-4 py-2 bg-[#FF6B35] text-white rounded-lg hover:bg-[#E55A2B] transition-colors disabled:opacity-50"
-                            >
-                                {enrollMutation.isPending ? 'Enrolling...' : 'Enroll'}
-                            </button>
-                        )}
                     </div>
-                ))}
+
+                    {/* Course Legend */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                        <h4 className="text-sm font-bold text-gray-900 mb-3">My Courses</h4>
+                        <div className="space-y-2">
+                            {DUMMY_COURSES.map(c => (
+                                <div key={c.code} onClick={() => handleCourseClick(c)} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg px-1 py-0.5 -mx-1 transition-colors">
+                                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
+                                    <span className="text-[11px] font-bold text-gray-700">{c.code}</span>
+                                    <span className="text-[10px] text-gray-400 truncate">{c.title}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
 }
+
 
 // Class Summaries Tab Component
 function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedSummary: any, setShowSummaryView: any }) {

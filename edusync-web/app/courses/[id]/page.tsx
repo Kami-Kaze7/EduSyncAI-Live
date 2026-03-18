@@ -208,8 +208,8 @@ export default function CourseDetailsPage() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Course not found</h2>
-                    <Link href="/courses" className="text-indigo-600 hover:text-indigo-800">
-                        ← Back to courses
+                    <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-800">
+                        ← Back to dashboard
                     </Link>
                 </div>
             </div>
@@ -222,7 +222,7 @@ export default function CourseDetailsPage() {
             <header className="bg-white shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center space-x-4">
-                        <Link href="/courses" className="text-gray-600 hover:text-gray-900">
+                        <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
                             <ArrowLeftIcon className="h-6 w-6" />
                         </Link>
                         <div>

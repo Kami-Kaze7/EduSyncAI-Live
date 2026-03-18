@@ -103,4 +103,34 @@ export const adminApi = {
             headers: { Authorization: `Bearer ${token}` },
         });
     },
+
+    // Course management
+    getCourses: async () => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.get(`${API_BASE_URL}/courses`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    createCourse: async (data: {
+        courseCode: string;
+        courseName: string;
+        description?: string;
+        creditHours: number;
+        lecturerId: number;
+    }) => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.post(`${API_BASE_URL}/courses`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    deleteCourse: async (id: number) => {
+        const token = localStorage.getItem('adminToken');
+        await axios.delete(`${API_BASE_URL}/courses/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    },
 };
