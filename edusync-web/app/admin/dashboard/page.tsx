@@ -656,7 +656,7 @@ function StudentsTab() {
                         className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                     >
                         <option value="all">All Faculties</option>
-                        {allFaculties.map(f => <option key={f} value={f}>{f}</option>)}
+                        {(allFaculties as string[]).map(f => <option key={f} value={f}>{f}</option>)}
                     </select>
 
                     <select
@@ -665,7 +665,7 @@ function StudentsTab() {
                         className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                     >
                         <option value="all">All Departments</option>
-                        {allDepts.map(d => <option key={d} value={d}>{d}</option>)}
+                        {(allDepts as string[]).map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
 
                     <select
