@@ -99,6 +99,11 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<EduSyncDbContext>();
     context.Database.EnsureCreated();
     
+    // Add DayNumber column if it doesn't exist (schema migration)
+    try {
+        context.Database.ExecuteSqlRaw("ALTER TABLE WeeklySummaries ADD COLUMN DayNumber INTEGER NOT NULL DEFAULT 1");
+    } catch { /* Column already exists — ignore */ }
+    
     // Seed test user
     DatabaseSeeder.SeedTestUser(context);
 }

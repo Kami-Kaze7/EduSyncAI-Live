@@ -217,49 +217,7 @@ namespace EduSyncAI.WebAPI.Controllers
             return Ok(coursesWithLecturers);
         }
 
-        // GET: api/students/my-courses
-        [HttpGet("my-courses")]
-        public async Task<ActionResult> GetMyCourses()
-        {
-            var studentId = GetStudentIdFromToken();
-            if (studentId == null)
-                return Unauthorized();
 
-            var enrollments = await _context.CourseEnrollments
-                .Where(e => e.StudentId == studentId)
-                .ToListAsync();
-
-            var myCourses = new List<object>();
-            foreach (var enrollment in enrollments)
-            {
-                var course = await _context.Courses.FindAsync(enrollment.CourseId);
-                if (course != null)
-                {
-                    var session = await _context.ClassSessions
-                        .Where(s => s.CourseId == course.Id)
-                        .FirstOrDefaultAsync();
-
-                    string lecturerName = "TBA";
-                    if (session != null)
-                    {
-                        var lecturer = await _context.Lecturers.FindAsync(session.LecturerId);
-                        if (lecturer != null)
-                            lecturerName = lecturer.FullName;
-                    }
-
-                    myCourses.Add(new
-                    {
-                        course.Id,
-                        course.CourseCode,
-                        course.CourseTitle,
-                        LecturerName = lecturerName,
-                        enrollment.EnrolledAt
-                    });
-                }
-            }
-
-            return Ok(myCourses);
-        }
 
         // POST: api/students/enroll/{courseId}
         [HttpPost("enroll/{courseId}")]
@@ -425,6 +383,115 @@ namespace EduSyncAI.WebAPI.Controllers
     }).ThenByDescending(x => ((dynamic)x).ClassDate);
 
     return Ok(finalResult);
+        }
+
+        // GET: api/students/my-courses
+        [HttpGet("my-courses")]
+        public async Task<ActionResult> GetMyCourses()
+        {
+            var studentId = GetStudentIdFromToken();
+            if (studentId == null)
+                return Unauthorized();
+
+            var enrolledCourses = await _context.CourseEnrollments
+                .Where(e => e.StudentId == studentId)
+                .Join(_context.Courses,
+                      e => e.CourseId,
+                      c => c.Id,
+                      (e, c) => new { Course = c, Enrollment = e })
+                .ToListAsync();
+
+            var result = new List<object>();
+            foreach (var ec in enrolledCourses)
+            {
+                var lecturer = await _context.Lecturers.FindAsync(ec.Course.LecturerId);
+                result.Add(new
+                {
+                    courseCode = ec.Course.CourseCode,
+                    courseTitle = ec.Course.CourseTitle,
+                    lecturerName = lecturer?.FullName ?? "TBA",
+                    enrolledAt = ec.Enrollment.EnrolledAt
+                });
+            }
+
+            return Ok(result);
+        }
+
+        // GET: api/students/course-summaries/{courseCode}
+        [HttpGet("course-summaries/{courseCode}")]
+        public async Task<ActionResult> GetCourseSummariesByCode(string courseCode)
+        {
+            var studentId = GetStudentIdFromToken();
+            if (studentId == null)
+                return Unauthorized();
+
+            // Get ALL courses with this code that the student is enrolled in
+            // (handles duplicate course code entries in the DB)
+            var enrolledCourseIds = await _context.CourseEnrollments
+                .Where(e => e.StudentId == studentId)
+                .Join(_context.Courses.Where(c => c.CourseCode == courseCode),
+                      e => e.CourseId,
+                      c => c.Id,
+                      (e, c) => c.Id)
+                .ToListAsync();
+
+            if (!enrolledCourseIds.Any())
+                return Ok(new List<object>());
+
+            // Get summaries from ALL enrolled courses with this code (pick whichever has them)
+            var summaries = await _context.WeeklySummaries
+                .Where(ws => enrolledCourseIds.Contains(ws.CourseId))
+                .OrderBy(ws => ws.WeekNumber)
+                .ThenBy(ws => ws.DayNumber)
+                .ToListAsync();
+
+            // For display, use the course that has the most summaries
+            var primaryCourseId = summaries.Any()
+                ? summaries.GroupBy(ws => ws.CourseId)
+                           .OrderByDescending(g => g.Count())
+                           .First().Key
+                : enrolledCourseIds.First();
+
+            var course = await _context.Courses.FindAsync(primaryCourseId);
+            var lecturer = course != null ? await _context.Lecturers.FindAsync(course.LecturerId) : null;
+
+            var result = summaries.Select(ws => new {
+                ws.Id,
+                ws.WeekNumber,
+                ws.DayNumber,
+                Title = ws.WeekTitle ?? $"Week {ws.WeekNumber} Day {ws.DayNumber}",
+                ws.Summary,
+                ws.KeyTopics,
+                ws.LearningObjectives,
+                ws.PreparationNotes,
+                CourseCode = courseCode,
+                CourseName = course?.CourseTitle ?? courseCode,
+                LecturerName = lecturer?.FullName ?? "Unknown",
+                GeneratedAt = ws.GeneratedAt
+            }).ToList();
+
+            _logger.LogInformation("GetCourseSummariesByCode: code={Code} enrolledIds=[{Ids}] summaryCount={Count}",
+                courseCode, string.Join(",", enrolledCourseIds), result.Count);
+
+            return Ok(result);
+        }
+
+        // GET: api/students/debug-db (temporary diagnostic endpoint)
+        [HttpGet("debug-db")]
+        public async Task<ActionResult> DebugDb()
+        {
+            var courses = await _context.Courses
+                .Select(c => new { c.Id, c.CourseCode, c.CourseTitle, c.LecturerId })
+                .ToListAsync();
+            var summaryGroups = await _context.WeeklySummaries
+                .GroupBy(ws => new { ws.CourseId, ws.WeekNumber })
+                .Select(g => new { g.Key.CourseId, g.Key.WeekNumber, DayCount = g.Count(), MaxDay = g.Max(x => x.DayNumber) })
+                .OrderBy(x => x.CourseId).ThenBy(x => x.WeekNumber)
+                .ToListAsync();
+            var enrollments = await _context.CourseEnrollments
+                .Select(e => new { e.Id, e.CourseId, e.StudentId })
+                .ToListAsync();
+            return Ok(new { courses, summaryGroups, enrollments });
         }
 
         // Helper methods

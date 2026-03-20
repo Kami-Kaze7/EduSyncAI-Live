@@ -1,7 +1,7 @@
 'use client';
 import { API_BASE_URL, API_SERVER_URL } from '@/lib/config';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { studentApi } from '@/lib/studentApi';
 import toast from 'react-hot-toast';
@@ -662,7 +662,46 @@ function CoursesTab() {
     const [viewMonth, setViewMonth] = useState(0); // 0 = January 2025
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [selectedCourse, setSelectedCourse] = useState<CourseEvent | null>(null);
+    const [selectedCourseDate, setSelectedCourseDate] = useState<Date | null>(null);
     const [summaryTab, setSummaryTab] = useState<'general' | 'personalized'>('general');
+    const [courses, setCourses] = useState<CourseEvent[]>(DUMMY_COURSES);
+
+    // Fetch real lecturer names from API and merge into course data
+    useEffect(() => {
+        const fetchRealLecturers = async () => {
+            try {
+                const token = localStorage.getItem('studentToken');
+                if (!token) return;
+                const res = await fetch(`${API_BASE_URL}/students/my-courses`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+                const enrolled: { courseCode: string; courseTitle: string; lecturerName: string }[] = await res.json();
+                if (!enrolled.length) return;
+                // Build lookup: courseCode -> real lecturer name
+                const lecturerMap: Record<string, string> = {};
+                enrolled.forEach(c => {
+                    if (c.lecturerName && c.lecturerName !== 'TBA') {
+                        lecturerMap[c.courseCode] = c.lecturerName;
+                    }
+                });
+                // Merge into DUMMY_COURSES
+                setCourses(DUMMY_COURSES.map(dc => ({
+                    ...dc,
+                    lecturer: lecturerMap[dc.code] || dc.lecturer
+                })));
+            } catch { /* keep dummy data on error */ }
+        };
+        fetchRealLecturers();
+    }, []);
+
+    const getCoursesForDateLocal = (date: Date): CourseEvent[] => {
+        const dayOfWeek = date.getDay();
+        const semesterEnd = new Date(SEMESTER_START);
+        semesterEnd.setDate(semesterEnd.getDate() + SEMESTER_WEEKS * 7);
+        if (date < SEMESTER_START || date >= semesterEnd) return [];
+        return courses.filter(c => c.days.includes(dayOfWeek));
+    };
 
     const year = 2025;
     const month = viewMonth; // 0-indexed
@@ -678,15 +717,17 @@ function CoursesTab() {
     while (calendarCells.length % 7 !== 0) calendarCells.push(null);
 
     // Get courses for selected date (for detail panel)
-    const selectedCourses = selectedDate ? getCoursesForDate(selectedDate) : [];
+    const selectedCourses = selectedDate ? getCoursesForDateLocal(selectedDate) : [];
 
     const prevMonth = () => setViewMonth(m => Math.max(0, m - 1));
     const nextMonth = () => setViewMonth(m => Math.min(2, m + 1)); // Jan-Mar 2025
 
-    const handleCourseClick = (course: CourseEvent) => {
+    const handleCourseClick = (course: CourseEvent, dateCtx?: Date) => {
         setSelectedCourse(course);
+        setSelectedCourseDate(dateCtx ?? selectedDate ?? today);
         setSummaryTab('general');
     };
+
 
     // ─── Course Detail View ─────────────────────────────────
     if (selectedCourse) {
@@ -751,11 +792,10 @@ function CoursesTab() {
 
                 {/* Tab Content */}
                 {summaryTab === 'general' ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
-                        <div className="text-4xl mb-3">📄</div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-1">General Summaries</h4>
-                        <p className="text-sm text-gray-400">No summaries available yet for {selectedCourse.code}.</p>
-                    </div>
+                    <GeneralSummariesSection
+                        course={selectedCourse}
+                        clickedDate={selectedCourseDate}
+                    />
                 ) : (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
                         <div className="text-4xl mb-3">🎯</div>
@@ -900,7 +940,7 @@ function CoursesTab() {
                         </div>
                         <div className="space-y-2">
                             {(selectedCourses.length > 0 ? selectedCourses : getCoursesForDate(today)).map(c => (
-                                <div key={c.code} onClick={() => handleCourseClick(c)} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+                                <div key={c.code} onClick={() => handleCourseClick(c, selectedDate ?? today)} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
                                     <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-bold text-gray-900 truncate">{c.title}</p>
@@ -936,6 +976,321 @@ function CoursesTab() {
     );
 }
 
+
+// ─── General Summaries Section ──────────────────────────────────────────────
+// Fetches the exact AI daily summary for the clicked course + date.
+function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent | null; clickedDate: Date | null }) {
+    const effectiveDate = clickedDate || new Date();
+
+    // Compute which semester week (1-12) the clicked date falls in
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    const diffMs = effectiveDate.getTime() - SEMESTER_START.getTime();
+    const weekNumber = diffMs < 0 ? 0 : Math.min(Math.floor(diffMs / msPerWeek) + 1, SEMESTER_WEEKS);
+
+    // Compute which day ordinal (1, 2, 3) within the course schedule
+    const clickedDow = effectiveDate.getDay();
+    const courseDays = course?.days ?? [];
+    const sortedDays = [...courseDays].sort((a: number, b: number) => a - b);
+    const dayIndex = sortedDays.indexOf(clickedDow);
+    const dayOrdinal = dayIndex >= 0 ? dayIndex + 1 : 1;
+    const totalDays = Math.max(sortedDays.length, 1);
+    const dayLabels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayName = dayLabels[clickedDow] || 'Today';
+
+    const { data: summaries, isLoading } = useQuery({
+        queryKey: ['course-summaries', course?.code],
+        queryFn: () => course ? studentApi.getCourseSummariesByCode(course.code) : Promise.resolve([]),
+        enabled: !!course,
+    });
+
+    if (!course) return null;
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center py-16">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600" />
+            </div>
+        );
+    }
+
+    // Look up the exact daily summary by weekNumber AND dayNumber
+    const daySummary = (summaries || []).find(
+        (s: any) => s.weekNumber === weekNumber && s.dayNumber === dayOrdinal
+    );
+
+    if (!daySummary) {
+        return (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+                <div className="text-5xl mb-4">📄</div>
+                <h4 className="text-lg font-bold text-gray-900 mb-1">No Summary Yet</h4>
+                <p className="text-sm text-gray-400 max-w-sm mx-auto">
+                    The lecturer has not uploaded and analyzed the syllabus for {course.code} yet.
+                </p>
+                <div className="mt-5 inline-flex items-center gap-2 text-xs text-purple-500 bg-purple-50 px-4 py-2 rounded-full font-semibold">
+                    Week {weekNumber} &bull; Day {dayOrdinal} of {totalDays} &bull; {dayName}
+                </div>
+            </div>
+        );
+    }
+
+    let keyTopics: string[] = [];
+    try {
+        keyTopics = typeof daySummary.keyTopics === 'string'
+            ? JSON.parse(daySummary.keyTopics)
+            : (daySummary.keyTopics || []);
+    } catch { keyTopics = []; }
+
+    const isLastDay = dayOrdinal === totalDays;
+
+    return (
+        <div className="space-y-4">
+            {/* Header card */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-5 text-white">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <span className="text-xs font-bold bg-white/20 px-2.5 py-0.5 rounded-full">Week {weekNumber}</span>
+                            <span className="text-xs font-bold bg-white/20 px-2.5 py-0.5 rounded-full">Day {dayOrdinal} of {totalDays}</span>
+                            <span className="text-xs font-bold bg-white/20 px-2.5 py-0.5 rounded-full">{dayName}</span>
+                        </div>
+                        <h3 className="text-lg font-bold leading-snug">{daySummary.title}</h3>
+                        <p className="text-sm text-white/80 mt-1">{course.code} &mdash; {course.title}</p>
+                    </div>
+                    <span className="text-3xl">🧠</span>
+                </div>
+                <p className="text-xs text-white/60 mt-3">
+                    AI summary for {effectiveDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+            </div>
+
+            {/* Summary content */}
+            {daySummary.summary && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-black">{dayOrdinal}</span>
+                        Today&apos;s Lecture Summary
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{daySummary.summary}</p>
+                </div>
+            )}
+
+            {/* Key topics */}
+            {keyTopics.length > 0 && (
+                <div className="bg-indigo-50 rounded-2xl p-5 border border-indigo-100">
+                    <h4 className="text-sm font-bold text-indigo-800 mb-3">Key Topics &mdash; {dayName}</h4>
+                    <div className="flex flex-wrap gap-2">
+                        {keyTopics.map((topic: string, i: number) => (
+                            <span key={i} className="px-3 py-1.5 bg-white text-indigo-700 text-xs font-semibold rounded-lg border border-indigo-200 shadow-sm">
+                                #{topic}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Preparation notes on last day */}
+            {isLastDay && daySummary.preparationNotes && (
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                    <h4 className="text-sm font-bold text-amber-800 mb-2">Preparation for Next Week</h4>
+                    <p className="text-amber-800 text-sm italic leading-relaxed">{daySummary.preparationNotes}</p>
+                </div>
+            )}
+
+            {/* All available day summaries */}
+            {(summaries || []).length > 0 && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Available Summaries</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                        {(summaries as any[]).map((s: any) => (
+                            <span
+                                key={s.id}
+                                className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                                    s.weekNumber === weekNumber && s.dayNumber === dayOrdinal
+                                        ? 'bg-purple-600 text-white'
+                                        : 'bg-gray-100 text-gray-600'
+                                }`}
+                            >
+                                W{s.weekNumber}D{s.dayNumber}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* AI Course Chatbot */}
+            <SummaryChatbot summaryId={daySummary.id} courseCode={course.code} summaryTitle={daySummary.title} />
+        </div>
+    );
+}
+
+// ─── AI Course Chatbot ─────────────────────────────────────────────
+interface ChatMsg { role: 'user' | 'assistant' | 'quiz'; content: string; quizData?: QuizQ[]; }
+interface QuizQ { question: string; options: string[]; correctIndex: number; explanation: string; }
+
+function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: number; courseCode: string; summaryTitle: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [msgs, setMsgs] = useState<ChatMsg[]>([
+        { role: 'assistant', content: `Hi! I'm your AI tutor for ${courseCode}. Ask me anything about "${summaryTitle}" or click Quiz to test yourself! 🎓` }
+    ]);
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [qAnswers, setQAnswers] = useState<Record<number, number>>({});
+    const [qDone, setQDone] = useState<Record<number, boolean>>({});
+    const endRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, isOpen]);
+
+    const send = async () => {
+        if (!input.trim() || loading) return;
+        const q = input.trim(); setInput('');
+        setMsgs(p => [...p, { role: 'user', content: q }]);
+        setLoading(true);
+        try {
+            const d = await studentApi.askAI(summaryId, q);
+            setMsgs(p => [...p, { role: 'assistant', content: d.response || 'Sorry, I could not generate a response.' }]);
+        } catch { setMsgs(p => [...p, { role: 'assistant', content: '⚠️ Failed to get a response. Please try again.' }]); }
+        setLoading(false);
+    };
+
+    const genQuiz = async () => {
+        if (loading) return;
+        setLoading(true);
+        setMsgs(p => [...p, { role: 'user', content: '📝 Generate a quiz on this topic' }]);
+        try {
+            const token = localStorage.getItem('studentToken');
+            const res = await fetch(`${API_BASE_URL}/chat/quiz`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ summaryId, questionCount: 5 })
+            });
+            const data = await res.json();
+            if (data.quiz) {
+                const parsed: QuizQ[] = JSON.parse(data.quiz);
+                setMsgs(p => [...p, { role: 'quiz', content: `Here's a ${parsed.length}-question quiz! Select your answers.`, quizData: parsed }]);
+            } else { setMsgs(p => [...p, { role: 'assistant', content: '⚠️ Could not generate quiz. Try again.' }]); }
+        } catch { setMsgs(p => [...p, { role: 'assistant', content: '⚠️ Failed to generate quiz. AI may be unavailable.' }]); }
+        setLoading(false);
+    };
+
+    const pickAnswer = (mi: number, qi: number, oi: number) => {
+        const k = mi * 100 + qi;
+        if (qDone[k]) return;
+        setQAnswers(p => ({ ...p, [k]: oi }));
+        setQDone(p => ({ ...p, [k]: true }));
+    };
+
+    if (!isOpen) return (
+        <button onClick={() => setIsOpen(true)}
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl p-4 flex items-center gap-3 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl group">
+            <span className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🤖</span>
+            <div className="text-left flex-1">
+                <div className="font-bold text-sm">AI Course Assistant</div>
+                <div className="text-xs text-white/70">Ask questions about this topic or take a quiz</div>
+            </div>
+            <svg className="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        </button>
+    );
+
+    return (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex items-center gap-3 cursor-pointer" onClick={() => setIsOpen(false)}>
+                <span className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg">🤖</span>
+                <div className="flex-1">
+                    <div className="font-bold text-sm">AI Course Assistant — {courseCode}</div>
+                    <div className="text-xs text-white/70">Ask me anything about this lecture</div>
+                </div>
+                <svg className="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+            </div>
+
+            {/* Messages */}
+            <div className="h-80 overflow-y-auto p-4 space-y-3 bg-gray-50/50">
+                {msgs.map((m, i) => (
+                    <div key={i}>
+                        {m.role === 'user' ? (
+                            <div className="flex justify-end"><div className="bg-purple-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 max-w-[80%] text-sm">{m.content}</div></div>
+                        ) : m.role === 'quiz' && m.quizData ? (
+                            <div className="space-y-3">
+                                <div className="flex items-start gap-2">
+                                    <span className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</span>
+                                    <div className="bg-white rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[90%] text-sm text-gray-800 border border-gray-100">{m.content}</div>
+                                </div>
+                                {m.quizData.map((q, qi) => {
+                                    const k = i * 100 + qi; const done = qDone[k]; const sel = qAnswers[k]; const ok = sel === q.correctIndex;
+                                    return (
+                                        <div key={qi} className="bg-white rounded-xl border border-gray-200 p-4 ml-9">
+                                            <p className="text-sm font-semibold text-gray-800 mb-2"><span className="text-purple-600 mr-1">Q{qi + 1}.</span>{q.question}</p>
+                                            <div className="space-y-1.5">
+                                                {q.options.map((o, oi) => {
+                                                    let cls = 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-purple-50 hover:border-purple-300 cursor-pointer';
+                                                    if (done) {
+                                                        if (oi === q.correctIndex) cls = 'bg-green-50 border-green-400 text-green-800';
+                                                        else if (oi === sel && !ok) cls = 'bg-red-50 border-red-400 text-red-800';
+                                                        else cls = 'bg-gray-50 border-gray-200 text-gray-400';
+                                                    }
+                                                    return (
+                                                        <button key={oi} onClick={() => pickAnswer(i, qi, oi)} disabled={done}
+                                                            className={`w-full text-left px-3 py-2 rounded-lg border text-xs font-medium transition-all ${cls}`}>
+                                                            {o}{done && oi === q.correctIndex && ' ✅'}{done && oi === sel && !ok && ' ❌'}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            {done && <p className={`text-xs mt-2 p-2 rounded-lg ${ok ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{ok ? '🎉 Correct! ' : '💡 '}{q.explanation}</p>}
+                                        </div>
+                                    );
+                                })}
+                                {(() => {
+                                    const tot = m.quizData!.length;
+                                    const answered = m.quizData!.filter((_, qi) => qDone[i * 100 + qi]).length;
+                                    if (answered === tot && tot > 0) {
+                                        const correct = m.quizData!.filter((q, qi) => qAnswers[i * 100 + qi] === q.correctIndex).length;
+                                        const pct = Math.round((correct / tot) * 100);
+                                        return (
+                                            <div className={`ml-9 p-3 rounded-xl border text-center text-sm font-bold ${pct >= 80 ? 'bg-green-50 border-green-200 text-green-700' : pct >= 50 ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                                                {pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '📚'} Score: {correct}/{tot} ({pct}%)
+                                                {pct >= 80 ? ' — Excellent!' : pct >= 50 ? ' — Good job!' : ' — Review and try again!'}
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
+                            </div>
+                        ) : (
+                            <div className="flex items-start gap-2">
+                                <span className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</span>
+                                <div className="bg-white rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[80%] text-sm text-gray-800 border border-gray-100 whitespace-pre-wrap">{m.content}</div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+                {loading && (
+                    <div className="flex items-start gap-2">
+                        <span className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">AI</span>
+                        <div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 border border-gray-100">
+                            <div className="flex gap-1"><span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0s'}} /><span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0.15s'}} /><span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0.3s'}} /></div>
+                        </div>
+                    </div>
+                )}
+                <div ref={endRef} />
+            </div>
+
+            {/* Input area */}
+            <div className="border-t border-gray-200 p-3 flex gap-2 bg-white">
+                <button onClick={genQuiz} disabled={loading}
+                    className="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold hover:bg-indigo-200 transition-colors disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
+                    title="Generate a quiz">📝 Quiz</button>
+                <input value={input} onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+                    placeholder="Ask about this topic..."
+                    className="flex-1 px-3 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all" disabled={loading} />
+                <button onClick={send} disabled={loading || !input.trim()}
+                    className="w-9 h-9 bg-purple-600 text-white rounded-xl flex items-center justify-center hover:bg-purple-700 transition-colors disabled:opacity-50 flex-shrink-0">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                </button>
+            </div>
+        </div>
+    );
+}
 
 // Class Summaries Tab Component
 function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedSummary: any, setShowSummaryView: any }) {

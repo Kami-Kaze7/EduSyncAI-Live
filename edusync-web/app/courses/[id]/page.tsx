@@ -362,7 +362,59 @@ export default function CourseDetailsPage() {
                     </div>
                 </div>
 
-                {/* Weekly Summaries Section */}
+                {/* Enrolled Students Section - full width below the two panels */}
+                <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">Enrolled Students</h2>
+                            <p className="text-sm text-gray-500 mt-0.5">{enrollments?.length || 0} student{(enrollments?.length || 0) !== 1 ? 's' : ''} enrolled in this course</p>
+                        </div>
+                        <UsersIcon className="h-6 w-6 text-indigo-500" />
+                    </div>
+
+                    {enrollments && enrollments.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matric Number</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrolled On</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-100">
+                                    {enrollments.map((enrollment: any, idx: number) => (
+                                        <tr key={enrollment.id} className="hover:bg-indigo-50 transition-colors">
+                                            <td className="px-4 py-3 text-sm text-gray-400">{idx + 1}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                                        {enrollment.student?.fullName?.charAt(0)?.toUpperCase() || '?'}
+                                                    </div>
+                                                    <span className="text-sm font-semibold text-gray-900">{enrollment.student?.fullName || '—'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-700">{enrollment.student?.matricNumber || '—'}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{enrollment.student?.email || '—'}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString() : '—'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                            <UsersIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                            <p className="text-gray-500 font-medium">No students enrolled yet</p>
+                            <p className="text-xs text-gray-400 mt-1">Students enrolled by the admin will appear here.</p>
+                        </div>
+                    )}
+                </div>
+
                 {summaries && summaries.length > 0 && (
                     <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between mb-6">

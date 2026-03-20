@@ -405,6 +405,166 @@ namespace EduSyncAI.WebAPI.Controllers
             }
         }
 
+        // GET: api/admin/courses
+        [HttpGet("courses")]
+        public async Task<ActionResult> GetCourses()
+        {
+            try
+            {
+                var courses = await _context.Courses.ToListAsync();
+                var lecturers = await _context.Lecturers.ToListAsync();
+
+                var result = courses.Select(c => new
+                {
+                    c.Id,
+                    c.CourseCode,
+                    c.CourseName,
+                    c.Description,
+                    c.CreditHours,
+                    c.LecturerId,
+                    c.SyllabusPath,
+                    c.CreatedAt,
+                    lecturerName = lecturers.FirstOrDefault(l => l.Id == c.LecturerId)?.FullName ?? "Unassigned"
+                });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching courses");
+                return StatusCode(500, new { error = "Failed to fetch courses" });
+            }
+        }
+
+        // POST: api/admin/courses
+        [HttpPost("courses")]
+        public async Task<ActionResult> CreateCourse([FromBody] CreateAdminCourseRequest request)
+        {
+            try
+            {
+                var lecturer = await _context.Lecturers.FindAsync(request.LecturerId);
+                if (lecturer == null)
+                    return BadRequest(new { error = "Lecturer not found" });
+
+                var course = new Course
+                {
+                    CourseCode = request.CourseCode,
+                    CourseName = request.CourseName,
+                    Description = request.Description ?? "",
+                    CreditHours = request.CreditHours,
+                    LecturerId = request.LecturerId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Courses.Add(course);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    course.Id,
+                    course.CourseCode,
+                    course.CourseName,
+                    course.Description,
+                    course.CreditHours,
+                    course.LecturerId,
+                    course.CreatedAt,
+                    lecturerName = lecturer.FullName
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating course");
+                return StatusCode(500, new { error = "Failed to create course" });
+            }
+        }
+
+        // DELETE: api/admin/courses/5
+        [HttpDelete("courses/{id}")]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            try
+            {
+                var course = await _context.Courses.FindAsync(id);
+                if (course == null)
+                    return NotFound(new { error = "Course not found" });
+
+                var sessions = await _context.ClassSessions.Where(s => s.CourseId == id).ToListAsync();
+                _context.ClassSessions.RemoveRange(sessions);
+
+                var enrollments = await _context.CourseEnrollments.Where(e => e.CourseId == id).ToListAsync();
+                _context.CourseEnrollments.RemoveRange(enrollments);
+
+                _context.Courses.Remove(course);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting course {CourseId}", id);
+                return StatusCode(500, new { error = $"Failed to delete course: {ex.Message}" });
+            }
+        }
+
+        // POST: api/admin/students/{id}/enroll-all
+        [HttpPost("students/{id}/enroll-all")]
+        public async Task<ActionResult> EnrollStudentInAllCourses(int id)
+        {
+            try
+            {
+                var student = await _context.Students.FindAsync(id);
+                if (student == null)
+                    return NotFound(new { error = "Student not found" });
+
+                // The 10 standard course codes
+                var standardCodes = new[] { "CSC301","CSC303","CSC305","CSC307","CSC309","MTH301","CSC311","CSC313","EEE301","GST301" };
+
+                var courses = await _context.Courses
+                    .Where(c => standardCodes.Contains(c.CourseCode))
+                    .ToListAsync();
+
+                int enrolled = 0, skipped = 0;
+                foreach (var course in courses)
+                {
+                    var exists = await _context.CourseEnrollments
+                        .AnyAsync(e => e.CourseId == course.Id && e.StudentId == id);
+                    if (!exists)
+                    {
+                        _context.CourseEnrollments.Add(new CourseEnrollment
+                        {
+                            CourseId = course.Id,
+                            StudentId = id,
+                            EnrolledAt = DateTime.UtcNow
+                        });
+
+                        // Also link all existing summaries to this student
+                        var existingSummaries = await _context.WeeklySummaries
+                            .Where(ws => ws.CourseId == course.Id)
+                            .ToListAsync();
+                        foreach (var summary in existingSummaries)
+                        {
+                            _context.StudentWeeklySummaries.Add(new StudentWeeklySummary
+                            {
+                                StudentId = id,
+                                WeeklySummaryId = summary.Id,
+                                SentAt = DateTime.UtcNow
+                            });
+                        }
+                        enrolled++;
+                    }
+                    else skipped++;
+                }
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = $"Enrolled in {enrolled} course(s). {skipped} already enrolled.", enrolled, skipped, totalFound = courses.Count });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error enrolling student {StudentId} in all courses", id);
+                return StatusCode(500, new { error = "Failed to enroll student" });
+            }
+        }
+
         // Helper methods
         private string HashPassword(string password)
         {
@@ -465,5 +625,14 @@ namespace EduSyncAI.WebAPI.Controllers
         public string FullName { get; set; } = string.Empty;
         public string? Email { get; set; }
         public string? Password { get; set; }
+    }
+
+    public class CreateAdminCourseRequest
+    {
+        public string CourseCode { get; set; } = string.Empty;
+        public string CourseName { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public int CreditHours { get; set; } = 3;
+        public int LecturerId { get; set; }
     }
 }

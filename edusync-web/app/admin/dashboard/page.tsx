@@ -309,11 +309,6 @@ function CoursesTab() {
         }
     };
 
-    const getLecturerName = (lecturerId: number) => {
-        const lec = lecturers?.find((l: any) => l.id === lecturerId);
-        return lec ? lec.fullName : 'Unassigned';
-    };
-
     const handleDownloadSyllabus = async (courseId: number, courseCode: string) => {
         try {
             toast.loading('Downloading syllabus...', { id: `download-${courseId}` });
@@ -374,9 +369,9 @@ function CoursesTab() {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className="text-sm text-gray-700 flex items-center gap-1.5">
                                             <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
-                                                {getLecturerName(course.lecturerId).charAt(0).toUpperCase()}
+                                                {(course.lecturerName || 'U').charAt(0).toUpperCase()}
                                             </span>
-                                            {getLecturerName(course.lecturerId)}
+                                            {course.lecturerName || 'Unassigned'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -420,6 +415,20 @@ function CoursesTab() {
     );
 }
 
+// ─── Dummy course catalogue (matches student dashboard) ───
+const COURSE_LIST = [
+    { code: 'CSC301', name: 'Data Structures' },
+    { code: 'CSC303', name: 'Operating Systems' },
+    { code: 'CSC305', name: 'Computer Networks' },
+    { code: 'CSC307', name: 'Software Engineering' },
+    { code: 'CSC309', name: 'Database Systems' },
+    { code: 'MTH301', name: 'Numerical Methods' },
+    { code: 'CSC311', name: 'Artificial Intelligence' },
+    { code: 'CSC313', name: 'Computer Architecture' },
+    { code: 'EEE301', name: 'Signal Processing' },
+    { code: 'GST301', name: 'Entrepreneurship Studies' },
+];
+
 // Create Course Modal
 function CreateCourseModal({ lecturers, onClose }: { lecturers: any[]; onClose: () => void }) {
     const queryClient = useQueryClient();
@@ -462,14 +471,24 @@ function CreateCourseModal({ lecturers, onClose }: { lecturers: any[]; onClose: 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Course Code *</label>
-                            <input
-                                type="text"
+                            <select
                                 value={formData.courseCode}
-                                onChange={(e) => setFormData({ ...formData, courseCode: e.target.value })}
+                                onChange={(e) => {
+                                    const selected = COURSE_LIST.find(c => c.code === e.target.value);
+                                    setFormData({
+                                        ...formData,
+                                        courseCode: e.target.value,
+                                        courseName: selected ? selected.name : formData.courseName,
+                                    });
+                                }}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                placeholder="e.g., CSC301"
                                 required
-                            />
+                            >
+                                <option value="">-- Select course code --</option>
+                                {COURSE_LIST.map(c => (
+                                    <option key={c.code} value={c.code}>{c.code}</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Credit Hours *</label>
@@ -491,10 +510,14 @@ function CreateCourseModal({ lecturers, onClose }: { lecturers: any[]; onClose: 
                             type="text"
                             value={formData.courseName}
                             onChange={(e) => setFormData({ ...formData, courseName: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            placeholder="e.g., Data Structures & Algorithms"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${formData.courseCode ? 'bg-gray-50 text-gray-600' : ''}`}
+                            placeholder="Auto-filled when code is selected"
+                            readOnly={!!formData.courseCode}
                             required
                         />
+                        {formData.courseCode && (
+                            <p className="text-xs text-amber-600 mt-1">Auto-filled from selected course code</p>
+                        )}
                     </div>
 
                     <div>
@@ -587,6 +610,14 @@ function StudentsTab() {
             toast.success('Student deleted successfully');
         },
         onError: () => toast.error('Failed to delete student'),
+    });
+
+    const enrollMutation = useMutation({
+        mutationFn: adminApi.enrollStudentInAllCourses,
+        onSuccess: (data: any) => {
+            toast.success(data.message || 'Student enrolled successfully!');
+        },
+        onError: () => toast.error('Enrollment failed. Make sure the 10 courses exist in the system.'),
     });
 
     const handleDelete = (id: number) => {
@@ -735,7 +766,15 @@ function StudentsTab() {
                                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${yearColors[student.year] || 'bg-gray-100 text-gray-600'}`}>
                                                             Yr {student.year}
                                                         </span>
-                                                        <button onClick={() => handleDelete(student.id)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
+                                                        <button
+                                                             onClick={() => enrollMutation.mutate(student.id)}
+                                                             disabled={enrollMutation.isPending}
+                                                             title="Enroll in all 10 courses"
+                                                             className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                                                         >
+                                                             Enroll
+                                                         </button>
+                                                         <button onClick={() => handleDelete(student.id)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
                                                     </div>
                                                 </div>
                                             ))}
@@ -786,7 +825,16 @@ function StudentsTab() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => handleDelete(student.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                                        <div className="flex items-center justify-end gap-3">
+                                            <button
+                                                onClick={() => enrollMutation.mutate(student.id)}
+                                                disabled={enrollMutation.isPending}
+                                                className="text-amber-600 hover:text-amber-900 font-semibold"
+                                            >
+                                                Enroll
+                                            </button>
+                                            <button onClick={() => handleDelete(student.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

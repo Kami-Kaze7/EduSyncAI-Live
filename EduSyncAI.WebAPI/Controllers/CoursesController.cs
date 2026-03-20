@@ -700,8 +700,8 @@ namespace EduSyncAI.WebAPI.Controllers
                 _context.CourseSyllabi.Add(syllabus);
                 await _context.SaveChangesAsync();
 
-                // AUTOMATION: Generate summaries for all weeks automatically
-                _logger.LogInformation("Starting batch summary generation for course {CourseId}, {WeekCount} weeks", id, analysis.TotalWeeks);
+                // AUTOMATION: Generate individual day summaries for each week (3 days per week = 36 total for 12 weeks)
+                _logger.LogInformation("Starting batch day summary generation for course {CourseId}, {WeekCount} weeks x 3 days", id, analysis.TotalWeeks);
                 
                 var enrolledStudentIds = await _context.CourseEnrollments
                     .Where(e => e.CourseId == id)
@@ -710,45 +710,50 @@ namespace EduSyncAI.WebAPI.Controllers
 
                 foreach (var week in analysis.Weeks)
                 {
-                    try
+                    for (int dayNumber = 1; dayNumber <= 3; dayNumber++)
                     {
-                        _logger.LogInformation("Generating automated summary for Week {WeekNumber}", week.WeekNumber);
-                        var summaryResult = await _geminiService.SummarizeWeekAsync(extractedText, week.WeekNumber);
-
-                        var weeklySummary = new WeeklySummary
+                        try
                         {
-                            SyllabusId = syllabus.Id,
-                            CourseId = id,
-                            LecturerId = syllabus.LecturerId,
-                            WeekNumber = week.WeekNumber,
-                            WeekTitle = summaryResult.WeekTitle,
-                            Summary = summaryResult.Summary,
-                            KeyTopics = System.Text.Json.JsonSerializer.Serialize(summaryResult.KeyTopics),
-                            LearningObjectives = System.Text.Json.JsonSerializer.Serialize(summaryResult.LearningObjectives),
-                            PreparationNotes = summaryResult.PreparationNotes,
-                            GeneratedAt = DateTime.UtcNow,
-                            SentToStudents = true, // Automated
-                            SentAt = DateTime.UtcNow
-                        };
+                            _logger.LogInformation("Generating summary for Week {WeekNumber} Day {DayNumber}", week.WeekNumber, dayNumber);
+                            var summaryResult = await _geminiService.SummarizeDayAsync(extractedText, week.WeekNumber, dayNumber);
 
-                        _context.WeeklySummaries.Add(weeklySummary);
-                        await _context.SaveChangesAsync();
-
-                        // Automatically distribute to students
-                        foreach (var studentId in enrolledStudentIds)
-                        {
-                            _context.StudentWeeklySummaries.Add(new StudentWeeklySummary
+                            var weeklySummary = new WeeklySummary
                             {
-                                StudentId = studentId,
-                                WeeklySummaryId = weeklySummary.Id,
+                                SyllabusId = syllabus.Id,
+                                CourseId = id,
+                                LecturerId = syllabus.LecturerId,
+                                WeekNumber = week.WeekNumber,
+                                DayNumber = dayNumber,
+                                WeekTitle = summaryResult.WeekTitle,
+                                Summary = summaryResult.Summary,
+                                KeyTopics = System.Text.Json.JsonSerializer.Serialize(summaryResult.KeyTopics),
+                                LearningObjectives = System.Text.Json.JsonSerializer.Serialize(summaryResult.LearningObjectives),
+                                PreparationNotes = summaryResult.PreparationNotes,
+                                GeneratedAt = DateTime.UtcNow,
+                                SentToStudents = true,
                                 SentAt = DateTime.UtcNow
-                            });
+                            };
+
+                            _context.WeeklySummaries.Add(weeklySummary);
+                            await _context.SaveChangesAsync();
+
+                            // Distribute to currently enrolled students
+                            foreach (var studentId in enrolledStudentIds)
+                            {
+                                _context.StudentWeeklySummaries.Add(new StudentWeeklySummary
+                                {
+                                    StudentId = studentId,
+                                    WeeklySummaryId = weeklySummary.Id,
+                                    SentAt = DateTime.UtcNow
+                                });
+                            }
+                            await _context.SaveChangesAsync();
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to generate automated summary for Week {WeekNumber}", week.WeekNumber);
-                        // Continue with other weeks even if one fails
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to generate summary for Week {WeekNumber} Day {DayNumber}", week.WeekNumber, dayNumber);
+                            // Continue with remaining days/weeks even if one fails
+                        }
                     }
                 }
 
@@ -1053,6 +1058,7 @@ namespace EduSyncAI.WebAPI.Controllers
 
                 if (summary == null)
                 {
+
                     return NotFound(new { error = "Summary not found" });
                 }
 
@@ -1107,27 +1113,29 @@ namespace EduSyncAI.WebAPI.Controllers
                     return Unauthorized(new { error = "You do not have permission to delete this syllabus" });
                 }
 
-                // 1. Get all summaries for this syllabus
+                // 1. Get ALL summaries for this course (by both SyllabusId and CourseId to catch all rows)
                 var summaries = await _context.WeeklySummaries
-                    .Where(ws => ws.SyllabusId == syllabus.Id)
+                    .Where(ws => ws.SyllabusId == syllabus.Id || ws.CourseId == id)
                     .ToListAsync();
 
                 var summaryIds = summaries.Select(s => s.Id).ToList();
 
-                // 2. Delete all student links for these summaries
-                var studentSummaries = await _context.StudentWeeklySummaries
-                    .Where(sws => summaryIds.Contains(sws.WeeklySummaryId))
-                    .ToListAsync();
-                
-                if (studentSummaries.Any())
+                // 2. Delete all StudentWeeklySummaries child records first (FK constraint)
+                if (summaryIds.Any())
                 {
-                    _context.StudentWeeklySummaries.RemoveRange(studentSummaries);
+                    var studentSummaries = await _context.StudentWeeklySummaries
+                        .Where(sws => summaryIds.Contains(sws.WeeklySummaryId))
+                        .ToListAsync();
+                    if (studentSummaries.Any())
+                        _context.StudentWeeklySummaries.RemoveRange(studentSummaries);
+                    await _context.SaveChangesAsync();
                 }
 
-                // 3. Delete summaries
+                // 3. Delete WeeklySummaries
                 if (summaries.Any())
                 {
                     _context.WeeklySummaries.RemoveRange(summaries);
+                    await _context.SaveChangesAsync();
                 }
 
                 // 4. Delete physical file

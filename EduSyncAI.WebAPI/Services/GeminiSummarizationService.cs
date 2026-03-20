@@ -130,6 +130,68 @@ Focus specifically on Week {weekNumber}. Return ONLY the JSON object, no additio
             }
         }
 
+        /// <summary>
+        /// Generates a focused AI summary for ONE specific day within a week.
+        /// dayNumber: 1 = first class day of the week, 2 = second, 3 = third.
+        /// </summary>
+        public async Task<WeeklySummaryResult> SummarizeDayAsync(string syllabusText, int weekNumber, int dayNumber)
+        {
+            if (string.IsNullOrWhiteSpace(syllabusText))
+                return new WeeklySummaryResult { WeekTitle = $"Week {weekNumber} Day {dayNumber}", Summary = "Syllabus text is empty" };
+
+            var dayOrdinal = dayNumber == 1 ? "first" : dayNumber == 2 ? "second" : "third";
+            var isLastDay = dayNumber == 3;
+
+            var prompt = $@"You are an experienced university lecturer creating a study summary for your students.
+
+Task: Write a focused summary for the {dayOrdinal} class session of Week {weekNumber} of this course.
+
+The course typically meets 3 times per week (Day 1, Day 2, Day 3). Focus ONLY on Day {dayNumber} content for Week {weekNumber}.
+
+Write as if you are teaching directly to the student:
+- Explain each topic clearly with relatable examples.
+- Use Markdown formatting (headers, bold, bullet points).
+- Be encouraging and academic in tone.
+- Depth should be appropriate for one class session (approximately 60-90 mins of material).
+{(isLastDay ? "- Include preparation notes for the following week." : "")}
+
+Return a JSON object with this EXACT format:
+{{
+  ""weekTitle"": ""Brief title for Week {weekNumber} Day {dayNumber}"",
+  ""summary"": ""Detailed narrative explanation of this day's topics, written as a lecturer teaching the material. Use Markdown."",
+  ""keyTopics"": [""topic1"", ""topic2"", ""topic3""],
+  ""learningObjectives"": [""By the end of this class, students should be able to...""],
+  ""preparationNotes"": ""{(isLastDay ? "What to review or prepare before next week" : "What to review before the next class session")}""
+}}
+
+Syllabus content:
+{syllabusText}
+
+Focus ONLY on Week {weekNumber}, Day {dayNumber} (the {dayOrdinal} class session). Return ONLY the JSON object, no additional text.";
+
+            try
+            {
+                var response = await CallGeminiAPIAsync(prompt);
+                var result = JsonSerializer.Deserialize<WeeklySummaryResult>(response, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                return result ?? new WeeklySummaryResult
+                {
+                    WeekTitle = $"Week {weekNumber} Day {dayNumber}",
+                    Summary = "",
+                    KeyTopics = new List<string>(),
+                    LearningObjectives = new List<string>(),
+                    PreparationNotes = ""
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error in SummarizeDayAsync (Week {weekNumber} Day {dayNumber}): {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task<string> ChatWithAIAsync(string context, string question)
         {
             var prompt = $@"You are a helpful and experienced university lecturer. You are currently discussing a specific week of course material with a student.

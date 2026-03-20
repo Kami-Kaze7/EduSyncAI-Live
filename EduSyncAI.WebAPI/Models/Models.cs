@@ -194,6 +194,7 @@ namespace EduSyncAI.WebAPI.Models
         public int CourseId { get; set; }
         public int LecturerId { get; set; }
         public int WeekNumber { get; set; }
+        public int DayNumber { get; set; } = 1; // 1=Day1, 2=Day2, 3=Day3 within the week
         public string? WeekTitle { get; set; }
         public string Summary { get; set; } = string.Empty;
         public string? KeyTopics { get; set; } // JSON array

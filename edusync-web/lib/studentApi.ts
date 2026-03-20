@@ -74,6 +74,14 @@ export const studentApi = {
         return response.data;
     },
 
+    getCourseSummariesByCode: async (courseCode: string) => {
+        const token = localStorage.getItem('studentToken');
+        const response = await axios.get(`${API_BASE_URL}/students/course-summaries/${courseCode}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
     askAI: async (summaryId: number | null, question: string) => {
         const token = localStorage.getItem('studentToken');
         const response = await axios.post(
