@@ -708,54 +708,83 @@ namespace EduSyncAI.WebAPI.Controllers
                     .Select(e => e.StudentId)
                     .ToListAsync();
 
+                int successCount = 0;
+                int failCount = 0;
+
                 foreach (var week in analysis.Weeks)
                 {
                     for (int dayNumber = 1; dayNumber <= 3; dayNumber++)
                     {
-                        try
+                        // Rate-limit protection: wait between API calls to avoid hitting Gemini limits
+                        if (successCount + failCount > 0)
                         {
-                            _logger.LogInformation("Generating summary for Week {WeekNumber} Day {DayNumber}", week.WeekNumber, dayNumber);
-                            var summaryResult = await _geminiService.SummarizeDayAsync(extractedText, week.WeekNumber, dayNumber);
-
-                            var weeklySummary = new WeeklySummary
-                            {
-                                SyllabusId = syllabus.Id,
-                                CourseId = id,
-                                LecturerId = syllabus.LecturerId,
-                                WeekNumber = week.WeekNumber,
-                                DayNumber = dayNumber,
-                                WeekTitle = summaryResult.WeekTitle,
-                                Summary = summaryResult.Summary,
-                                KeyTopics = System.Text.Json.JsonSerializer.Serialize(summaryResult.KeyTopics),
-                                LearningObjectives = System.Text.Json.JsonSerializer.Serialize(summaryResult.LearningObjectives),
-                                PreparationNotes = summaryResult.PreparationNotes,
-                                GeneratedAt = DateTime.UtcNow,
-                                SentToStudents = true,
-                                SentAt = DateTime.UtcNow
-                            };
-
-                            _context.WeeklySummaries.Add(weeklySummary);
-                            await _context.SaveChangesAsync();
-
-                            // Distribute to currently enrolled students
-                            foreach (var studentId in enrolledStudentIds)
-                            {
-                                _context.StudentWeeklySummaries.Add(new StudentWeeklySummary
-                                {
-                                    StudentId = studentId,
-                                    WeeklySummaryId = weeklySummary.Id,
-                                    SentAt = DateTime.UtcNow
-                                });
-                            }
-                            await _context.SaveChangesAsync();
+                            await Task.Delay(2500); // 2.5 seconds between calls
                         }
-                        catch (Exception ex)
+
+                        bool generated = false;
+                        for (int retry = 0; retry < 3 && !generated; retry++)
                         {
-                            _logger.LogError(ex, "Failed to generate summary for Week {WeekNumber} Day {DayNumber}", week.WeekNumber, dayNumber);
-                            // Continue with remaining days/weeks even if one fails
+                            try
+                            {
+                                if (retry > 0)
+                                {
+                                    _logger.LogWarning("Retry {Retry}/3 for Week {WeekNumber} Day {DayNumber}", retry + 1, week.WeekNumber, dayNumber);
+                                    await Task.Delay(retry * 5000); // Exponential backoff: 5s, 10s
+                                }
+
+                                _logger.LogInformation("Generating summary for Week {WeekNumber} Day {DayNumber} ({Num}/{Total})", 
+                                    week.WeekNumber, dayNumber, successCount + failCount + 1, analysis.TotalWeeks * 3);
+                                var summaryResult = await _geminiService.SummarizeDayAsync(extractedText, week.WeekNumber, dayNumber);
+
+                                var weeklySummary = new WeeklySummary
+                                {
+                                    SyllabusId = syllabus.Id,
+                                    CourseId = id,
+                                    LecturerId = syllabus.LecturerId,
+                                    WeekNumber = week.WeekNumber,
+                                    DayNumber = dayNumber,
+                                    WeekTitle = summaryResult.WeekTitle,
+                                    Summary = summaryResult.Summary,
+                                    KeyTopics = System.Text.Json.JsonSerializer.Serialize(summaryResult.KeyTopics),
+                                    LearningObjectives = System.Text.Json.JsonSerializer.Serialize(summaryResult.LearningObjectives),
+                                    PreparationNotes = summaryResult.PreparationNotes,
+                                    GeneratedAt = DateTime.UtcNow,
+                                    SentToStudents = true,
+                                    SentAt = DateTime.UtcNow
+                                };
+
+                                _context.WeeklySummaries.Add(weeklySummary);
+                                await _context.SaveChangesAsync();
+
+                                // Distribute to currently enrolled students
+                                foreach (var studentId in enrolledStudentIds)
+                                {
+                                    _context.StudentWeeklySummaries.Add(new StudentWeeklySummary
+                                    {
+                                        StudentId = studentId,
+                                        WeeklySummaryId = weeklySummary.Id,
+                                        SentAt = DateTime.UtcNow
+                                    });
+                                }
+                                await _context.SaveChangesAsync();
+                                
+                                generated = true;
+                                successCount++;
+                            }
+                            catch (HttpRequestException ex) when (ex.Message.Contains("429") || ex.Message.Contains("RESOURCE_EXHAUSTED"))
+                            {
+                                _logger.LogWarning("Rate limit hit for Week {WeekNumber} Day {DayNumber}, waiting before retry...", week.WeekNumber, dayNumber);
+                                await Task.Delay(15000); // Wait 15 seconds on rate limit
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Failed to generate summary for Week {WeekNumber} Day {DayNumber} (attempt {Retry})", week.WeekNumber, dayNumber, retry + 1);
+                                if (retry == 2) failCount++; // Only count as failed after all retries exhausted
+                            }
                         }
                     }
                 }
+                _logger.LogInformation("Batch summary generation complete: {Success} succeeded, {Failed} failed out of {Total}", successCount, failCount, analysis.TotalWeeks * 3);
 
                 await _context.SaveChangesAsync();
 
