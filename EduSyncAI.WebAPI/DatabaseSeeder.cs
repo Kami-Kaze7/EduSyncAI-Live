@@ -290,7 +290,62 @@ namespace EduSyncAI.WebAPI
                     }
                 }
 
-                Console.WriteLine("🔍 Database schema verification complete (checked all tables including CourseEnrollments and LectureMaterials).");
+                // 11. CourseSyllabi Table
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CourseSyllabi (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        CourseId INTEGER NOT NULL,
+                        LecturerId INTEGER NOT NULL,
+                        FileName TEXT NOT NULL,
+                        FilePath TEXT NOT NULL,
+                        FileType TEXT NOT NULL,
+                        ExtractedText TEXT,
+                        TotalWeeks INTEGER,
+                        UploadedAt TEXT NOT NULL
+                    );";
+                cmd.ExecuteNonQuery();
+
+                // 12. WeeklySummaries Table
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS WeeklySummaries (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        SyllabusId INTEGER NOT NULL,
+                        CourseId INTEGER NOT NULL,
+                        LecturerId INTEGER NOT NULL,
+                        WeekNumber INTEGER NOT NULL,
+                        DayNumber INTEGER NOT NULL DEFAULT 1,
+                        WeekTitle TEXT,
+                        Summary TEXT NOT NULL,
+                        KeyTopics TEXT,
+                        LearningObjectives TEXT,
+                        PreparationNotes TEXT,
+                        GeneratedAt TEXT NOT NULL,
+                        SentToStudents INTEGER NOT NULL DEFAULT 0,
+                        SentAt TEXT
+                    );";
+                cmd.ExecuteNonQuery();
+
+                // 13. StudentWeeklySummaries Table
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS StudentWeeklySummaries (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        StudentId INTEGER NOT NULL,
+                        WeeklySummaryId INTEGER NOT NULL,
+                        SentAt TEXT NOT NULL
+                    );";
+                cmd.ExecuteNonQuery();
+
+                // 14. LectureNotes Table
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS LectureNotes (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        SessionId INTEGER NOT NULL,
+                        Content TEXT NOT NULL,
+                        LastModified TEXT NOT NULL
+                    );";
+                cmd.ExecuteNonQuery();
+
+                Console.WriteLine("🔍 Database schema verification complete (all 14 tables checked).");
             }
             finally
             {
