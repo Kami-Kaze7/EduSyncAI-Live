@@ -245,7 +245,52 @@ namespace EduSyncAI.WebAPI
                     );";
                 cmd.ExecuteNonQuery();
 
-                Console.WriteLine("🔍 Database schema verification complete (checked Admins, Lecturers, Students, Courses, Sessions, and Attendance tables).");
+                // 9. CourseEnrollments Table
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS CourseEnrollments (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        CourseId INTEGER NOT NULL,
+                        StudentId INTEGER NOT NULL,
+                        EnrolledAt TEXT NOT NULL,
+                        UNIQUE(CourseId, StudentId)
+                    );";
+                cmd.ExecuteNonQuery();
+
+                // 10. LectureMaterials Table
+                cmd.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS LectureMaterials (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        SessionId INTEGER NOT NULL,
+                        FileName TEXT NOT NULL,
+                        FilePath TEXT NOT NULL,
+                        FileType TEXT,
+                        FileSize INTEGER DEFAULT 0,
+                        UploadedAt TEXT NOT NULL
+                    );";
+                cmd.ExecuteNonQuery();
+
+                // Migrate Courses table: add missing columns
+                var courseColumnsToAdd = new[]
+                {
+                    ("CreatedAt", "TEXT"),
+                    ("CreditHours", "INTEGER NOT NULL DEFAULT 3"),
+                    ("CourseName", "TEXT"),
+                };
+                foreach (var (colName, colType) in courseColumnsToAdd)
+                {
+                    try
+                    {
+                        cmd.CommandText = $"ALTER TABLE Courses ADD COLUMN {colName} {colType};";
+                        cmd.ExecuteNonQuery();
+                        Console.WriteLine($"  ✅ Added column Courses.{colName}");
+                    }
+                    catch
+                    {
+                        // Column already exists — safe to ignore
+                    }
+                }
+
+                Console.WriteLine("🔍 Database schema verification complete (checked all tables including CourseEnrollments and LectureMaterials).");
             }
             finally
             {
