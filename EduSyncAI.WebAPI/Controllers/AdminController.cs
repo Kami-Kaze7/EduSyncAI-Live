@@ -405,8 +405,8 @@ namespace EduSyncAI.WebAPI.Controllers
             }
         }
 
-        // GET: api/admin/courses
-        [HttpGet("courses")]
+        // GET: api/admin/course-list
+        [HttpGet("course-list")]
         public async Task<ActionResult> GetCourses()
         {
             try
@@ -436,8 +436,8 @@ namespace EduSyncAI.WebAPI.Controllers
             }
         }
 
-        // POST: api/admin/courses
-        [HttpPost("courses")]
+        // POST: api/admin/course-create
+        [HttpPost("course-create")]
         public async Task<ActionResult> CreateCourse([FromBody] CreateAdminCourseRequest request)
         {
             try
@@ -478,8 +478,8 @@ namespace EduSyncAI.WebAPI.Controllers
             }
         }
 
-        // DELETE: api/admin/courses/5
-        [HttpDelete("courses/{id}")]
+        // DELETE: api/admin/course-delete/5
+        [HttpDelete("course-delete/{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
             try
