@@ -247,7 +247,6 @@ export default function StudentDashboard() {
                                                             {wb.fileType?.match(/\.(mp4|webm|avi|mov)$/i) && (
                                                                 <span className="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full">🎬 REC</span>
                                                             )}
-                                                            <h3 className="text-base font-bold text-gray-900 truncate" title={wb.fileName}>{wb.fileName}</h3>
                                                         </div>
                                                         <p className="text-xs font-medium text-[#FF6B35] uppercase tracking-wider mt-1">{wb.courseCode} • {wb.courseName}</p>
                                                     </div>
@@ -1179,19 +1178,17 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
     };
 
     if (!isOpen) return (
-        <button onClick={() => setIsOpen(true)}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl p-4 flex items-center gap-3 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl group">
-            <span className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🤖</span>
-            <div className="text-left flex-1">
-                <div className="font-bold text-sm">AI Course Assistant</div>
-                <div className="text-xs text-white/70">Ask questions about this topic or take a quiz</div>
-            </div>
-            <svg className="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-        </button>
+        <div className="fixed bottom-6 right-6 z-50">
+            <button onClick={() => setIsOpen(true)}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full p-4 flex items-center gap-3 hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-1 group">
+                <span className="text-2xl group-hover:scale-110 transition-transform">🤖</span>
+                <span className="font-bold pr-2 hidden sm:block">Ask AI Assistant</span>
+            </button>
+        </div>
     );
 
     return (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="fixed bottom-6 right-6 z-50 w-[90vw] sm:w-[420px] bg-white rounded-3xl shadow-2xl shadow-purple-500/20 border border-gray-200/60 overflow-hidden flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-5">
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex items-center gap-3 cursor-pointer" onClick={() => setIsOpen(false)}>
                 <span className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg">🤖</span>

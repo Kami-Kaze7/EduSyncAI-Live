@@ -94,22 +94,29 @@ namespace EduSyncAI
         {
             try
             {
-                // Load courses
-                var courses = _dbService.GetAllCourses();
-                Courses.Clear();
-                foreach (var course in courses)
+                if (AppConfig.UseRemoteServer)
                 {
-                    Courses.Add(course);
+                    LoadCoursesFromRemoteApi();
+                }
+                else
+                {
+                    // Load courses from local DB
+                    var courses = _dbService.GetAllCourses();
+                    Courses.Clear();
+                    foreach (var course in courses)
+                    {
+                        Courses.Add(course);
+                    }
                 }
 
-                // Load active session
+                // Load active session (local)
                 ActiveSession = _sessionService.GetActiveSession();
                 if (ActiveSession != null)
                 {
                     StartLiveTimer();
                 }
 
-                // Load session history
+                // Load session history (local)
                 var sessions = _sessionService.GetAllSessions();
                 SessionHistory.Clear();
                 foreach (var session in sessions)
@@ -121,6 +128,63 @@ namespace EduSyncAI
             {
                 System.Windows.MessageBox.Show($"Error loading data: {ex.Message}", "Error",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
+
+        private void LoadCoursesFromRemoteApi()
+        {
+            try
+            {
+                using var client = new HttpClient();
+                client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
+
+                // Add JWT auth token
+                var token = AuthenticationService.AuthToken;
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+
+                Console.WriteLine($"[COURSES] Fetching courses from {AppConfig.ApiUrl}/courses");
+                var response = client.GetAsync("api/courses").ConfigureAwait(false).GetAwaiter().GetResult();
+                var responseText = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+                Console.WriteLine($"[COURSES] Response: {response.StatusCode}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var courses = JsonSerializer.Deserialize<List<Course>>(responseText, options);
+
+                    Courses.Clear();
+                    if (courses != null)
+                    {
+                        foreach (var course in courses)
+                        {
+                            Console.WriteLine($"[COURSES] Found: {course.CourseCode} - {course.CourseTitle}");
+                            Courses.Add(course);
+                            // Sync into local DB so session creation foreign keys work
+                            _dbService.UpsertCourseWithId(course);
+                        }
+                    }
+                    Console.WriteLine($"[COURSES] Total courses loaded: {Courses.Count}");
+                }
+                else
+                {
+                    Console.WriteLine($"[COURSES] Failed to fetch courses: {responseText}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[COURSES] Error fetching remote courses: {ex.Message}");
+                // Fallback to local DB
+                var courses = _dbService.GetAllCourses();
+                Courses.Clear();
+                foreach (var course in courses)
+                {
+                    Courses.Add(course);
+                }
             }
         }
 
@@ -177,10 +241,6 @@ namespace EduSyncAI
                 // 3. Start the session
                 _sessionService.StartSession(sessionId);
                 
-                var session = _sessionService.GetSessionById(sessionId);
-                System.Windows.MessageBox.Show($"Session started successfully!\n\nCourse: {session.CourseName}\nLecture: {session.LectureTopic}", 
-                    "Session Live", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-
                 LoadData();
             }
             catch (Exception ex)
@@ -197,36 +257,20 @@ namespace EduSyncAI
                 return;
             }
 
-            var result = System.Windows.MessageBox.Show(
-                $"End this session?\n\nCourse: {ActiveSession.CourseName}\nLecture: {ActiveSession.LectureTopic}",
-                "Confirm End Session",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Question);
-
-            if (result == System.Windows.MessageBoxResult.Yes)
+            try
             {
-                try
-                {
-                    _sessionService.EndSession(ActiveSession.Id);
-                    StopLiveTimer();
+                _sessionService.EndSession(ActiveSession.Id);
+                StopLiveTimer();
 
-                    var endedSession = _sessionService.GetSessionById(ActiveSession.Id);
-                    var duration = _sessionService.GetFormattedDuration(endedSession.Duration);
-
-                    System.Windows.MessageBox.Show($"Session ended!\n\nDuration: {duration}", 
-                        "Session Ended", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-
-                    LoadData();
+                LoadData();
 
                     // Upload attendance records to cloud
-                    _ = UploadAttendanceRecordsAsync(endedSession.Id);
+                    _ = UploadAttendanceRecordsAsync(ActiveSession.Id);
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.MessageBox.Show($"Error ending session: {ex.Message}", "Error",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    System.Diagnostics.Debug.WriteLine($"Error ending session: {ex.Message}");
                 }
-            }
         }
 
         private void StartLiveTimer()

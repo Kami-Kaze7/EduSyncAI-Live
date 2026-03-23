@@ -102,7 +102,7 @@ export default function LecturerWhiteboardsPage() {
                                                 {wb.fileType?.match(/\.(mp4|webm|avi|mov)$/i) && (
                                                     <span className="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full flex-shrink-0">🎬 REC</span>
                                                 )}
-                                                <h3 className="text-base font-bold text-gray-900 truncate" title={wb.fileName}>{wb.fileName}</h3>
+
                                             </div>
                                             <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider mt-1">{wb.courseCode} • {wb.courseName}</p>
                                         </div>

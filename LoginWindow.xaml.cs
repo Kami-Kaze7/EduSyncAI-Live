@@ -20,6 +20,20 @@ namespace EduSyncAI
             PasswordBox.PasswordChanged += (s, e) => _viewModel.Password = PasswordBox.Password;
         }
 
+        private void ToggleFingerprint_Click(object sender, RoutedEventArgs e)
+        {
+            if (PasswordPanel.Visibility == Visibility.Visible)
+            {
+                PasswordPanel.Visibility = Visibility.Collapsed;
+                FingerprintPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PasswordPanel.Visibility = Visibility.Visible;
+                FingerprintPanel.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void OnLecturerLoginSuccessful(object sender, Lecturer lecturer)
         {
             // Open lecturer dashboard
