@@ -23,6 +23,7 @@ export default function StudentDashboard() {
     const [materials, setMaterials] = useState<any[]>([]);
     const [isFetchingMaterials, setIsFetchingMaterials] = useState(false);
     const [liveStreams, setLiveStreams] = useState<any[]>([]);
+    const [isMounted, setIsMounted] = useState(false);
 
     const handleAskAI = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,6 +46,7 @@ export default function StudentDashboard() {
     };
 
     useEffect(() => {
+        setIsMounted(true);
         const token = localStorage.getItem('studentToken');
         if (!token) {
             router.push('/student/login');
@@ -131,7 +133,7 @@ export default function StudentDashboard() {
         router.push('/student/login');
     };
 
-    const studentUser = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('studentUser') || '{"fullName":"Student"}') : { fullName: 'Student' };
+    const studentUser = isMounted ? JSON.parse(localStorage.getItem('studentUser') || '{"fullName":"Student"}') : { fullName: 'Student' };
 
     const { data: profile } = useQuery<any>({
         queryKey: ['student-profile'],
