@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { studentApi } from '@/lib/studentApi';
 import toast from 'react-hot-toast';
@@ -11,7 +11,10 @@ export default function LiveClassroomPage() {
     const sessionId = params.sessionId as string;
     const [streamInfo, setStreamInfo] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isInCall, setIsInCall] = useState(false);
     const [elapsed, setElapsed] = useState('00:00');
+    const jitsiContainerRef = useRef<HTMLDivElement>(null);
+    const jitsiApiRef = useRef<any>(null);
 
     // Fetch stream info
     useEffect(() => {
@@ -55,49 +58,95 @@ export default function LiveClassroomPage() {
         return () => clearInterval(interval);
     }, [streamInfo]);
 
-    const handleJoinClass = () => {
-        if (!streamInfo) return;
+    // Cleanup Jitsi on unmount
+    useEffect(() => {
+        return () => {
+            if (jitsiApiRef.current) {
+                try { jitsiApiRef.current.dispose(); } catch {}
+            }
+        };
+    }, []);
+
+    const handleJoinClass = useCallback(() => {
+        if (!streamInfo || !jitsiContainerRef.current) return;
 
         const studentUser = typeof window !== 'undefined'
             ? JSON.parse(localStorage.getItem('studentUser') || '{"fullName":"Student"}')
             : { fullName: 'Student' };
 
-        const displayName = encodeURIComponent(studentUser.fullName);
-        
-        // Build return URL for when call ends — redirect back to student dashboard
-        const returnUrl = encodeURIComponent(window.location.origin + '/student/dashboard');
-        
-        // Navigate the current tab directly to the Jitsi URL
-        // This is the most reliable method — no iframes, no popups, no deep-link interception
-        // The browser navigates directly to Jitsi like visiting any website
-        const jitsiUrl = `https://meet.viicsoft.dev/${streamInfo.roomName}` +
-            `#config.prejoinConfig.enabled=false` +
-            `&config.prejoinPageEnabled=false` +
-            `&config.startWithAudioMuted=true` +
-            `&config.startWithVideoMuted=true` +
-            `&config.disableDeepLinking=true` +
-            `&config.disableInitialGUM=true` +
-            `&config.hideConferenceSubject=true` +
-            `&config.enableInsecureRoomNameWarning=false` +
-            `&config.enableClosePage=true` +
-            `&config.redirectOnHangup=${returnUrl}` +
-            `&config.disableInviteFunctions=true` +
-            `&config.displayName=${displayName}` +
-            `&userInfo.displayName=${displayName}` +
-            `&interfaceConfig.SHOW_JITSI_WATERMARK=false` +
-            `&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false` +
-            `&interfaceConfig.SHOW_BRAND_WATERMARK=false` +
-            `&interfaceConfig.SHOW_POWERED_BY=false` +
-            `&interfaceConfig.MOBILE_APP_PROMO=false` +
-            `&interfaceConfig.APP_NAME=EduSync+AI` +
-            `&interfaceConfig.NATIVE_APP_NAME=EduSync+AI` +
-            `&interfaceConfig.PROVIDER_NAME=EduSync+AI`;
-        
-        // Navigate in the SAME tab — this is the key difference
-        // Unlike window.open() or iframes, this works exactly like the user
-        // typing the URL directly into the browser's address bar
-        window.location.href = jitsiUrl;
-    };
+        const displayName = studentUser.fullName || 'Student';
+
+        // Load the Jitsi IFrame API script dynamically
+        const script = document.createElement('script');
+        script.src = 'https://meet.viicsoft.dev/external_api.js';
+        script.async = true;
+        script.onload = () => {
+            // Create Jitsi Meet API instance with full control
+            const api = new (window as any).JitsiMeetExternalAPI('meet.viicsoft.dev', {
+                roomName: streamInfo.roomName,
+                parentNode: jitsiContainerRef.current,
+                width: '100%',
+                height: '100%',
+                userInfo: {
+                    displayName: displayName,
+                },
+                configOverwrite: {
+                    prejoinConfig: { enabled: false },
+                    prejoinPageEnabled: false,
+                    startWithAudioMuted: true,
+                    startWithVideoMuted: true,
+                    disableDeepLinking: true,
+                    hideConferenceSubject: true,
+                    enableInsecureRoomNameWarning: false,
+                    enableClosePage: false,
+                    disableInviteFunctions: true,
+                    toolbarButtons: [
+                        'microphone', 'camera', 'chat', 'raisehand',
+                        'tileview', 'hangup'
+                    ],
+                },
+                interfaceConfigOverwrite: {
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                    SHOW_BRAND_WATERMARK: false,
+                    SHOW_POWERED_BY: false,
+                    MOBILE_APP_PROMO: false,
+                    APP_NAME: 'EduSync AI',
+                    NATIVE_APP_NAME: 'EduSync AI',
+                    PROVIDER_NAME: 'EduSync AI',
+                    DEFAULT_REMOTE_DISPLAY_NAME: 'Student',
+                    TOOLBAR_ALWAYS_VISIBLE: true,
+                },
+            });
+
+            jitsiApiRef.current = api;
+            setIsInCall(true);
+
+            // When the user hangs up, redirect back to dashboard
+            api.addEventListener('readyToClose', () => {
+                console.log('[JITSI] Call ended, redirecting to dashboard');
+                api.dispose();
+                jitsiApiRef.current = null;
+                router.push('/student/dashboard');
+            });
+
+            // Also handle video conference left
+            api.addEventListener('videoConferenceLeft', () => {
+                console.log('[JITSI] Left conference, redirecting to dashboard');
+                setTimeout(() => {
+                    if (jitsiApiRef.current) {
+                        jitsiApiRef.current.dispose();
+                        jitsiApiRef.current = null;
+                    }
+                    router.push('/student/dashboard');
+                }, 500);
+            });
+        };
+        script.onerror = () => {
+            toast.error('Failed to load Jitsi. Please try again.');
+        };
+        document.body.appendChild(script);
+    }, [streamInfo, router]);
 
     if (isLoading) {
         return (
@@ -136,6 +185,16 @@ export default function LiveClassroomPage() {
         );
     }
 
+    // When in call, show full-screen Jitsi iframe
+    if (isInCall) {
+        return (
+            <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
+                <div ref={jitsiContainerRef} style={{ width: '100%', height: '100%' }} />
+            </div>
+        );
+    }
+
+    // Pre-join lobby
     return (
         <div style={{
             minHeight: '100vh',
