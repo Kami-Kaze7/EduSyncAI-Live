@@ -12,10 +12,7 @@ namespace EduSyncAI
 
         static DatabaseService()
         {
-            // Resolve absolute path: bin/Debug/net9.0-windows.../  →  project root  →  Data/edusync.db
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var projectRoot = Path.GetFullPath(Path.Combine(baseDir, "..", "..", ".."));
-            DbPath = Path.Combine(projectRoot, "Data", "edusync.db");
+            DbPath = Path.Combine(AppConfig.DataDir, "edusync.db");
             ConnString = "Data Source=" + DbPath;
             Console.WriteLine($"[DB] Using database: {DbPath}");
             Console.WriteLine($"[DB] File exists: {File.Exists(DbPath)}");
@@ -207,6 +204,26 @@ namespace EduSyncAI
             command.Parameters.AddWithValue("@title", course.CourseTitle);
             command.Parameters.AddWithValue("@path", course.SyllabusPath ?? "");
             return Convert.ToInt32(command.ExecuteScalar());
+        }
+
+        /// <summary>
+        /// Inserts or updates a course with a specific ID (to sync remote courses into local DB).
+        /// Uses INSERT OR REPLACE to preserve the remote server's ID.
+        /// </summary>
+        public void UpsertCourseWithId(Course course)
+        {
+            using var connection = GetConnection();
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+            INSERT OR REPLACE INTO Courses (Id, CourseCode, CourseTitle, SyllabusPath)
+            VALUES (@id, @code, @title, @path);
+        ";
+            command.Parameters.AddWithValue("@id", course.Id);
+            command.Parameters.AddWithValue("@code", course.CourseCode ?? "");
+            command.Parameters.AddWithValue("@title", course.CourseTitle ?? "");
+            command.Parameters.AddWithValue("@path", course.SyllabusPath ?? "");
+            command.ExecuteNonQuery();
         }
 
         public List<Course> GetAllCourses()

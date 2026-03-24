@@ -9,6 +9,9 @@ namespace EduSyncAI
     {
         private ServiceManager? _serviceManager;
 
+        // Portable crash log path — works on any PC
+        private static readonly string CrashLogPath = Path.Combine(AppConfig.DataDir, "crash_log.txt");
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             // Prevent premature shutdown during async startup
@@ -16,24 +19,22 @@ namespace EduSyncAI
             
             base.OnStartup(e);
             
-            Console.Error.WriteLine("[EduSync] OnStartup entered");
-            File.AppendAllText(@"c:\EduSyncAI\crash_log.txt", $"\n===STARTUP ENTERED [{DateTime.Now}]===\n");
+            try { File.AppendAllText(CrashLogPath, $"\n===STARTUP ENTERED [{DateTime.Now}]===\n"); } catch { }
             // Global crash logger
-            var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "crash_log.txt");
             AppDomain.CurrentDomain.UnhandledException += (s, args) =>
             {
                 var ex = args.ExceptionObject as Exception;
-                File.AppendAllText(logPath, $"\n\n===UNHANDLED [{DateTime.Now}]===\n{ex?.ToString()}");
+                try { File.AppendAllText(CrashLogPath, $"\n\n===UNHANDLED [{DateTime.Now}]===\n{ex?.ToString()}"); } catch { }
             };
             DispatcherUnhandledException += (s, args) =>
             {
-                File.AppendAllText(logPath, $"\n\n===DISPATCHER [{DateTime.Now}]===\n{args.Exception.ToString()}");
+                try { File.AppendAllText(CrashLogPath, $"\n\n===DISPATCHER [{DateTime.Now}]===\n{args.Exception.ToString()}"); } catch { }
                 MessageBox.Show(args.Exception.ToString(), "EduSync Crash", MessageBoxButton.OK, MessageBoxImage.Error);
                 args.Handled = true;
             };
             TaskScheduler.UnobservedTaskException += (s, args) =>
             {
-                File.AppendAllText(logPath, $"\n\n===TASK [{DateTime.Now}]===\n{args.Exception.ToString()}");
+                try { File.AppendAllText(CrashLogPath, $"\n\n===TASK [{DateTime.Now}]===\n{args.Exception.ToString()}"); } catch { }
             };
             try
             {
@@ -42,7 +43,7 @@ namespace EduSyncAI
             }
             catch (Exception ex)
             {
-                File.AppendAllText(@"c:\EduSyncAI\crash_log.txt", $"\n\n===DB INIT [{DateTime.Now}]===\n{ex}");
+                try { File.AppendAllText(CrashLogPath, $"\n\n===DB INIT [{DateTime.Now}]===\n{ex}"); } catch { }
                 MessageBox.Show(
                     $"Database initialization failed:\n\n{ex.Message}",
                     "Startup Error",
@@ -71,7 +72,7 @@ namespace EduSyncAI
                 }
                 catch (Exception ex)
                 {
-                    File.AppendAllText(@"c:\EduSyncAI\crash_log.txt", $"\n\n===SERVICE [{DateTime.Now}]===\n{ex}");
+                    try { File.AppendAllText(CrashLogPath, $"\n\n===SERVICE [{DateTime.Now}]===\n{ex}"); } catch { }
                     splash.ShowError($"Startup error: {ex.Message}");
                     await Task.Delay(2000);
                 }
@@ -86,7 +87,7 @@ namespace EduSyncAI
             }
             catch (Exception ex)
             {
-                File.AppendAllText(@"c:\EduSyncAI\crash_log.txt", $"\n\n===STARTUP [{DateTime.Now}]===\n{ex}");
+                try { File.AppendAllText(CrashLogPath, $"\n\n===STARTUP [{DateTime.Now}]===\n{ex}"); } catch { }
                 MessageBox.Show($"Startup Error:\n\n{ex.Message}\n\nSee crash_log.txt for details.", "EduSync Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

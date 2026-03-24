@@ -13,14 +13,14 @@ namespace EduSyncAI
     public class GeminiVisionService
     {
         private static readonly string API_KEY = "AIzaSyAvSaTdksyJd1H2IaSGWbBrD1WJd1zLXSA";
-        private static readonly string GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
+        private static readonly string GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
         
         private readonly HttpClient _httpClient;
 
         public GeminiVisionService()
         {
             _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(60);
+            _httpClient.Timeout = TimeSpan.FromSeconds(45);
         }
 
         public async Task<FaceRecognitionResult> RecognizeFacesAsync(byte[] classroomImage, List<StudentProfile> enrolledStudents)
@@ -111,8 +111,12 @@ Return ONLY the JSON, nothing else.";
                 string jsonRequest = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(GEMINI_API_URL, content);
-                string responseJson = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[GEMINI] Sending recognition request with {enrolledStudents.Count} reference photos...");
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                var response = await _httpClient.PostAsync(GEMINI_API_URL, content).ConfigureAwait(false);
+                string responseJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                sw.Stop();
+                Console.WriteLine($"[GEMINI] Response received in {sw.ElapsedMilliseconds}ms - Status: {response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {

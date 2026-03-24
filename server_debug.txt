@@ -1,0 +1,27 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=../Data/edusync.db"
+  },
+  "Jwt": {
+    "Secret": "EduSyncAI-Super-Secret-Key-For-JWT-Authentication-Min-32-Chars",
+    "Issuer": "EduSyncAI",
+    "Audience": "EduSyncAI-Web",
+    "ExpirationHours": 24
+  },
+  "Gemini": {
+    "ApiKey": "AIzaSyCPDfN0mq2lEMebdtNBOPP5Hoq4sFrp1kE"
+  }
+}
+===DB===
+-rw-r--r-- 1 root root 0 Mar 21 23:02 /opt/edusyncai/publish/edusync.db
+-rw-r--r-- 1 root root 440K Mar 15 23:44 /opt/edusyncai/publish/webapi/Data/edusync.db
+-rwxrwxrwx 1 root root 608K Mar 21 23:13 /opt/edusyncai/publish/Data/edusync.db
+-rw-r--r-- 1 root root 628K Mar 23 16:23 /opt/edusyncai/Data/edusync.db

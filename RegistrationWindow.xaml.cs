@@ -354,7 +354,7 @@ namespace EduSyncAI
                     }
 
                     // Save all captured poses
-                    var photosDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "StudentPhotos");
+                    var photosDir = Path.Combine(AppConfig.DataDir, "StudentPhotos");
                     Directory.CreateDirectory(photosDir);
                     
                     var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");

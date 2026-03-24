@@ -64,6 +64,9 @@ export default function LiveClassroomPage() {
 
         const displayName = encodeURIComponent(studentUser.fullName);
         
+        // Build return URL for when call ends — redirect back to student dashboard
+        const returnUrl = encodeURIComponent(window.location.origin + '/student/dashboard');
+        
         // Navigate the current tab directly to the Jitsi URL
         // This is the most reliable method — no iframes, no popups, no deep-link interception
         // The browser navigates directly to Jitsi like visiting any website
@@ -76,8 +79,10 @@ export default function LiveClassroomPage() {
             `&config.disableInitialGUM=true` +
             `&config.hideConferenceSubject=true` +
             `&config.enableInsecureRoomNameWarning=false` +
-            `&config.enableClosePage=false` +
+            `&config.enableClosePage=true` +
+            `&config.redirectOnHangup=${returnUrl}` +
             `&config.disableInviteFunctions=true` +
+            `&config.displayName=${displayName}` +
             `&userInfo.displayName=${displayName}` +
             `&interfaceConfig.SHOW_JITSI_WATERMARK=false` +
             `&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false` +

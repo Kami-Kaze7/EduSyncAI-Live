@@ -8,60 +8,65 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Emgu.CV;
-using Emgu.CV.Structure;
-using Emgu.CV.CvEnum;
-using System.Runtime.InteropServices;
-using System.Windows.Media;
-using Drawing = System.Drawing;
-using System.Drawing.Imaging;
 using System.Diagnostics;
 
 namespace EduSyncAI
 {
     public partial class SessionManagementView : UserControl
     {
-        private readonly GeminiFaceRecognitionService _faceService;
-        private readonly DatabaseService _dbService;
-        private DispatcherTimer _cameraTimer;
-        private DispatcherTimer _recognitionTimer;
-        private VideoCapture? _capture;
-        private bool _isCameraActive = false;
-        private bool _isRecognizing = false;
-        private HashSet<int> _markedStudents = new HashSet<int>();
-        
-        // Live streaming state
-        private bool _isStreamingFrames = false;
-        private int _liveSessionId = 0;
-        private int _frameCounter = 0;
-        private static readonly HttpClient _streamClient = new HttpClient();
-
-        // Screen recording state
+        // Screen recording state (stays here — recording is session-level)
         private Process? _screenRecordProcess;
         private bool _isScreenRecording = false;
         private string _screenRecordingPath = "";
         private int _recordingSessionId = 0;
         private DispatcherTimer? _recBlinkTimer;
 
+        // Reference to auto-opened whiteboard
+        private WhiteboardWindow? _activeWhiteboard;
+
+        // Course card selection
+        private System.Windows.Controls.Border? _selectedCardBorder;
+
         public SessionManagementView()
         {
             InitializeComponent();
-            _faceService = new GeminiFaceRecognitionService();
-            _dbService = new DatabaseService();
-            
-            // Subscribe to DataContext changes to handle session end
             DataContextChanged += SessionManagementView_DataContextChanged;
+        }
+
+        private void CourseCard_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Border border && border.Tag is Course course)
+            {
+                var viewModel = DataContext as SessionManagementViewModel;
+                if (viewModel != null)
+                {
+                    viewModel.SelectedCourse = course;
+                }
+
+                // Reset previous selection
+                if (_selectedCardBorder != null)
+                {
+                    _selectedCardBorder.Background = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8F9FA"));
+                    _selectedCardBorder.BorderBrush = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BDC3C7"));
+                }
+
+                // Highlight selected card
+                border.Background = new System.Windows.Media.SolidColorBrush(
+                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EBF5FB"));
+                border.BorderBrush = new System.Windows.Media.SolidColorBrush(
+                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#3498DB"));
+                _selectedCardBorder = border;
+            }
         }
 
         private void SessionManagementView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            // Unsubscribe from old ViewModel
             if (e.OldValue is SessionManagementViewModel oldViewModel)
             {
                 oldViewModel.PropertyChanged -= ViewModel_PropertyChanged;
             }
-
-            // Subscribe to new ViewModel
             if (e.NewValue is SessionManagementViewModel newViewModel)
             {
                 newViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -77,16 +82,15 @@ namespace EduSyncAI
                 {
                     if (viewModel.HasActiveSession && viewModel.ActiveSession != null)
                     {
-                        // Session started → start screen recording
+                        // Session started → start screen recording + auto-open whiteboard
                         StartScreenRecording(viewModel.ActiveSession.Id);
+                        AutoOpenWhiteboard(viewModel);
                     }
                     else
                     {
-                        // Session ended → stop camera and recording
-                        if (_isCameraActive) StopCameraIfActive();
+                        // Session ended → stop recording
                         if (_isScreenRecording)
                         {
-                            // Await the stop to ensure FFmpeg finalizes the file
                             await StopScreenRecordingAsync();
                         }
                     }
@@ -94,12 +98,59 @@ namespace EduSyncAI
             }
         }
 
-        public void StopCameraIfActive()
+        private void AutoOpenWhiteboard(SessionManagementViewModel viewModel)
         {
-            if (_isCameraActive)
+            try
             {
-                _ = StopCameraAsync();
+                if (viewModel.ActiveSession == null) return;
+
+                _activeWhiteboard = new WhiteboardWindow(
+                    viewModel.ActiveSession.Id,
+                    viewModel,
+                    OnWhiteboardSessionEnded);
+                _activeWhiteboard.Closed += (s, e) => RestoreMainWindow();
+                _activeWhiteboard.Show();
+
+                // Minimize the main window so only the whiteboard is visible
+                MinimizeMainWindow();
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error opening whiteboard: {ex.Message}");
+            }
+        }
+
+        private async void OnWhiteboardSessionEnded()
+        {
+            // When session is ended from the whiteboard, stop recording here
+            if (_isScreenRecording)
+            {
+                await StopScreenRecordingAsync();
+            }
+            // Restore the main window
+            RestoreMainWindow();
+        }
+
+        private void MinimizeMainWindow()
+        {
+            var mainWindow = Window.GetWindow(this);
+            if (mainWindow != null)
+            {
+                mainWindow.WindowState = WindowState.Minimized;
+            }
+        }
+
+        private void RestoreMainWindow()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var mainWindow = Window.GetWindow(this);
+                if (mainWindow != null)
+                {
+                    mainWindow.WindowState = WindowState.Normal;
+                    mainWindow.Activate();
+                }
+            });
         }
 
         private void OpenWhiteboard_Click(object sender, RoutedEventArgs e)
@@ -109,409 +160,30 @@ namespace EduSyncAI
                 var viewModel = DataContext as SessionManagementViewModel;
                 if (viewModel?.ActiveSession != null)
                 {
-                    var whiteboard = new WhiteboardWindow(viewModel.ActiveSession.Id);
-                    whiteboard.Show();
+                    // If whiteboard is already open, just bring it to front
+                    if (_activeWhiteboard != null && _activeWhiteboard.IsLoaded)
+                    {
+                        _activeWhiteboard.WindowState = WindowState.Normal;
+                        _activeWhiteboard.Activate();
+                        MinimizeMainWindow();
+                        return;
+                    }
+                    _activeWhiteboard = new WhiteboardWindow(
+                        viewModel.ActiveSession.Id,
+                        viewModel,
+                        OnWhiteboardSessionEnded);
+                    _activeWhiteboard.Closed += (s, args) => RestoreMainWindow();
+                    _activeWhiteboard.Show();
+                    MinimizeMainWindow();
                 }
                 else
                 {
-                    MessageBox.Show("No active session. Please start a session first.",
-                        "No Active Session", MessageBoxButton.OK, MessageBoxImage.Information);
+                    System.Diagnostics.Debug.WriteLine("No active session. Please start a session first.");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error opening whiteboard:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}",
-                    "Whiteboard Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void StartCamera_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                FacialStatusText.Text = "Starting native camera...";
-                StartButton.Visibility = Visibility.Collapsed;
-                StopButton.Visibility = Visibility.Visible;
-                
-                _capture = new VideoCapture(0); // Open default camera
-                if (!_capture.IsOpened)
-                {
-                    MessageBox.Show("Failed to open camera. Please check if camera is available.", 
-                        "Camera Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    FacialStatusText.Text = "Camera failed to start";
-                    StartButton.Visibility = Visibility.Visible;
-                    StopButton.Visibility = Visibility.Collapsed;
-                    return;
-                }
-
-                _isCameraActive = true;
-                _markedStudents.Clear();
-                FacialStatusText.Text = "🔴 LIVE: Native recognition active. Students will be marked as they appear.";
-
-                // Start camera preview timer (fast - 33ms for ~30fps)
-                _cameraTimer = new DispatcherTimer
-                {
-                    Interval = TimeSpan.FromMilliseconds(33)
-                };
-                _cameraTimer.Tick += (s, args) => UpdateCameraPreview();
-                _cameraTimer.Start();
-
-                // Start recognition timer (slower - every 10 seconds)
-                _recognitionTimer = new DispatcherTimer
-                {
-                    Interval = TimeSpan.FromSeconds(10)
-                };
-                _recognitionTimer.Tick += async (s, args) => await AutoRecognizeFaces();
-                _recognitionTimer.Start();
-
-                MessageBox.Show("✅ Native recognition started!\n\nSnapshots will be taken every 10 seconds and matched against student profile pictures.", 
-                    "Recognition Active", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error starting camera: {ex.Message}", 
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                FacialStatusText.Text = "Error starting camera";
-                StartButton.Visibility = Visibility.Visible;
-                StopButton.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void UpdateCameraPreview()
-        {
-            try
-            {
-                if (_capture == null || !_capture.IsOpened) return;
-
-                using (var frame = _capture.QueryFrame())
-                {
-                    if (frame != null)
-                    {
-                        CameraPreview.Source = MatToBitmapSource(frame);
-                        
-                        // Send frame to Web API for PiP streaming (~5fps: every 6th frame from 30fps)
-                        _frameCounter++;
-                        if (_isStreamingFrames && _frameCounter % 6 == 0)
-                        {
-                            _ = SendFrameAsync(frame);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                // Ignore preview errors
-            }
-        }
-
-        private async Task AutoRecognizeFaces()
-        {
-            if (_isRecognizing || _capture == null || !_capture.IsOpened)
-                return;
-
-            try
-            {
-                _isRecognizing = true;
-                if (DataContext is not SessionManagementViewModel viewModel || viewModel.ActiveSession == null) return;
-
-                FacialStatusText.Text = "📸 Taking snapshot for recognition...";
-
-                string base64Snapshot = "";
-                using (var frame = _capture.QueryFrame())
-                {
-                    if (frame == null) return;
-                    
-                    // Convert Mat to Base64
-                    using (var mem = new MemoryStream())
-                    {
-                        using (Drawing.Bitmap bitmap = frame.ToBitmap())
-                        {
-                            bitmap.Save(mem, ImageFormat.Jpeg);
-                            base64Snapshot = Convert.ToBase64String(mem.ToArray());
-                        }
-                    }
-                }
-
-                if (string.IsNullOrEmpty(base64Snapshot)) return;
-
-                FacialStatusText.Text = "🔍 Matching faces against profile pictures...";
-
-                // Recognize faces natively
-                var result = await _faceService.RecognizeFacesAsync(viewModel.ActiveSession.Id, base64Snapshot);
-
-                if (!result.Success)
-                {
-                    FacialStatusText.Text = $"🔴 LIVE: Recognition error - {result.Error}";
-                    return;
-                }
-
-                // Process new matches only
-                var newMatches = result.Matches.Where(m => !_markedStudents.Contains(m.StudentId)).ToList();
-
-                if (newMatches.Count > 0)
-                {
-                    // Mark attendance for new students
-                    var markedCount = await _faceService.MarkAttendanceAsync(viewModel.ActiveSession.Id, newMatches);
-
-                    if (markedCount > 0)
-                    {
-                        // Add to marked list
-                        foreach (var match in newMatches)
-                        {
-                            _markedStudents.Add(match.StudentId);
-
-                            // Add to UI
-                            var studentPanel = new Border
-                            {
-                                Background = System.Windows.Media.Brushes.White,
-                                Padding = new Thickness(10),
-                                Margin = new Thickness(0, 0, 0, 5),
-                                CornerRadius = new CornerRadius(3)
-                            };
-
-                            var grid = new Grid();
-                            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                            var nameText = new TextBlock
-                            {
-                                Text = match.Name,
-                                FontWeight = FontWeights.SemiBold
-                            };
-                            Grid.SetColumn(nameText, 0);
-
-                            var confidencePanel = new StackPanel
-                            {
-                                Orientation = System.Windows.Controls.Orientation.Horizontal
-                            };
-                            var confidenceText = new TextBlock
-                            {
-                                Text = $"{(match.Confidence * 100):F0}%",
-                                Foreground = System.Windows.Media.Brushes.Green,
-                                FontWeight = FontWeights.Bold,
-                                Margin = new Thickness(0, 0, 5, 0)
-                            };
-                            var checkText = new TextBlock
-                            {
-                                Text = "✓",
-                                Foreground = System.Windows.Media.Brushes.Green,
-                                FontWeight = FontWeights.Bold
-                            };
-                            confidencePanel.Children.Add(confidenceText);
-                            confidencePanel.Children.Add(checkText);
-                            Grid.SetColumn(confidencePanel, 1);
-
-                            grid.Children.Add(nameText);
-                            grid.Children.Add(confidencePanel);
-                            studentPanel.Child = grid;
-
-                            RecognizedStudentsList.Children.Insert(0, studentPanel);
-                        }
-
-                        // Play success sound
-                        System.Media.SystemSounds.Exclamation.Play();
-                        
-                        // Update UI Count
-                        viewModel.ActiveSession.AttendanceCount += markedCount;
-                        _dbService.UpdateClassSession(viewModel.ActiveSession);
-                        
-                        RecognizedStudentsPanel.Visibility = Visibility.Visible;
-                        FacialStatusText.Text = $"✅ {_markedStudents.Count} student(s) marked present. Scanning continues...";
-                    }
-                    else
-                    {
-                        FacialStatusText.Text = "🔴 LIVE: Recognition succeeded, but database save failed.";
-                    }
-                }
-                else
-                {
-                    // No new matches
-                    if (_markedStudents.Count > 0)
-                    {
-                        FacialStatusText.Text = $"🔴 LIVE: {_markedStudents.Count} student(s) marked. Scanning for more...";
-                    }
-                    else
-                    {
-                        FacialStatusText.Text = "🔴 LIVE: Scanning... No students recognized yet.";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                FacialStatusText.Text = $"⚠️ Error: {ex.Message}. Continuing to scan...";
-            }
-            finally
-            {
-                _isRecognizing = false;
-            }
-        }
-
-        private async void StopCamera_Click(object sender, RoutedEventArgs e)
-        {
-            await StopCameraAsync();
-        }
-
-        private async Task StopCameraAsync()
-        {
-            try
-            {
-                _cameraTimer?.Stop();
-                _cameraTimer = null;
-                _recognitionTimer?.Stop();
-                _recognitionTimer = null;
-                _isCameraActive = false;
-                _isRecognizing = false;
-
-                if (_capture != null)
-                {
-                    _capture.Dispose();
-                    _capture = null;
-                }
-                
-                CameraPreview.Source = null;
-                StartButton.Visibility = Visibility.Visible;
-                StopButton.Visibility = Visibility.Collapsed;
-
-                var totalMarked = _markedStudents.Count;
-                FacialStatusText.Text = $"Recognition stopped. Total students marked: {totalMarked}";
-
-                if (totalMarked > 0)
-                {
-                    MessageBox.Show($"✅ Recognition session ended!\n\nTotal students marked present: {totalMarked}", 
-                        "Session Complete", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error stopping camera: {ex.Message}", 
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private BitmapSource MatToBitmapSource(Mat mat)
-        {
-            using (Drawing.Bitmap bitmap = mat.ToBitmap())
-            {
-                IntPtr hBitmap = bitmap.GetHbitmap();
-                try
-                {
-                    return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                        hBitmap,
-                        IntPtr.Zero,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-                }
-                finally
-                {
-                    DeleteObject(hBitmap);
-                }
-            }
-        }
-
-        [DllImport("gdi32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool DeleteObject(IntPtr hObject);
-
-        private BitmapImage Base64ToImage(string base64String)
-        {
-            // Remove data:image prefix if present
-            if (base64String.Contains(","))
-            {
-                base64String = base64String.Split(',')[1];
-            }
-
-            byte[] imageBytes = Convert.FromBase64String(base64String);
-            var bitmap = new BitmapImage();
-            using (var stream = new MemoryStream(imageBytes))
-            {
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.StreamSource = stream;
-                bitmap.EndInit();
-            }
-            bitmap.Freeze();
-            return bitmap;
-        }
-
-        // ==================== FRAME STREAMING ====================
-
-        private async Task SendFrameAsync(Mat frame)
-        {
-            try
-            {
-                using (Drawing.Bitmap bitmap = frame.ToBitmap())
-                using (var ms = new MemoryStream())
-                {
-                    bitmap.Save(ms, ImageFormat.Jpeg);
-                    var content = new ByteArrayContent(ms.ToArray());
-                    content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-                    await _streamClient.PostAsync($"{AppConfig.ApiUrl}/stream/{_liveSessionId}/frame", content);
-                }
-            }
-            catch
-            {
-                // Ignore frame send errors silently
-            }
-        }
-
-        // ==================== LIVE CLASSROOM ====================
-
-        private async void GoLive_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var viewModel = DataContext as SessionManagementViewModel;
-                if (viewModel?.ActiveSession == null)
-                {
-                    MessageBox.Show("No active session. Please start a session first.",
-                        "No Active Session", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-
-                var authService = new AuthenticationService();
-                var lecturer = authService.GetCurrentLecturer();
-                var lecturerName = lecturer?.FullName ?? "Lecturer";
-                var lecturerId = lecturer?.Id ?? 0;
-                var courseName = viewModel.ActiveSession.CourseName ?? "Class";
-
-                GoLiveBtn.Visibility = Visibility.Collapsed;
-                StopLiveBtn.Visibility = Visibility.Visible;
-                LivePanel.Visibility = Visibility.Visible;
-
-                await LivePanel.StartBroadcastAsync(
-                    viewModel.ActiveSession.Id,
-                    lecturerName,
-                    courseName,
-                    lecturerId);
-
-                // Enable PiP frame streaming if camera is running
-                _liveSessionId = viewModel.ActiveSession.Id;
-                _isStreamingFrames = _isCameraActive;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error starting broadcast:\n\n{ex.Message}",
-                    "Broadcast Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                GoLiveBtn.Visibility = Visibility.Visible;
-                StopLiveBtn.Visibility = Visibility.Collapsed;
-                LivePanel.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private async void StopLive_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                _isStreamingFrames = false;
-                await LivePanel.StopBroadcastAsync();
-                GoLiveBtn.Visibility = Visibility.Visible;
-                StopLiveBtn.Visibility = Visibility.Collapsed;
-                LivePanel.Visibility = Visibility.Collapsed;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error stopping broadcast: {ex.Message}",
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"Error opening whiteboard: {ex.Message}");
             }
         }
 
@@ -528,22 +200,48 @@ namespace EduSyncAI
                     return;
                 }
 
-                // Create output directory and file path
-                var recordingsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Recordings");
+                var recordingsDir = System.IO.Path.Combine(AppConfig.DataDir, "Recordings");
                 System.IO.Directory.CreateDirectory(recordingsDir);
                 var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 _screenRecordingPath = System.IO.Path.Combine(recordingsDir, $"Session_{sessionId}_{timestamp}.mp4");
                 _recordingSessionId = sessionId;
 
-                // Start FFmpeg gdigrab — captures entire desktop
-                // -movflags frag_keyframe+empty_moov writes the moov atom at start and
-                // embeds keyframe metadata inline, ensuring a playable file even if interrupted
+                // Try to find an audio device for recording system audio
+                string audioArgs = "";
+                try
+                {
+                    var audioDevice = FindAudioDevice(ffmpegPath);
+                    if (!string.IsNullOrEmpty(audioDevice))
+                    {
+                        audioArgs = $"-f dshow -i audio=\"{audioDevice}\" ";
+                        System.Diagnostics.Debug.WriteLine($"Audio capture device found: {audioDevice}");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("No audio capture device found, recording video only");
+                    }
+                }
+                catch { /* Fall back to video-only */ }
+
+                // Build ffmpeg arguments: video + optional audio
+                string ffmpegArgs;
+                if (!string.IsNullOrEmpty(audioArgs))
+                {
+                    // Record screen + system audio
+                    ffmpegArgs = $"-y -f gdigrab -framerate 10 -i desktop {audioArgs}-c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"";
+                }
+                else
+                {
+                    // Video only (no audio device available)
+                    ffmpegArgs = $"-y -f gdigrab -framerate 10 -i desktop -c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"";
+                }
+
                 _screenRecordProcess = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = ffmpegPath,
-                        Arguments = $"-y -f gdigrab -framerate 10 -i desktop -c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"",
+                        Arguments = ffmpegArgs,
                         UseShellExecute = false,
                         RedirectStandardInput = true,
                         RedirectStandardError = true,
@@ -552,16 +250,83 @@ namespace EduSyncAI
                 };
                 _screenRecordProcess.Start();
                 _isScreenRecording = true;
-
-                // Start REC indicator blink
                 StartRecBlink();
-
                 System.Diagnostics.Debug.WriteLine($"Screen recording started: {_screenRecordingPath}");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to start screen recording: {ex.Message}");
                 RecStatusText.Text = "NO REC";
+            }
+        }
+
+        /// <summary>
+        /// Detects an available audio output device for recording system audio.
+        /// Looks for "Stereo Mix", "What U Hear", or any audio capture device.
+        /// </summary>
+        private string? FindAudioDevice(string ffmpegPath)
+        {
+            try
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = ffmpegPath,
+                        Arguments = "-list_devices true -f dshow -i dummy",
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+                process.Start();
+                var output = process.StandardError.ReadToEnd();
+                process.WaitForExit(5000);
+                if (!process.HasExited) process.Kill();
+
+                // Parse output for audio devices
+                var lines = output.Split('\n');
+                bool inAudioSection = false;
+                var preferredDevices = new[] { "Stereo Mix", "What U Hear", "Loopback", "CABLE Output" };
+                string? fallbackDevice = null;
+
+                foreach (var line in lines)
+                {
+                    if (line.Contains("DirectShow audio devices"))
+                    {
+                        inAudioSection = true;
+                        continue;
+                    }
+                    if (inAudioSection && line.Contains("\""))
+                    {
+                        var start = line.IndexOf('"') + 1;
+                        var end = line.IndexOf('"', start);
+                        if (end > start)
+                        {
+                            var deviceName = line.Substring(start, end - start);
+                            
+                            // Prefer virtual/loopback audio devices
+                            foreach (var preferred in preferredDevices)
+                            {
+                                if (deviceName.Contains(preferred, StringComparison.OrdinalIgnoreCase))
+                                    return deviceName;
+                            }
+                            
+                            // Use any microphone as fallback
+                            if (deviceName.Contains("Microphone", StringComparison.OrdinalIgnoreCase) ||
+                                deviceName.Contains("Mic", StringComparison.OrdinalIgnoreCase))
+                            {
+                                fallbackDevice = deviceName;
+                            }
+                        }
+                    }
+                }
+                return fallbackDevice;
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -575,8 +340,6 @@ namespace EduSyncAI
 
                 if (_screenRecordProcess != null && !_screenRecordProcess.HasExited)
                 {
-                    // Close stdin to signal FFmpeg to stop (EOF on input)
-                    // Then send 'q' as backup before closing
                     try
                     {
                         _screenRecordProcess.StandardInput.Write("q");
@@ -585,7 +348,6 @@ namespace EduSyncAI
                     }
                     catch { }
 
-                    // Wait for FFmpeg to finalize the MP4 (max 30 seconds)
                     await Task.Run(() => _screenRecordProcess.WaitForExit(30000));
                     if (!_screenRecordProcess.HasExited)
                     {
@@ -596,25 +358,15 @@ namespace EduSyncAI
                     _screenRecordProcess = null;
                 }
 
-                // Upload the recording
                 if (System.IO.File.Exists(_screenRecordingPath))
                 {
                     var fileInfo = new System.IO.FileInfo(_screenRecordingPath);
                     System.Diagnostics.Debug.WriteLine($"Screen recording saved: {_screenRecordingPath} ({fileInfo.Length / 1024}KB)");
-                    
                     if (fileInfo.Length > 0)
                     {
                         var fileName = System.IO.Path.GetFileName(_screenRecordingPath);
                         await UploadRecordingAsync(_screenRecordingPath, fileName, _recordingSessionId);
                     }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("Recording file is empty — FFmpeg may have failed.");
-                    }
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"Recording file not found: {_screenRecordingPath}");
                 }
             }
             catch (Exception ex)
@@ -631,36 +383,27 @@ namespace EduSyncAI
                 {
                     client.Timeout = TimeSpan.FromMinutes(10);
                     client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
-
                     using (var content = new MultipartFormDataContent())
                     {
                         var fileContent = new ByteArrayContent(System.IO.File.ReadAllBytes(filePath));
                         fileContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("video/mp4");
                         content.Add(fileContent, "file", fileName);
-
-                        System.Diagnostics.Debug.WriteLine($"Uploading recording to {AppConfig.ServerUrl}/api/materials/session/{sessionId}...");
                         var response = await client.PostAsync($"api/materials/session/{sessionId}", content);
                         if (response.IsSuccessStatusCode)
                         {
-                            System.Diagnostics.Debug.WriteLine($"Recording uploaded: {fileName}");
-                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                                System.Windows.MessageBox.Show($"Recording uploaded successfully!\n{fileName}", "Upload Complete", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information));
+                            System.Diagnostics.Debug.WriteLine($"Recording uploaded successfully: {fileName}");
                         }
                         else
                         {
                             var errorBody = await response.Content.ReadAsStringAsync();
-                            System.Diagnostics.Debug.WriteLine($"Upload failed: {response.StatusCode} - {errorBody}");
-                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                                System.Windows.MessageBox.Show($"Recording upload failed!\nStatus: {response.StatusCode}\n{errorBody}", "Upload Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning));
+                            System.Diagnostics.Debug.WriteLine($"Recording upload failed! Status: {response.StatusCode} {errorBody}");
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error uploading recording: {ex.Message}");
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    System.Windows.MessageBox.Show($"Recording upload error:\n{ex.Message}", "Upload Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning));
+                System.Diagnostics.Debug.WriteLine($"Recording upload error: {ex.Message}");
             }
         }
 
@@ -679,7 +422,6 @@ namespace EduSyncAI
                 if (System.IO.File.Exists(loc)) return loc;
             }
 
-            // Check PATH
             try
             {
                 var pathDirs = Environment.GetEnvironmentVariable("PATH")?.Split(';') ?? Array.Empty<string>();

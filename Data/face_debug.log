@@ -1,0 +1,919 @@
+[09:43:58.817] [FACE] Service initialized
+[09:44:21.055] [FACE] RecognizeFacesAsync called, sessionId=83, imageLen=24951
+[09:44:21.056] [FACE] Session found, courseId=4
+[09:44:21.057] [FACE] Using remote server to fetch students
+[09:44:22.847] [FACE] Found 1 students with photos, calling Gemini...
+[09:44:22.849] [FACE] Classroom image size: 18696 bytes
+[09:44:27.430] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[09:44:27.435] [FACE] MarkAttendanceAsync: sessionId=83, matches=1
+[09:44:27.443] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.95
+[09:44:27.448] [FACE] MarkAttendance returned id=16
+[09:44:27.451] [FACE] MarkAttendanceAsync returning markedCount=1
+[09:44:36.059] [FACE] RecognizeFacesAsync called, sessionId=83, imageLen=25911
+[09:44:36.062] [FACE] Session found, courseId=4
+[09:44:36.064] [FACE] Using remote server to fetch students
+[09:44:36.358] [FACE] Found 1 students with photos, calling Gemini...
+[09:44:36.360] [FACE] Classroom image size: 19416 bytes
+[09:44:39.534] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[10:19:49.223] [FACE] Service initialized
+[10:20:10.257] [FACE] RecognizeFacesAsync called, sessionId=84, imageLen=25819
+[10:20:10.259] [FACE] Session found, courseId=4
+[10:20:10.259] [FACE] Using remote server to fetch students
+[10:20:11.205] [FACE] Found 1 students with photos, calling Gemini...
+[10:20:11.209] [FACE] Classroom image size: 19347 bytes
+[10:20:16.170] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[10:20:16.175] [FACE] MarkAttendanceAsync: sessionId=84, matches=1
+[10:20:16.183] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.98
+[10:20:16.189] [FACE] MarkAttendance returned id=17
+[10:20:16.195] [FACE] MarkAttendanceAsync returning markedCount=1
+[10:20:25.242] [FACE] RecognizeFacesAsync called, sessionId=84, imageLen=31115
+[10:20:25.243] [FACE] Session found, courseId=4
+[10:20:25.245] [FACE] Using remote server to fetch students
+[10:20:25.510] [FACE] Found 1 students with photos, calling Gemini...
+[10:20:25.511] [FACE] Classroom image size: 23317 bytes
+[10:20:29.513] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[10:34:28.719] [FACE] Service initialized
+[10:36:07.090] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=15895
+[10:36:07.092] [FACE] Session found, courseId=4
+[10:36:07.093] [FACE] Using remote server to fetch students
+[10:36:07.787] [FACE] Found 1 students with photos, calling Gemini...
+[10:36:07.789] [FACE] Classroom image size: 11902 bytes
+[10:36:12.164] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:36:22.090] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=23623
+[10:36:22.092] [FACE] Session found, courseId=4
+[10:36:22.092] [FACE] Using remote server to fetch students
+[10:36:22.251] [FACE] Found 1 students with photos, calling Gemini...
+[10:36:22.252] [FACE] Classroom image size: 17699 bytes
+[10:36:24.833] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:36:37.112] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=23207
+[10:36:37.114] [FACE] Session found, courseId=4
+[10:36:37.115] [FACE] Using remote server to fetch students
+[10:36:37.278] [FACE] Found 1 students with photos, calling Gemini...
+[10:36:37.280] [FACE] Classroom image size: 17386 bytes
+[10:36:40.036] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:36:52.123] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=28491
+[10:36:52.125] [FACE] Session found, courseId=4
+[10:36:52.126] [FACE] Using remote server to fetch students
+[10:36:52.322] [FACE] Found 1 students with photos, calling Gemini...
+[10:36:52.324] [FACE] Classroom image size: 21349 bytes
+[10:36:55.497] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:37:07.157] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=15243
+[10:37:07.159] [FACE] Session found, courseId=4
+[10:37:07.161] [FACE] Using remote server to fetch students
+[10:37:07.377] [FACE] Found 1 students with photos, calling Gemini...
+[10:37:07.379] [FACE] Classroom image size: 11413 bytes
+[10:37:10.549] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:37:22.150] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=14511
+[10:37:22.153] [FACE] Session found, courseId=4
+[10:37:22.155] [FACE] Using remote server to fetch students
+[10:37:22.318] [FACE] Found 1 students with photos, calling Gemini...
+[10:37:22.320] [FACE] Classroom image size: 10865 bytes
+[10:37:24.784] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:37:37.161] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=14719
+[10:37:37.163] [FACE] Session found, courseId=4
+[10:37:37.165] [FACE] Using remote server to fetch students
+[10:37:37.391] [FACE] Found 1 students with photos, calling Gemini...
+[10:37:37.394] [FACE] Classroom image size: 11021 bytes
+[10:37:39.835] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:37:52.199] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=21167
+[10:37:52.201] [FACE] Session found, courseId=4
+[10:37:52.202] [FACE] Using remote server to fetch students
+[10:37:52.409] [FACE] Found 1 students with photos, calling Gemini...
+[10:37:52.411] [FACE] Classroom image size: 15856 bytes
+[10:37:56.113] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:38:07.174] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=33691
+[10:38:07.176] [FACE] Session found, courseId=4
+[10:38:07.177] [FACE] Using remote server to fetch students
+[10:38:08.166] [FACE] Found 1 students with photos, calling Gemini...
+[10:38:08.168] [FACE] Classroom image size: 25249 bytes
+[10:38:13.079] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:38:22.184] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=37555
+[10:38:22.186] [FACE] Session found, courseId=4
+[10:38:22.187] [FACE] Using remote server to fetch students
+[10:38:22.438] [FACE] Found 1 students with photos, calling Gemini...
+[10:38:22.439] [FACE] Classroom image size: 28147 bytes
+[10:38:26.116] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:38:37.186] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=42415
+[10:38:37.188] [FACE] Session found, courseId=4
+[10:38:37.190] [FACE] Using remote server to fetch students
+[10:38:37.390] [FACE] Found 1 students with photos, calling Gemini...
+[10:38:37.393] [FACE] Classroom image size: 31793 bytes
+[10:38:40.353] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:38:52.183] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=41131
+[10:38:52.186] [FACE] Session found, courseId=4
+[10:38:52.188] [FACE] Using remote server to fetch students
+[10:38:52.434] [FACE] Found 1 students with photos, calling Gemini...
+[10:38:52.436] [FACE] Classroom image size: 30829 bytes
+[10:38:55.178] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:39:07.186] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=26423
+[10:39:07.188] [FACE] Session found, courseId=4
+[10:39:07.189] [FACE] Using remote server to fetch students
+[10:39:07.385] [FACE] Found 1 students with photos, calling Gemini...
+[10:39:07.388] [FACE] Classroom image size: 19798 bytes
+[10:39:10.063] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:39:22.192] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=28187
+[10:39:22.196] [FACE] Session found, courseId=4
+[10:39:22.197] [FACE] Using remote server to fetch students
+[10:39:22.437] [FACE] Found 1 students with photos, calling Gemini...
+[10:39:22.439] [FACE] Classroom image size: 21121 bytes
+[10:39:24.979] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:39:37.190] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=40639
+[10:39:37.193] [FACE] Session found, courseId=4
+[10:39:37.195] [FACE] Using remote server to fetch students
+[10:39:37.392] [FACE] Found 1 students with photos, calling Gemini...
+[10:39:37.395] [FACE] Classroom image size: 30460 bytes
+[10:39:40.746] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[10:39:52.209] [FACE] RecognizeFacesAsync called, sessionId=85, imageLen=19327
+[10:39:52.212] [FACE] Session found, courseId=4
+[10:39:52.213] [FACE] Using remote server to fetch students
+[10:39:52.544] [FACE] Found 1 students with photos, calling Gemini...
+[10:39:52.547] [FACE] Classroom image size: 14476 bytes
+[10:39:56.848] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[11:02:45.748] [FACE] Service initialized
+[11:03:05.889] [FACE] RecognizeFacesAsync called, sessionId=86, imageLen=27211
+[11:03:05.891] [FACE] Session found, courseId=4
+[11:03:05.893] [FACE] Using remote server to fetch students
+[11:03:07.232] [FACE] Found 1 students with photos, calling Gemini...
+[11:03:07.235] [FACE] Classroom image size: 20390 bytes
+[11:03:12.077] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:03:12.083] [FACE] MarkAttendanceAsync: sessionId=86, matches=1
+[11:03:12.098] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.9
+[11:03:12.107] [FACE] MarkAttendance returned id=18
+[11:03:12.109] [FACE] MarkAttendanceAsync returning markedCount=1
+[11:03:20.839] [FACE] RecognizeFacesAsync called, sessionId=86, imageLen=25743
+[11:03:20.841] [FACE] Session found, courseId=4
+[11:03:20.842] [FACE] Using remote server to fetch students
+[11:03:21.040] [FACE] Found 1 students with photos, calling Gemini...
+[11:03:21.042] [FACE] Classroom image size: 19289 bytes
+[11:03:26.255] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:03:35.843] [FACE] RecognizeFacesAsync called, sessionId=86, imageLen=27999
+[11:03:35.844] [FACE] Session found, courseId=4
+[11:03:35.845] [FACE] Using remote server to fetch students
+[11:03:36.234] [FACE] Found 1 students with photos, calling Gemini...
+[11:03:36.236] [FACE] Classroom image size: 20980 bytes
+[11:03:39.265] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:03:50.896] [FACE] RecognizeFacesAsync called, sessionId=86, imageLen=29791
+[11:03:50.898] [FACE] Session found, courseId=4
+[11:03:50.900] [FACE] Using remote server to fetch students
+[11:03:51.061] [FACE] Found 1 students with photos, calling Gemini...
+[11:03:51.063] [FACE] Classroom image size: 22324 bytes
+[11:03:54.230] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:16:21.210] [FACE] Service initialized
+[11:16:41.159] [FACE] RecognizeFacesAsync called, sessionId=87, imageLen=26679
+[11:16:41.161] [FACE] Session found, courseId=4
+[11:16:41.163] [FACE] Using remote server to fetch students
+[11:16:41.895] [FACE] Found 1 students with photos, calling Gemini...
+[11:16:41.896] [FACE] Classroom image size: 19992 bytes
+[11:16:46.399] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:16:46.405] [FACE] MarkAttendanceAsync: sessionId=87, matches=1
+[11:16:46.413] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.95
+[11:16:46.419] [FACE] MarkAttendance returned id=19
+[11:16:46.420] [FACE] MarkAttendanceAsync returning markedCount=1
+[11:16:56.126] [FACE] RecognizeFacesAsync called, sessionId=87, imageLen=25799
+[11:16:56.127] [FACE] Session found, courseId=4
+[11:16:56.127] [FACE] Using remote server to fetch students
+[11:16:56.439] [FACE] Found 1 students with photos, calling Gemini...
+[11:16:56.442] [FACE] Classroom image size: 19330 bytes
+[11:16:59.411] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:17:11.146] [FACE] RecognizeFacesAsync called, sessionId=87, imageLen=27355
+[11:17:11.149] [FACE] Session found, courseId=4
+[11:17:11.151] [FACE] Using remote server to fetch students
+[11:17:11.398] [FACE] Found 1 students with photos, calling Gemini...
+[11:17:11.399] [FACE] Classroom image size: 20497 bytes
+[11:17:14.665] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:17:26.138] [FACE] RecognizeFacesAsync called, sessionId=87, imageLen=28455
+[11:17:26.139] [FACE] Session found, courseId=4
+[11:17:26.141] [FACE] Using remote server to fetch students
+[11:17:26.447] [FACE] Found 1 students with photos, calling Gemini...
+[11:17:26.448] [FACE] Classroom image size: 21322 bytes
+[11:17:29.925] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:17:41.154] [FACE] RecognizeFacesAsync called, sessionId=87, imageLen=29679
+[11:17:41.157] [FACE] Session found, courseId=4
+[11:17:41.158] [FACE] Using remote server to fetch students
+[11:17:41.403] [FACE] Found 1 students with photos, calling Gemini...
+[11:17:41.406] [FACE] Classroom image size: 22241 bytes
+[11:17:44.157] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:25:29.802] [FACE] Service initialized
+[11:25:48.911] [FACE] RecognizeFacesAsync called, sessionId=88, imageLen=27455
+[11:25:48.914] [FACE] Session found, courseId=4
+[11:25:48.915] [FACE] Using remote server to fetch students
+[11:25:49.454] [FACE] Found 1 students with photos, calling Gemini...
+[11:25:49.457] [FACE] Classroom image size: 20574 bytes
+[11:25:53.532] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:25:53.537] [FACE] MarkAttendanceAsync: sessionId=88, matches=1
+[11:25:53.545] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.98
+[11:25:53.552] [FACE] MarkAttendance returned id=20
+[11:25:53.558] [FACE] MarkAttendanceAsync returning markedCount=1
+[11:26:03.894] [FACE] RecognizeFacesAsync called, sessionId=88, imageLen=27731
+[11:26:03.897] [FACE] Session found, courseId=4
+[11:26:03.898] [FACE] Using remote server to fetch students
+[11:26:04.174] [FACE] Found 1 students with photos, calling Gemini...
+[11:26:04.175] [FACE] Classroom image size: 20781 bytes
+[11:26:13.184] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:26:18.922] [FACE] RecognizeFacesAsync called, sessionId=88, imageLen=28567
+[11:26:18.924] [FACE] Session found, courseId=4
+[11:26:18.926] [FACE] Using remote server to fetch students
+[11:26:19.641] [FACE] Found 1 students with photos, calling Gemini...
+[11:26:19.645] [FACE] Classroom image size: 21407 bytes
+[11:26:23.117] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:26:33.912] [FACE] RecognizeFacesAsync called, sessionId=88, imageLen=34287
+[11:26:33.913] [FACE] Session found, courseId=4
+[11:26:33.915] [FACE] Using remote server to fetch students
+[11:26:34.391] [FACE] Found 1 students with photos, calling Gemini...
+[11:26:34.393] [FACE] Classroom image size: 25698 bytes
+[11:26:38.885] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:26:48.927] [FACE] RecognizeFacesAsync called, sessionId=88, imageLen=31531
+[11:26:48.930] [FACE] Session found, courseId=4
+[11:26:48.932] [FACE] Using remote server to fetch students
+[11:26:49.135] [FACE] Found 1 students with photos, calling Gemini...
+[11:26:49.138] [FACE] Classroom image size: 23631 bytes
+[11:26:53.228] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:27:03.919] [FACE] RecognizeFacesAsync called, sessionId=88, imageLen=31299
+[11:27:03.921] [FACE] Session found, courseId=4
+[11:27:03.923] [FACE] Using remote server to fetch students
+[11:27:04.183] [FACE] Found 1 students with photos, calling Gemini...
+[11:27:04.185] [FACE] Classroom image size: 23456 bytes
+[11:27:07.864] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:41:48.499] [FACE] Service initialized
+[11:42:07.676] [FACE] RecognizeFacesAsync called, sessionId=89, imageLen=6595
+[11:42:07.679] [FACE] Session found, courseId=4
+[11:42:07.680] [FACE] Using remote server to fetch students
+[11:42:08.273] [FACE] Found 1 students with photos, calling Gemini...
+[11:42:08.274] [FACE] Classroom image size: 4928 bytes
+[11:42:12.485] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[11:42:22.662] [FACE] RecognizeFacesAsync called, sessionId=89, imageLen=5555
+[11:42:22.664] [FACE] Session found, courseId=4
+[11:42:22.666] [FACE] Using remote server to fetch students
+[11:42:22.904] [FACE] Found 1 students with photos, calling Gemini...
+[11:42:22.906] [FACE] Classroom image size: 4147 bytes
+[11:42:26.487] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:42:26.491] [FACE] MarkAttendanceAsync: sessionId=89, matches=1
+[11:42:26.497] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.95
+[11:42:26.503] [FACE] MarkAttendance returned id=21
+[11:42:26.505] [FACE] MarkAttendanceAsync returning markedCount=1
+[11:42:37.651] [FACE] RecognizeFacesAsync called, sessionId=89, imageLen=6287
+[11:42:37.653] [FACE] Session found, courseId=4
+[11:42:37.655] [FACE] Using remote server to fetch students
+[11:42:37.852] [FACE] Found 1 students with photos, calling Gemini...
+[11:42:37.854] [FACE] Classroom image size: 4697 bytes
+[11:42:41.551] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[11:42:52.657] [FACE] RecognizeFacesAsync called, sessionId=89, imageLen=6207
+[11:42:52.659] [FACE] Session found, courseId=4
+[11:42:52.660] [FACE] Using remote server to fetch students
+[11:42:52.904] [FACE] Found 1 students with photos, calling Gemini...
+[11:42:52.905] [FACE] Classroom image size: 4637 bytes
+[11:42:57.610] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:06:33.755] [FACE] Service initialized
+[12:10:54.200] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=5975
+[12:10:54.202] [FACE] Session found, courseId=4
+[12:10:54.204] [FACE] Using remote server to fetch students
+[12:10:55.501] [FACE] Found 1 students with photos, calling Gemini...
+[12:10:55.503] [FACE] Classroom image size: 4462 bytes
+[12:10:59.924] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:10:59.928] [FACE] MarkAttendanceAsync: sessionId=90, matches=1
+[12:10:59.935] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.95
+[12:10:59.941] [FACE] MarkAttendance returned id=22
+[12:10:59.943] [FACE] MarkAttendanceAsync returning markedCount=1
+[12:11:09.187] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6099
+[12:11:09.192] [FACE] Session found, courseId=4
+[12:11:09.194] [FACE] Using remote server to fetch students
+[12:11:09.388] [FACE] Found 1 students with photos, calling Gemini...
+[12:11:09.391] [FACE] Classroom image size: 4557 bytes
+[12:11:15.443] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:11:24.166] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=5887
+[12:11:24.168] [FACE] Session found, courseId=4
+[12:11:24.169] [FACE] Using remote server to fetch students
+[12:11:24.385] [FACE] Found 1 students with photos, calling Gemini...
+[12:11:24.387] [FACE] Classroom image size: 4396 bytes
+[12:11:28.044] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:11:39.152] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6163
+[12:11:39.155] [FACE] Session found, courseId=4
+[12:11:39.157] [FACE] Using remote server to fetch students
+[12:11:39.837] [FACE] Found 1 students with photos, calling Gemini...
+[12:11:39.838] [FACE] Classroom image size: 4604 bytes
+[12:11:43.058] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:11:54.182] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=5971
+[12:11:54.184] [FACE] Session found, courseId=4
+[12:11:54.185] [FACE] Using remote server to fetch students
+[12:11:54.405] [FACE] Found 1 students with photos, calling Gemini...
+[12:11:54.407] [FACE] Classroom image size: 4459 bytes
+[12:11:58.016] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:12:09.193] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=5963
+[12:12:09.196] [FACE] Session found, courseId=4
+[12:12:09.197] [FACE] Using remote server to fetch students
+[12:12:09.408] [FACE] Found 1 students with photos, calling Gemini...
+[12:12:09.410] [FACE] Classroom image size: 4453 bytes
+[12:12:12.792] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:12:24.198] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=8095
+[12:12:24.200] [FACE] Session found, courseId=4
+[12:12:24.201] [FACE] Using remote server to fetch students
+[12:12:24.416] [FACE] Found 1 students with photos, calling Gemini...
+[12:12:24.421] [FACE] Classroom image size: 6053 bytes
+[12:12:27.977] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:12:39.201] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6991
+[12:12:39.203] [FACE] Session found, courseId=4
+[12:12:39.204] [FACE] Using remote server to fetch students
+[12:12:39.411] [FACE] Found 1 students with photos, calling Gemini...
+[12:12:39.413] [FACE] Classroom image size: 5224 bytes
+[12:12:42.979] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:12:54.198] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7579
+[12:12:54.200] [FACE] Session found, courseId=4
+[12:12:54.201] [FACE] Using remote server to fetch students
+[12:12:54.420] [FACE] Found 1 students with photos, calling Gemini...
+[12:12:54.426] [FACE] Classroom image size: 5666 bytes
+[12:12:57.576] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:13:09.244] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7747
+[12:13:09.247] [FACE] Session found, courseId=4
+[12:13:09.249] [FACE] Using remote server to fetch students
+[12:13:09.512] [FACE] Found 1 students with photos, calling Gemini...
+[12:13:09.514] [FACE] Classroom image size: 5792 bytes
+[12:13:12.428] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:13:24.239] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7195
+[12:13:24.241] [FACE] Session found, courseId=4
+[12:13:24.242] [FACE] Using remote server to fetch students
+[12:13:24.521] [FACE] Found 1 students with photos, calling Gemini...
+[12:13:24.522] [FACE] Classroom image size: 5378 bytes
+[12:13:27.843] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:13:39.233] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7835
+[12:13:39.235] [FACE] Session found, courseId=4
+[12:13:39.237] [FACE] Using remote server to fetch students
+[12:13:39.529] [FACE] Found 1 students with photos, calling Gemini...
+[12:13:39.530] [FACE] Classroom image size: 5858 bytes
+[12:13:43.730] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:13:54.248] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7151
+[12:13:54.250] [FACE] Session found, courseId=4
+[12:13:54.251] [FACE] Using remote server to fetch students
+[12:13:54.918] [FACE] Found 1 students with photos, calling Gemini...
+[12:13:54.921] [FACE] Classroom image size: 5346 bytes
+[12:13:58.729] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:14:09.278] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7511
+[12:14:09.282] [FACE] Session found, courseId=4
+[12:14:09.283] [FACE] Using remote server to fetch students
+[12:14:09.516] [FACE] Found 1 students with photos, calling Gemini...
+[12:14:09.518] [FACE] Classroom image size: 5616 bytes
+[12:14:13.043] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:14:24.258] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7159
+[12:14:24.260] [FACE] Session found, courseId=4
+[12:14:24.261] [FACE] Using remote server to fetch students
+[12:14:24.508] [FACE] Found 1 students with photos, calling Gemini...
+[12:14:24.509] [FACE] Classroom image size: 5350 bytes
+[12:14:28.008] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:14:39.278] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7531
+[12:14:39.281] [FACE] Session found, courseId=4
+[12:14:39.283] [FACE] Using remote server to fetch students
+[12:14:39.524] [FACE] Found 1 students with photos, calling Gemini...
+[12:14:39.526] [FACE] Classroom image size: 5630 bytes
+[12:14:43.281] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:14:54.267] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7223
+[12:14:54.269] [FACE] Session found, courseId=4
+[12:14:54.270] [FACE] Using remote server to fetch students
+[12:14:54.516] [FACE] Found 1 students with photos, calling Gemini...
+[12:14:54.518] [FACE] Classroom image size: 5398 bytes
+[12:14:58.093] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:15:09.293] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7463
+[12:15:09.295] [FACE] Session found, courseId=4
+[12:15:09.297] [FACE] Using remote server to fetch students
+[12:15:09.500] [FACE] Found 1 students with photos, calling Gemini...
+[12:15:09.502] [FACE] Classroom image size: 5580 bytes
+[12:15:13.433] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:15:24.268] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7271
+[12:15:24.270] [FACE] Session found, courseId=4
+[12:15:24.271] [FACE] Using remote server to fetch students
+[12:15:24.529] [FACE] Found 1 students with photos, calling Gemini...
+[12:15:24.531] [FACE] Classroom image size: 5436 bytes
+[12:15:27.602] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:15:39.258] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7543
+[12:15:39.260] [FACE] Session found, courseId=4
+[12:15:39.261] [FACE] Using remote server to fetch students
+[12:15:39.515] [FACE] Found 1 students with photos, calling Gemini...
+[12:15:39.517] [FACE] Classroom image size: 5639 bytes
+[12:15:43.722] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:15:54.261] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6979
+[12:15:54.263] [FACE] Session found, courseId=4
+[12:15:54.265] [FACE] Using remote server to fetch students
+[12:15:54.502] [FACE] Found 1 students with photos, calling Gemini...
+[12:15:54.504] [FACE] Classroom image size: 5215 bytes
+[12:15:58.721] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:16:09.295] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7175
+[12:16:09.298] [FACE] Session found, courseId=4
+[12:16:09.300] [FACE] Using remote server to fetch students
+[12:16:09.508] [FACE] Found 1 students with photos, calling Gemini...
+[12:16:09.509] [FACE] Classroom image size: 5364 bytes
+[12:16:12.989] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:16:24.278] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7431
+[12:16:24.281] [FACE] Session found, courseId=4
+[12:16:24.283] [FACE] Using remote server to fetch students
+[12:16:24.509] [FACE] Found 1 students with photos, calling Gemini...
+[12:16:24.511] [FACE] Classroom image size: 5554 bytes
+[12:16:27.900] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:16:39.298] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7471
+[12:16:39.300] [FACE] Session found, courseId=4
+[12:16:39.302] [FACE] Using remote server to fetch students
+[12:16:39.523] [FACE] Found 1 students with photos, calling Gemini...
+[12:16:39.525] [FACE] Classroom image size: 5584 bytes
+[12:16:43.238] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:16:54.319] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7299
+[12:16:54.323] [FACE] Session found, courseId=4
+[12:16:54.326] [FACE] Using remote server to fetch students
+[12:16:54.532] [FACE] Found 1 students with photos, calling Gemini...
+[12:16:54.533] [FACE] Classroom image size: 5457 bytes
+[12:16:57.545] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:17:09.290] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7691
+[12:17:09.293] [FACE] Session found, courseId=4
+[12:17:09.295] [FACE] Using remote server to fetch students
+[12:17:09.529] [FACE] Found 1 students with photos, calling Gemini...
+[12:17:09.530] [FACE] Classroom image size: 5750 bytes
+[12:17:12.516] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:17:24.312] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7539
+[12:17:24.314] [FACE] Session found, courseId=4
+[12:17:24.317] [FACE] Using remote server to fetch students
+[12:17:24.521] [FACE] Found 1 students with photos, calling Gemini...
+[12:17:24.522] [FACE] Classroom image size: 5637 bytes
+[12:17:28.082] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:17:39.304] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7187
+[12:17:39.307] [FACE] Session found, courseId=4
+[12:17:39.309] [FACE] Using remote server to fetch students
+[12:17:39.517] [FACE] Found 1 students with photos, calling Gemini...
+[12:17:39.519] [FACE] Classroom image size: 5371 bytes
+[12:17:42.958] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:17:54.300] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7123
+[12:17:54.304] [FACE] Session found, courseId=4
+[12:17:54.306] [FACE] Using remote server to fetch students
+[12:17:54.506] [FACE] Found 1 students with photos, calling Gemini...
+[12:17:54.508] [FACE] Classroom image size: 5325 bytes
+[12:17:57.380] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:18:09.310] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7131
+[12:18:09.315] [FACE] Session found, courseId=4
+[12:18:09.318] [FACE] Using remote server to fetch students
+[12:18:09.525] [FACE] Found 1 students with photos, calling Gemini...
+[12:18:09.526] [FACE] Classroom image size: 5331 bytes
+[12:18:12.822] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:18:24.318] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7107
+[12:18:24.320] [FACE] Session found, courseId=4
+[12:18:24.322] [FACE] Using remote server to fetch students
+[12:18:24.521] [FACE] Found 1 students with photos, calling Gemini...
+[12:18:24.525] [FACE] Classroom image size: 5311 bytes
+[12:18:28.475] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:18:39.306] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7751
+[12:18:39.308] [FACE] Session found, courseId=4
+[12:18:39.309] [FACE] Using remote server to fetch students
+[12:18:40.140] [FACE] Found 1 students with photos, calling Gemini...
+[12:18:40.142] [FACE] Classroom image size: 5794 bytes
+[12:18:42.864] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:18:54.351] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7123
+[12:18:54.353] [FACE] Session found, courseId=4
+[12:18:54.354] [FACE] Using remote server to fetch students
+[12:18:54.566] [FACE] Found 1 students with photos, calling Gemini...
+[12:18:54.568] [FACE] Classroom image size: 5325 bytes
+[12:18:58.065] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:19:09.332] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7411
+[12:19:09.336] [FACE] Session found, courseId=4
+[12:19:09.338] [FACE] Using remote server to fetch students
+[12:19:09.546] [FACE] Found 1 students with photos, calling Gemini...
+[12:19:09.548] [FACE] Classroom image size: 5540 bytes
+[12:19:12.979] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:19:24.447] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7675
+[12:19:24.449] [FACE] Session found, courseId=4
+[12:19:24.451] [FACE] Using remote server to fetch students
+[12:19:24.652] [FACE] Found 1 students with photos, calling Gemini...
+[12:19:24.653] [FACE] Classroom image size: 5738 bytes
+[12:19:29.027] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:19:39.476] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7643
+[12:19:39.478] [FACE] Session found, courseId=4
+[12:19:39.479] [FACE] Using remote server to fetch students
+[12:19:39.686] [FACE] Found 1 students with photos, calling Gemini...
+[12:19:39.687] [FACE] Classroom image size: 5715 bytes
+[12:19:42.465] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:19:54.471] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7655
+[12:19:54.474] [FACE] Session found, courseId=4
+[12:19:54.475] [FACE] Using remote server to fetch students
+[12:19:54.670] [FACE] Found 1 students with photos, calling Gemini...
+[12:19:54.672] [FACE] Classroom image size: 5722 bytes
+[12:19:57.284] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:20:09.471] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7295
+[12:20:09.473] [FACE] Session found, courseId=4
+[12:20:09.474] [FACE] Using remote server to fetch students
+[12:20:09.677] [FACE] Found 1 students with photos, calling Gemini...
+[12:20:09.679] [FACE] Classroom image size: 5452 bytes
+[12:20:14.175] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:20:24.481] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7231
+[12:20:24.486] [FACE] Session found, courseId=4
+[12:20:24.489] [FACE] Using remote server to fetch students
+[12:20:24.691] [FACE] Found 1 students with photos, calling Gemini...
+[12:20:24.692] [FACE] Classroom image size: 5405 bytes
+[12:20:29.323] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:20:39.508] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7283
+[12:20:39.510] [FACE] Session found, courseId=4
+[12:20:39.512] [FACE] Using remote server to fetch students
+[12:20:39.731] [FACE] Found 1 students with photos, calling Gemini...
+[12:20:39.733] [FACE] Classroom image size: 5443 bytes
+[12:20:43.296] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:20:54.481] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7359
+[12:20:54.483] [FACE] Session found, courseId=4
+[12:20:54.485] [FACE] Using remote server to fetch students
+[12:20:54.721] [FACE] Found 1 students with photos, calling Gemini...
+[12:20:54.723] [FACE] Classroom image size: 5501 bytes
+[12:20:57.915] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:21:09.522] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7207
+[12:21:09.523] [FACE] Session found, courseId=4
+[12:21:09.524] [FACE] Using remote server to fetch students
+[12:21:09.720] [FACE] Found 1 students with photos, calling Gemini...
+[12:21:09.725] [FACE] Classroom image size: 5387 bytes
+[12:21:13.073] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:21:24.497] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7047
+[12:21:24.499] [FACE] Session found, courseId=4
+[12:21:24.501] [FACE] Using remote server to fetch students
+[12:21:24.729] [FACE] Found 1 students with photos, calling Gemini...
+[12:21:24.730] [FACE] Classroom image size: 5268 bytes
+[12:21:28.416] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:21:39.492] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7187
+[12:21:39.494] [FACE] Session found, courseId=4
+[12:21:39.495] [FACE] Using remote server to fetch students
+[12:21:39.730] [FACE] Found 1 students with photos, calling Gemini...
+[12:21:39.731] [FACE] Classroom image size: 5372 bytes
+[12:21:43.318] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:21:54.516] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6867
+[12:21:54.519] [FACE] Session found, courseId=4
+[12:21:54.520] [FACE] Using remote server to fetch students
+[12:21:54.717] [FACE] Found 1 students with photos, calling Gemini...
+[12:21:54.719] [FACE] Classroom image size: 5131 bytes
+[12:21:58.281] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:22:09.544] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7147
+[12:22:09.546] [FACE] Session found, courseId=4
+[12:22:09.547] [FACE] Using remote server to fetch students
+[12:22:09.757] [FACE] Found 1 students with photos, calling Gemini...
+[12:22:09.759] [FACE] Classroom image size: 5342 bytes
+[12:22:15.203] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:22:24.558] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7291
+[12:22:24.560] [FACE] Session found, courseId=4
+[12:22:24.561] [FACE] Using remote server to fetch students
+[12:22:24.774] [FACE] Found 1 students with photos, calling Gemini...
+[12:22:24.776] [FACE] Classroom image size: 5451 bytes
+[12:22:28.608] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:22:39.581] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7291
+[12:22:39.585] [FACE] Session found, courseId=4
+[12:22:39.588] [FACE] Using remote server to fetch students
+[12:22:39.801] [FACE] Found 1 students with photos, calling Gemini...
+[12:22:39.803] [FACE] Classroom image size: 5450 bytes
+[12:22:43.476] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:22:54.576] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6991
+[12:22:54.578] [FACE] Session found, courseId=4
+[12:22:54.581] [FACE] Using remote server to fetch students
+[12:22:54.795] [FACE] Found 1 students with photos, calling Gemini...
+[12:22:54.797] [FACE] Classroom image size: 5225 bytes
+[12:22:58.840] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:23:09.560] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7135
+[12:23:09.562] [FACE] Session found, courseId=4
+[12:23:09.563] [FACE] Using remote server to fetch students
+[12:23:09.828] [FACE] Found 1 students with photos, calling Gemini...
+[12:23:09.838] [FACE] Classroom image size: 5332 bytes
+[12:23:14.021] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:23:24.558] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7219
+[12:23:24.560] [FACE] Session found, courseId=4
+[12:23:24.561] [FACE] Using remote server to fetch students
+[12:23:24.756] [FACE] Found 1 students with photos, calling Gemini...
+[12:23:24.758] [FACE] Classroom image size: 5396 bytes
+[12:23:29.415] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:23:39.570] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6911
+[12:23:39.573] [FACE] Session found, courseId=4
+[12:23:39.574] [FACE] Using remote server to fetch students
+[12:23:39.785] [FACE] Found 1 students with photos, calling Gemini...
+[12:23:39.787] [FACE] Classroom image size: 5164 bytes
+[12:23:42.987] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:23:54.582] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7043
+[12:23:54.585] [FACE] Session found, courseId=4
+[12:23:54.587] [FACE] Using remote server to fetch students
+[12:23:54.833] [FACE] Found 1 students with photos, calling Gemini...
+[12:23:54.835] [FACE] Classroom image size: 5265 bytes
+[12:23:58.934] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:24:09.587] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7087
+[12:24:09.590] [FACE] Session found, courseId=4
+[12:24:09.592] [FACE] Using remote server to fetch students
+[12:24:09.799] [FACE] Found 1 students with photos, calling Gemini...
+[12:24:09.801] [FACE] Classroom image size: 5298 bytes
+[12:24:12.715] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:24:24.591] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7011
+[12:24:24.593] [FACE] Session found, courseId=4
+[12:24:24.595] [FACE] Using remote server to fetch students
+[12:24:24.810] [FACE] Found 1 students with photos, calling Gemini...
+[12:24:24.815] [FACE] Classroom image size: 5240 bytes
+[12:24:27.481] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:24:39.639] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6791
+[12:24:39.643] [FACE] Session found, courseId=4
+[12:24:39.645] [FACE] Using remote server to fetch students
+[12:24:39.847] [FACE] Found 1 students with photos, calling Gemini...
+[12:24:39.848] [FACE] Classroom image size: 5076 bytes
+[12:24:43.592] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:24:54.621] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7019
+[12:24:54.626] [FACE] Session found, courseId=4
+[12:24:54.628] [FACE] Using remote server to fetch students
+[12:24:54.829] [FACE] Found 1 students with photos, calling Gemini...
+[12:24:54.831] [FACE] Classroom image size: 5245 bytes
+[12:24:57.926] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:25:09.624] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7171
+[12:25:09.626] [FACE] Session found, courseId=4
+[12:25:09.628] [FACE] Using remote server to fetch students
+[12:25:09.824] [FACE] Found 1 students with photos, calling Gemini...
+[12:25:09.825] [FACE] Classroom image size: 5361 bytes
+[12:25:12.731] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:25:24.628] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6659
+[12:25:24.630] [FACE] Session found, courseId=4
+[12:25:24.633] [FACE] Using remote server to fetch students
+[12:25:24.839] [FACE] Found 1 students with photos, calling Gemini...
+[12:25:24.841] [FACE] Classroom image size: 4977 bytes
+[12:25:29.041] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:25:39.620] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7115
+[12:25:39.622] [FACE] Session found, courseId=4
+[12:25:39.624] [FACE] Using remote server to fetch students
+[12:25:39.837] [FACE] Found 1 students with photos, calling Gemini...
+[12:25:39.840] [FACE] Classroom image size: 5319 bytes
+[12:25:44.676] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:25:54.656] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7075
+[12:25:54.659] [FACE] Session found, courseId=4
+[12:25:54.663] [FACE] Using remote server to fetch students
+[12:25:54.873] [FACE] Found 1 students with photos, calling Gemini...
+[12:25:54.875] [FACE] Classroom image size: 5287 bytes
+[12:25:58.092] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:26:09.655] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7179
+[12:26:09.657] [FACE] Session found, courseId=4
+[12:26:09.659] [FACE] Using remote server to fetch students
+[12:26:09.869] [FACE] Found 1 students with photos, calling Gemini...
+[12:26:09.871] [FACE] Classroom image size: 5367 bytes
+[12:26:12.836] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:26:24.646] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7555
+[12:26:24.648] [FACE] Session found, courseId=4
+[12:26:24.649] [FACE] Using remote server to fetch students
+[12:26:24.862] [FACE] Found 1 students with photos, calling Gemini...
+[12:26:24.863] [FACE] Classroom image size: 5649 bytes
+[12:26:28.485] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:26:39.660] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7299
+[12:26:39.663] [FACE] Session found, courseId=4
+[12:26:39.665] [FACE] Using remote server to fetch students
+[12:26:39.872] [FACE] Found 1 students with photos, calling Gemini...
+[12:26:39.873] [FACE] Classroom image size: 5457 bytes
+[12:26:43.048] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:26:54.654] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7515
+[12:26:54.656] [FACE] Session found, courseId=4
+[12:26:54.657] [FACE] Using remote server to fetch students
+[12:26:54.871] [FACE] Found 1 students with photos, calling Gemini...
+[12:26:54.873] [FACE] Classroom image size: 5617 bytes
+[12:26:59.992] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:27:09.653] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7199
+[12:27:09.655] [FACE] Session found, courseId=4
+[12:27:09.656] [FACE] Using remote server to fetch students
+[12:27:09.876] [FACE] Found 1 students with photos, calling Gemini...
+[12:27:09.878] [FACE] Classroom image size: 5381 bytes
+[12:27:13.653] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:27:24.637] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7403
+[12:27:24.638] [FACE] Session found, courseId=4
+[12:27:24.638] [FACE] Using remote server to fetch students
+[12:27:24.853] [FACE] Found 1 students with photos, calling Gemini...
+[12:27:24.855] [FACE] Classroom image size: 5533 bytes
+[12:27:28.413] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:27:39.678] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7971
+[12:27:39.680] [FACE] Session found, courseId=4
+[12:27:39.681] [FACE] Using remote server to fetch students
+[12:27:39.900] [FACE] Found 1 students with photos, calling Gemini...
+[12:27:39.901] [FACE] Classroom image size: 5960 bytes
+[12:27:43.020] [FACE] Gemini result: Success=True, Matches=0, Error=none
+[12:27:54.685] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7331
+[12:27:54.687] [FACE] Session found, courseId=4
+[12:27:54.689] [FACE] Using remote server to fetch students
+[12:27:54.906] [FACE] Found 1 students with photos, calling Gemini...
+[12:27:54.908] [FACE] Classroom image size: 5480 bytes
+[12:27:58.809] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:28:09.653] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6967
+[12:28:09.655] [FACE] Session found, courseId=4
+[12:28:09.657] [FACE] Using remote server to fetch students
+[12:28:09.862] [FACE] Found 1 students with photos, calling Gemini...
+[12:28:09.864] [FACE] Classroom image size: 5208 bytes
+[12:28:13.337] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:28:24.664] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7499
+[12:28:24.666] [FACE] Session found, courseId=4
+[12:28:24.668] [FACE] Using remote server to fetch students
+[12:28:24.886] [FACE] Found 1 students with photos, calling Gemini...
+[12:28:24.887] [FACE] Classroom image size: 5607 bytes
+[12:28:28.568] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:28:39.679] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7739
+[12:28:39.681] [FACE] Session found, courseId=4
+[12:28:39.683] [FACE] Using remote server to fetch students
+[12:28:39.889] [FACE] Found 1 students with photos, calling Gemini...
+[12:28:39.890] [FACE] Classroom image size: 5786 bytes
+[12:28:44.475] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:28:54.669] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7567
+[12:28:54.671] [FACE] Session found, courseId=4
+[12:28:54.673] [FACE] Using remote server to fetch students
+[12:28:54.887] [FACE] Found 1 students with photos, calling Gemini...
+[12:28:54.889] [FACE] Classroom image size: 5657 bytes
+[12:28:58.617] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:29:09.699] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7287
+[12:29:09.704] [FACE] Session found, courseId=4
+[12:29:09.708] [FACE] Using remote server to fetch students
+[12:29:09.937] [FACE] Found 1 students with photos, calling Gemini...
+[12:29:09.939] [FACE] Classroom image size: 5447 bytes
+[12:29:13.847] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:29:24.708] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6611
+[12:29:24.712] [FACE] Session found, courseId=4
+[12:29:24.715] [FACE] Using remote server to fetch students
+[12:29:24.943] [FACE] Found 1 students with photos, calling Gemini...
+[12:29:24.947] [FACE] Classroom image size: 4941 bytes
+[12:29:30.379] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:29:39.696] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6211
+[12:29:39.698] [FACE] Session found, courseId=4
+[12:29:39.700] [FACE] Using remote server to fetch students
+[12:29:40.146] [FACE] Found 1 students with photos, calling Gemini...
+[12:29:40.148] [FACE] Classroom image size: 4641 bytes
+[12:29:55.635] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:30:09.710] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7523
+[12:30:09.713] [FACE] Session found, courseId=4
+[12:30:09.714] [FACE] Using remote server to fetch students
+[12:30:09.917] [FACE] Found 1 students with photos, calling Gemini...
+[12:30:09.918] [FACE] Classroom image size: 5625 bytes
+[12:30:14.094] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:30:24.726] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6931
+[12:30:24.727] [FACE] Session found, courseId=4
+[12:30:24.728] [FACE] Using remote server to fetch students
+[12:30:24.920] [FACE] Found 1 students with photos, calling Gemini...
+[12:30:24.921] [FACE] Classroom image size: 5181 bytes
+[12:30:49.230] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:30:54.754] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6543
+[12:30:54.756] [FACE] Session found, courseId=4
+[12:30:54.757] [FACE] Using remote server to fetch students
+[12:30:54.955] [FACE] Found 1 students with photos, calling Gemini...
+[12:30:54.955] [FACE] Classroom image size: 4890 bytes
+[12:30:58.769] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:31:09.770] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7519
+[12:31:09.772] [FACE] Session found, courseId=4
+[12:31:09.773] [FACE] Using remote server to fetch students
+[12:31:09.990] [FACE] Found 1 students with photos, calling Gemini...
+[12:31:09.991] [FACE] Classroom image size: 5622 bytes
+[12:31:14.110] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:31:24.749] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7399
+[12:31:24.750] [FACE] Session found, courseId=4
+[12:31:24.751] [FACE] Using remote server to fetch students
+[12:31:24.969] [FACE] Found 1 students with photos, calling Gemini...
+[12:31:24.972] [FACE] Classroom image size: 5530 bytes
+[12:31:30.913] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:31:39.791] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6799
+[12:31:39.798] [FACE] Session found, courseId=4
+[12:31:39.803] [FACE] Using remote server to fetch students
+[12:31:40.010] [FACE] Found 1 students with photos, calling Gemini...
+[12:31:40.012] [FACE] Classroom image size: 5082 bytes
+[12:31:44.005] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:31:54.746] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7747
+[12:31:54.747] [FACE] Session found, courseId=4
+[12:31:54.750] [FACE] Using remote server to fetch students
+[12:31:54.980] [FACE] Found 1 students with photos, calling Gemini...
+[12:31:54.982] [FACE] Classroom image size: 5793 bytes
+[12:31:59.609] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:32:09.767] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6963
+[12:32:09.769] [FACE] Session found, courseId=4
+[12:32:09.770] [FACE] Using remote server to fetch students
+[12:32:10.002] [FACE] Found 1 students with photos, calling Gemini...
+[12:32:10.003] [FACE] Classroom image size: 5203 bytes
+[12:32:13.568] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:32:24.760] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=6875
+[12:32:24.762] [FACE] Session found, courseId=4
+[12:32:24.763] [FACE] Using remote server to fetch students
+[12:32:24.980] [FACE] Found 1 students with photos, calling Gemini...
+[12:32:24.982] [FACE] Classroom image size: 5139 bytes
+[12:32:28.966] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:32:39.768] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7107
+[12:32:39.769] [FACE] Session found, courseId=4
+[12:32:39.770] [FACE] Using remote server to fetch students
+[12:32:39.972] [FACE] Found 1 students with photos, calling Gemini...
+[12:32:39.973] [FACE] Classroom image size: 5313 bytes
+[12:32:43.797] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:32:54.767] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7343
+[12:32:54.769] [FACE] Session found, courseId=4
+[12:32:54.770] [FACE] Using remote server to fetch students
+[12:32:54.969] [FACE] Found 1 students with photos, calling Gemini...
+[12:32:54.970] [FACE] Classroom image size: 5488 bytes
+[12:33:00.288] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:33:09.779] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7127
+[12:33:09.782] [FACE] Session found, courseId=4
+[12:33:09.784] [FACE] Using remote server to fetch students
+[12:33:09.985] [FACE] Found 1 students with photos, calling Gemini...
+[12:33:09.986] [FACE] Classroom image size: 5326 bytes
+[12:33:13.899] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:33:24.793] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7143
+[12:33:24.798] [FACE] Session found, courseId=4
+[12:33:24.802] [FACE] Using remote server to fetch students
+[12:33:25.016] [FACE] Found 1 students with photos, calling Gemini...
+[12:33:25.017] [FACE] Classroom image size: 5340 bytes
+[12:33:33.290] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:33:39.794] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7427
+[12:33:39.796] [FACE] Session found, courseId=4
+[12:33:39.797] [FACE] Using remote server to fetch students
+[12:33:40.016] [FACE] Found 1 students with photos, calling Gemini...
+[12:33:40.017] [FACE] Classroom image size: 5553 bytes
+[12:33:43.762] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:33:54.779] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7927
+[12:33:54.781] [FACE] Session found, courseId=4
+[12:33:54.782] [FACE] Using remote server to fetch students
+[12:33:54.984] [FACE] Found 1 students with photos, calling Gemini...
+[12:33:54.985] [FACE] Classroom image size: 5927 bytes
+[12:33:59.448] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:34:09.816] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7867
+[12:34:09.817] [FACE] Session found, courseId=4
+[12:34:09.818] [FACE] Using remote server to fetch students
+[12:34:10.024] [FACE] Found 1 students with photos, calling Gemini...
+[12:34:10.025] [FACE] Classroom image size: 5881 bytes
+[12:34:14.991] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[12:34:24.805] [FACE] RecognizeFacesAsync called, sessionId=90, imageLen=7027
+[12:34:24.807] [FACE] Session found, courseId=4
+[12:34:24.811] [FACE] Using remote server to fetch students
+[12:34:25.015] [FACE] Found 1 students with photos, calling Gemini...
+[12:34:25.017] [FACE] Classroom image size: 5251 bytes
+[12:34:28.515] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:32:24.576] [FACE] Service initialized
+[13:33:19.215] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4643
+[13:33:19.217] [FACE] Session found, courseId=4
+[13:33:19.219] [FACE] Using remote server to fetch students
+[13:33:20.300] [FACE] Found 1 students with photos, calling Gemini...
+[13:33:20.301] [FACE] Classroom image size: 3463 bytes
+[13:33:24.361] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:33:24.363] [FACE] MarkAttendanceAsync: sessionId=91, matches=1
+[13:33:24.366] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.92
+[13:33:24.371] [FACE] MarkAttendance returned id=23
+[13:33:24.371] [FACE] MarkAttendanceAsync returning markedCount=1
+[13:33:34.212] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4687
+[13:33:34.214] [FACE] Session found, courseId=4
+[13:33:34.215] [FACE] Using remote server to fetch students
+[13:33:34.381] [FACE] Found 1 students with photos, calling Gemini...
+[13:33:34.382] [FACE] Classroom image size: 3497 bytes
+[13:33:38.296] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:33:49.167] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4671
+[13:33:49.168] [FACE] Session found, courseId=4
+[13:33:49.169] [FACE] Using remote server to fetch students
+[13:33:49.326] [FACE] Found 1 students with photos, calling Gemini...
+[13:33:49.327] [FACE] Classroom image size: 3484 bytes
+[13:33:52.533] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:34:04.229] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4623
+[13:34:04.230] [FACE] Session found, courseId=4
+[13:34:04.231] [FACE] Using remote server to fetch students
+[13:34:04.396] [FACE] Found 1 students with photos, calling Gemini...
+[13:34:04.397] [FACE] Classroom image size: 3449 bytes
+[13:34:07.393] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:34:19.171] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4567
+[13:34:19.173] [FACE] Session found, courseId=4
+[13:34:19.173] [FACE] Using remote server to fetch students
+[13:34:19.341] [FACE] Found 1 students with photos, calling Gemini...
+[13:34:19.342] [FACE] Classroom image size: 3406 bytes
+[13:34:24.431] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:34:34.182] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4691
+[13:34:34.183] [FACE] Session found, courseId=4
+[13:34:34.184] [FACE] Using remote server to fetch students
+[13:34:34.364] [FACE] Found 1 students with photos, calling Gemini...
+[13:34:34.365] [FACE] Classroom image size: 3499 bytes
+[13:34:37.862] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:34:49.164] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4719
+[13:34:49.165] [FACE] Session found, courseId=4
+[13:34:49.166] [FACE] Using remote server to fetch students
+[13:34:49.330] [FACE] Found 1 students with photos, calling Gemini...
+[13:34:49.331] [FACE] Classroom image size: 3521 bytes
+[13:34:52.785] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:35:04.171] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4711
+[13:35:04.172] [FACE] Session found, courseId=4
+[13:35:04.173] [FACE] Using remote server to fetch students
+[13:35:04.328] [FACE] Found 1 students with photos, calling Gemini...
+[13:35:04.329] [FACE] Classroom image size: 3515 bytes
+[13:35:08.196] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:35:19.210] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4691
+[13:35:19.212] [FACE] Session found, courseId=4
+[13:35:19.213] [FACE] Using remote server to fetch students
+[13:35:19.371] [FACE] Found 1 students with photos, calling Gemini...
+[13:35:19.372] [FACE] Classroom image size: 3501 bytes
+[13:35:22.857] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:35:34.222] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4627
+[13:35:34.224] [FACE] Session found, courseId=4
+[13:35:34.225] [FACE] Using remote server to fetch students
+[13:35:34.392] [FACE] Found 1 students with photos, calling Gemini...
+[13:35:34.394] [FACE] Classroom image size: 3451 bytes
+[13:35:38.484] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:35:49.224] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=4615
+[13:35:49.225] [FACE] Session found, courseId=4
+[13:35:49.226] [FACE] Using remote server to fetch students
+[13:35:49.391] [FACE] Found 1 students with photos, calling Gemini...
+[13:35:49.392] [FACE] Classroom image size: 3442 bytes
+[13:35:52.805] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:36:04.232] [FACE] RecognizeFacesAsync called, sessionId=91, imageLen=5907
+[13:36:04.234] [FACE] Session found, courseId=4
+[13:36:04.235] [FACE] Using remote server to fetch students
+[13:36:04.400] [FACE] Found 1 students with photos, calling Gemini...
+[13:36:04.401] [FACE] Classroom image size: 4411 bytes
+[13:36:09.557] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:48:57.411] [FACE] Service initialized
+[13:56:22.669] [FACE] Service initialized
+[13:57:42.445] [FACE] RecognizeFacesAsync called, sessionId=93, imageLen=5099
+[13:57:42.448] [FACE] Session found, courseId=4
+[13:57:42.448] [FACE] Using remote server to fetch students
+[13:57:43.099] [FACE] Found 1 students with photos, calling Gemini...
+[13:57:43.101] [FACE] Classroom image size: 3805 bytes
+[13:57:47.403] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[13:57:47.408] [FACE] MarkAttendanceAsync: sessionId=93, matches=1
+[13:57:47.416] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.92
+[13:57:47.423] [FACE] MarkAttendance returned id=24
+[13:57:47.427] [FACE] MarkAttendanceAsync returning markedCount=1
+[16:01:13.810] [FACE] Service initialized
+[16:08:49.732] [FACE] Service initialized

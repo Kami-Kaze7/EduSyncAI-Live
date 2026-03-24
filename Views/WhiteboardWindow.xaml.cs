@@ -270,16 +270,27 @@ namespace EduSyncAI
                     image.MouseLeftButtonUp += Image_MouseLeftButtonUp;
                     image.MouseMove += Image_MouseMove;
 
-                    var centerX = (WhiteboardCanvas.ActualWidth - image.Width) / 2;
-                    var centerY = (WhiteboardCanvas.ActualHeight - image.Height) / 2;
-                    InkCanvas.SetLeft(image, centerX);
-                    InkCanvas.SetTop(image, centerY);
+                    var centerX = WhiteboardScrollViewer.HorizontalOffset + (WhiteboardScrollViewer.ViewportWidth / 2);
+                    var centerY = WhiteboardScrollViewer.VerticalOffset + (WhiteboardScrollViewer.ViewportHeight / 2);
+                    
+                    if (WhiteboardScrollViewer.ViewportWidth == 0) centerX = WhiteboardCanvas.ActualWidth / 2;
+                    if (WhiteboardScrollViewer.ViewportHeight == 0) centerY = WhiteboardCanvas.ActualHeight / 2;
+
+                    var absoluteX = centerX / CanvasScale.ScaleX;
+                    var absoluteY = centerY / CanvasScale.ScaleY;
+
+                    var imageLeft = absoluteX - (image.Width / 2);
+                    var imageTop = absoluteY - (image.Height / 2);
+
+                    InkCanvas.SetLeft(image, imageLeft);
+                    InkCanvas.SetTop(image, imageTop);
                     WhiteboardCanvas.Children.Add(image);
                     SaveToImageLibrary(openFileDialog.FileName);
                     // Image added silently
                 }
                 catch (Exception ex)
                 {
+                    System.Windows.MessageBox.Show($"Could not load the requested image: {ex.Message}", "Image Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     System.Diagnostics.Debug.WriteLine($"Error adding image: {ex.Message}");
                 }
             }

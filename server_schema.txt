@@ -1,0 +1,156 @@
+CREATE TABLE IF NOT EXISTS "Admins" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Admins" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+);
+CREATE TABLE sqlite_sequence(name,seq);
+CREATE TABLE IF NOT EXISTS "ClassSessions" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_ClassSessions" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "LectureId" INTEGER NOT NULL,
+    "LecturerId" INTEGER NULL,
+    "SessionCode" TEXT NULL,
+    "SessionState" TEXT NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "AudioFilePath" TEXT NULL,
+    "VideoFilePath" TEXT NULL,
+    "BoardExportPath" TEXT NULL,
+    "BoardSnapshotFolder" TEXT NULL,
+    "AttendanceCount" INTEGER NOT NULL,
+    "Duration" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+, Topic TEXT);
+CREATE TABLE IF NOT EXISTS "ClassSummaries" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_ClassSummaries" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "LecturerId" INTEGER NOT NULL,
+    "Title" TEXT NOT NULL,
+    "Summary" TEXT NOT NULL,
+    "KeyTopics" TEXT NULL,
+    "PreparationNotes" TEXT NULL,
+    "ClassDate" TEXT NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS "Courses" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Courses" PRIMARY KEY AUTOINCREMENT,
+    "CourseCode" TEXT NOT NULL,
+    "CourseTitle" TEXT NOT NULL,
+    "SyllabusPath" TEXT NULL
+, LecturerId INTEGER NOT NULL DEFAULT 1, CreatedAt TEXT, CreditHours INTEGER NOT NULL DEFAULT 3, CourseName TEXT);
+CREATE TABLE IF NOT EXISTS "Lecturers" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Lecturers" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "Email" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS "Students" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Students" PRIMARY KEY AUTOINCREMENT,
+    "MatricNumber" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "Email" TEXT NOT NULL,
+    "PhotoPath" TEXT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "Age" INTEGER NULL,
+    "Hobbies" TEXT NULL,
+    "Bio" TEXT NULL
+);
+CREATE TABLE IF NOT EXISTS "LectureMaterials" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_LectureMaterials" PRIMARY KEY AUTOINCREMENT,
+    "SessionId" INTEGER NOT NULL,
+    "FileName" TEXT NOT NULL,
+    "FilePath" TEXT NOT NULL,
+    "FileType" TEXT NOT NULL,
+    "FileSize" INTEGER NOT NULL,
+    "UploadedAt" TEXT NOT NULL,
+    CONSTRAINT "FK_LectureMaterials_ClassSessions_SessionId" FOREIGN KEY ("SessionId") REFERENCES "ClassSessions" ("Id") ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "LectureNotes" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_LectureNotes" PRIMARY KEY AUTOINCREMENT,
+    "SessionId" INTEGER NOT NULL,
+    "Content" TEXT NOT NULL,
+    "LastModified" TEXT NOT NULL,
+    CONSTRAINT "FK_LectureNotes_ClassSessions_SessionId" FOREIGN KEY ("SessionId") REFERENCES "ClassSessions" ("Id") ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "CourseEnrollments" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_CourseEnrollments" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "StudentId" INTEGER NOT NULL,
+    CONSTRAINT "FK_CourseEnrollments_Courses_CourseId" FOREIGN KEY ("CourseId") REFERENCES "Courses" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_CourseEnrollments_Students_StudentId" FOREIGN KEY ("StudentId") REFERENCES "Students" ("Id") ON DELETE CASCADE
+);
+CREATE INDEX "IX_CourseEnrollments_CourseId" ON "CourseEnrollments" ("CourseId");
+CREATE INDEX "IX_CourseEnrollments_StudentId" ON "CourseEnrollments" ("StudentId");
+CREATE INDEX "IX_LectureMaterials_SessionId" ON "LectureMaterials" ("SessionId");
+CREATE INDEX "IX_LectureNotes_SessionId" ON "LectureNotes" ("SessionId");
+CREATE TABLE Lectures (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CourseId INTEGER,
+                LectureDate TEXT,
+                Topic TEXT
+            );
+CREATE TABLE LecturePreps (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                LectureId INTEGER,
+                CoreIdeas TEXT,
+                KeyTerms TEXT,
+                SimpleExample TEXT,
+                WhatToListenFor TEXT,
+                CreatedAt TEXT
+            );
+CREATE TABLE Attendance (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                SessionId INTEGER NOT NULL,
+                StudentId INTEGER NOT NULL,
+                CheckInTime TEXT NOT NULL,
+                CheckInMethod TEXT NOT NULL,
+                VerifiedBy INTEGER,
+                FOREIGN KEY (SessionId) REFERENCES ClassSessions(Id),
+                FOREIGN KEY (StudentId) REFERENCES Students(Id),
+                FOREIGN KEY (VerifiedBy) REFERENCES Lecturers(Id),
+                UNIQUE(SessionId, StudentId)
+            );
+CREATE TABLE CourseSyllabi (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CourseId INTEGER NOT NULL,
+    LecturerId INTEGER NOT NULL,
+    FileName TEXT NOT NULL,
+    FilePath TEXT NOT NULL,
+    FileType TEXT NOT NULL,
+    ExtractedText TEXT,
+    TotalWeeks INTEGER,
+    UploadedAt TEXT NOT NULL,
+    FOREIGN KEY (CourseId) REFERENCES Courses(Id),
+    FOREIGN KEY (LecturerId) REFERENCES Lecturers(Id)
+);
+CREATE TABLE WeeklySummaries (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    SyllabusId INTEGER NOT NULL,
+    CourseId INTEGER NOT NULL,
+    LecturerId INTEGER NOT NULL,
+    WeekNumber INTEGER NOT NULL,
+    WeekTitle TEXT,
+    Summary TEXT NOT NULL,
+    KeyTopics TEXT,
+    LearningObjectives TEXT,
+    PreparationNotes TEXT,
+    GeneratedAt TEXT NOT NULL,
+    SentToStudents INTEGER DEFAULT 0,
+    SentAt TEXT, DayNumber INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (SyllabusId) REFERENCES CourseSyllabi(Id),
+    FOREIGN KEY (CourseId) REFERENCES Courses(Id),
+    FOREIGN KEY (LecturerId) REFERENCES Lecturers(Id)
+);
+CREATE TABLE StudentWeeklySummaries (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    StudentId INTEGER NOT NULL,
+    WeeklySummaryId INTEGER NOT NULL,
+    SentAt TEXT NOT NULL,
+    FOREIGN KEY (StudentId) REFERENCES Students(Id),
+    FOREIGN KEY (WeeklySummaryId) REFERENCES WeeklySummaries(Id)
+);

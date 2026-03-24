@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+c:\EduSyncAI\Views\WhiteboardWindow.xaml.cs(197,50): error CS1513: } expected [c:\EduSyncAI\EduSyncAI_wggkzqxs_wpftmp.csproj]
+
+Build FAILED.
+
+c:\EduSyncAI\Views\WhiteboardWindow.xaml.cs(197,50): error CS1513: } expected [c:\EduSyncAI\EduSyncAI_wggkzqxs_wpftmp.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.61

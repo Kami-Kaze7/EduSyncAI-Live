@@ -58,15 +58,14 @@ namespace EduSyncAI
             catch (Exception ex)
             {
                 StatusText.Text = $"Error: {ex.Message}";
-                MessageBox.Show($"Failed to start live broadcast:\n\n{ex.Message}",
-                    "Broadcast Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"Failed to start live broadcast: {ex.Message}");
             }
         }
 
         private async Task InitializeWebView2Async()
         {
             var userDataFolder = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory, "Data", "WebView2_LiveClassroom");
+                AppConfig.DataDir, "WebView2_LiveClassroom");
             Directory.CreateDirectory(userDataFolder);
 
             var envOptions = new CoreWebView2EnvironmentOptions(
@@ -178,10 +177,7 @@ namespace EduSyncAI
 
         private async void EndBroadcast_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show(
-                "End the live broadcast? All remote students will be disconnected.",
-                "End Broadcast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result == MessageBoxResult.Yes) await StopBroadcastAsync();
+            await StopBroadcastAsync();
         }
 
         public async Task StopBroadcastAsync()
@@ -203,6 +199,94 @@ namespace EduSyncAI
             catch { }
             StatusText.Text = "Broadcast ended";
             BroadcastEnded?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Whether the Jitsi broadcast is currently active
+        /// </summary>
+        public bool IsLive => _isLive;
+
+        /// <summary>
+        /// Captures ALL video streams from the Jitsi call, composites them into a single image.
+        /// Returns a base64 JPEG string, or null if capture fails.
+        /// </summary>
+        public async Task<string?> CaptureFrameFromJitsiAsync()
+        {
+            if (!_isLive || JitsiWebView.CoreWebView2 == null) return null;
+
+            try
+            {
+                // JavaScript: find ALL active video elements and composite them into a single canvas
+                var script = @"
+                    (function() {
+                        try {
+                            var videos = document.querySelectorAll('video');
+                            var activeVideos = [];
+                            for (var i = 0; i < videos.length; i++) {
+                                if (videos[i].videoWidth > 0 && videos[i].videoHeight > 0 && !videos[i].paused) {
+                                    activeVideos.push(videos[i]);
+                                }
+                            }
+                            if (activeVideos.length === 0) return null;
+                            
+                            // If only one video, capture it directly at higher quality
+                            if (activeVideos.length === 1) {
+                                var v = activeVideos[0];
+                                var w = Math.min(v.videoWidth, 640);
+                                var scale = w / v.videoWidth;
+                                var h = Math.round(v.videoHeight * scale);
+                                var canvas = document.createElement('canvas');
+                                canvas.width = w;
+                                canvas.height = h;
+                                var ctx = canvas.getContext('2d');
+                                ctx.drawImage(v, 0, 0, w, h);
+                                return canvas.toDataURL('image/jpeg', 0.7);
+                            }
+                            
+                            // Multiple videos: composite into a grid
+                            var cols = Math.min(activeVideos.length, 3);
+                            var rows = Math.ceil(activeVideos.length / cols);
+                            var cellW = 320;
+                            var cellH = 240;
+                            var canvas = document.createElement('canvas');
+                            canvas.width = cellW * cols;
+                            canvas.height = cellH * rows;
+                            var ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#000';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            
+                            for (var i = 0; i < activeVideos.length; i++) {
+                                var col = i % cols;
+                                var row = Math.floor(i / cols);
+                                var x = col * cellW;
+                                var y = row * cellH;
+                                ctx.drawImage(activeVideos[i], x, y, cellW, cellH);
+                            }
+                            return canvas.toDataURL('image/jpeg', 0.7);
+                        } catch(e) {
+                            return null;
+                        }
+                    })();
+                ";
+
+                var result = await JitsiWebView.CoreWebView2.ExecuteScriptAsync(script);
+
+                // WebView2 returns JSON-encoded string — strip quotes and handle null
+                if (result == null || result == "null" || result.Length < 10) return null;
+
+                // Remove surrounding quotes from JSON string
+                var base64 = result.Trim('"');
+                if (base64.StartsWith("data:image"))
+                {
+                    return base64;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[JITSI] Frame capture error: {ex.Message}");
+                return null;
+            }
         }
     }
 }

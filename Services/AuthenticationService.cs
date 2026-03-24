@@ -1,6 +1,9 @@
 using System;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace EduSyncAI
 {
@@ -10,6 +13,10 @@ namespace EduSyncAI
         private static Lecturer? _currentLecturer;
         private static Student? _currentStudent;
         private static string _currentUserType = "";
+        private static readonly HttpClient _httpClient = new HttpClient();
+        private static string? _authToken;
+
+        public static string? AuthToken => _authToken;
 
         public AuthenticationService()
         {
@@ -17,11 +24,79 @@ namespace EduSyncAI
         }
 
         /// <summary>
-        /// Authenticates lecturer with username and password
+        /// Authenticates lecturer with username and password.
+        /// Uses remote API when AppConfig.UseRemoteServer is true.
         /// </summary>
         public Lecturer? AuthenticateWithPassword(string username, string password)
         {
-            Console.WriteLine($"[DEBUG AUTH] Attempting lecturer login with username: '{username}'");
+            if (AppConfig.UseRemoteServer)
+            {
+                return AuthenticateViaRemoteApiAsync(username, password).GetAwaiter().GetResult();
+            }
+
+            return AuthenticateLocally(username, password);
+        }
+
+        /// <summary>
+        /// Authenticates lecturer via the remote WebAPI POST /api/auth/login
+        /// </summary>
+        private async Task<Lecturer?> AuthenticateViaRemoteApiAsync(string username, string password)
+        {
+            try
+            {
+                Console.WriteLine($"[AUTH] Attempting remote login for '{username}' at {AppConfig.ApiUrl}/auth/login");
+
+                var requestBody = new { Username = username, Password = password };
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{AppConfig.ApiUrl}/auth/login", content).ConfigureAwait(false);
+                var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                Console.WriteLine($"[AUTH] Remote login response: {response.StatusCode}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<JsonElement>(responseText);
+                    _authToken = result.GetProperty("token").GetString();
+
+                    var user = result.GetProperty("user");
+                    var lecturer = new Lecturer
+                    {
+                        Id = user.GetProperty("id").GetInt32(),
+                        Username = user.GetProperty("username").GetString() ?? username,
+                        FullName = user.GetProperty("fullName").GetString() ?? "",
+                        Email = user.GetProperty("email").GetString() ?? "",
+                        PasswordHash = "",
+                        IsActive = true
+                    };
+
+                    Console.WriteLine($"[AUTH] Remote login SUCCESS: {lecturer.FullName} (ID: {lecturer.Id})");
+                    _currentLecturer = lecturer;
+                    _currentUserType = "Lecturer";
+                    return lecturer;
+                }
+                else
+                {
+                    Console.WriteLine($"[AUTH] Remote login FAILED: {responseText}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AUTH] Remote login ERROR: {ex.Message}");
+                // If remote fails, fall back to local DB
+                Console.WriteLine("[AUTH] Falling back to local database...");
+                return AuthenticateLocally(username, password);
+            }
+        }
+
+        /// <summary>
+        /// Original local database authentication
+        /// </summary>
+        private Lecturer? AuthenticateLocally(string username, string password)
+        {
+            Console.WriteLine($"[DEBUG AUTH] Attempting local lecturer login with username: '{username}'");
             var lecturer = _dbService.GetLecturerByUsername(username);
             if (lecturer == null)
             {
@@ -31,16 +106,11 @@ namespace EduSyncAI
 
             Console.WriteLine($"[DEBUG AUTH] Found lecturer: Id={lecturer.Id}, Username='{lecturer.Username}', FullName='{lecturer.FullName}', IsActive={lecturer.IsActive}");
 
-            // Check if lecturer is active (important for admin-created accounts)
             if (!lecturer.IsActive)
             {
                 Console.WriteLine($"[DEBUG AUTH] Lecturer '{username}' is INACTIVE");
                 return null;
             }
-
-            Console.WriteLine($"[DEBUG AUTH] Stored hash: '{lecturer.PasswordHash}'");
-            Console.WriteLine($"[DEBUG AUTH] Hex hash of input: '{HashPassword(password)}'");
-            Console.WriteLine($"[DEBUG AUTH] Base64 hash of input: '{HashPasswordBase64(password)}'");
 
             if (VerifyPassword(password, lecturer.PasswordHash))
             {
@@ -184,6 +254,72 @@ namespace EduSyncAI
 
         public Student? AuthenticateStudentWithPassword(string matricNumber, string password)
         {
+            if (AppConfig.UseRemoteServer)
+            {
+                return AuthenticateStudentViaRemoteApiAsync(matricNumber, password).GetAwaiter().GetResult();
+            }
+
+            return AuthenticateStudentLocally(matricNumber, password);
+        }
+
+        /// <summary>
+        /// Authenticates student via the remote WebAPI POST /api/students/login
+        /// </summary>
+        private async Task<Student?> AuthenticateStudentViaRemoteApiAsync(string matricNumber, string password)
+        {
+            try
+            {
+                Console.WriteLine($"[AUTH] Attempting remote student login for '{matricNumber}'");
+
+                var requestBody = new { Username = matricNumber, Password = password };
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{AppConfig.ApiUrl}/students/login", content).ConfigureAwait(false);
+                var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                Console.WriteLine($"[AUTH] Remote student login response: {response.StatusCode}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<JsonElement>(responseText);
+                    _authToken = result.GetProperty("token").GetString();
+
+                    var user = result.GetProperty("student");
+                    var student = new Student
+                    {
+                        Id = user.GetProperty("id").GetInt32(),
+                        MatricNumber = user.GetProperty("matricNumber").GetString() ?? matricNumber,
+                        FullName = user.GetProperty("fullName").GetString() ?? "",
+                        Email = user.GetProperty("email").GetString() ?? "",
+                        PasswordHash = "",
+                        IsActive = true
+                    };
+
+                    Console.WriteLine($"[AUTH] Remote student login SUCCESS: {student.FullName} (ID: {student.Id})");
+                    _currentStudent = student;
+                    _currentUserType = "Student";
+                    return student;
+                }
+                else
+                {
+                    Console.WriteLine($"[AUTH] Remote student login FAILED: {responseText}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AUTH] Remote student login ERROR: {ex.Message}");
+                Console.WriteLine("[AUTH] Falling back to local database...");
+                return AuthenticateStudentLocally(matricNumber, password);
+            }
+        }
+
+        /// <summary>
+        /// Original local database student authentication
+        /// </summary>
+        private Student? AuthenticateStudentLocally(string matricNumber, string password)
+        {
             var student = _dbService.GetStudentByMatricNumber(matricNumber);
             if (student == null)
             {
@@ -191,7 +327,6 @@ namespace EduSyncAI
                 return null;
             }
             
-            // Check if student is active (important for admin-created accounts)
             if (!student.IsActive)
             {
                 System.Diagnostics.Debug.WriteLine($"Student {matricNumber} is inactive");
@@ -204,20 +339,13 @@ namespace EduSyncAI
                 return null;
             }
 
-            System.Diagnostics.Debug.WriteLine($"Authenticating student: {matricNumber}");
-            System.Diagnostics.Debug.WriteLine($"Stored hash: {student.PasswordHash}");
-            System.Diagnostics.Debug.WriteLine($"Input password: {password}");
-            System.Diagnostics.Debug.WriteLine($"Computed hash: {HashPassword(password)}");
-
             if (VerifyPassword(password, student.PasswordHash))
             {
                 _currentStudent = student;
                 _currentUserType = "Student";
-                System.Diagnostics.Debug.WriteLine("Authentication SUCCESS");
                 return student;
             }
             
-            System.Diagnostics.Debug.WriteLine("Authentication FAILED - password mismatch");
             return null;
         }
 
