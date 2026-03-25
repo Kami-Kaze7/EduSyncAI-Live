@@ -397,8 +397,8 @@ namespace EduSyncAI.WebAPI.Controllers
                 var enrollments = await _context.CourseEnrollments.Where(e => e.StudentId == id).ToListAsync();
                 if (enrollments.Any()) _context.CourseEnrollments.RemoveRange(enrollments);
 
-                var attendance = await _context.Attendance.Where(a => a.StudentId == id).ToListAsync();
-                if (attendance.Any()) _context.Attendance.RemoveRange(attendance);
+                var attendance = await _context.AttendanceRecords.Where(a => a.StudentId == id).ToListAsync();
+                if (attendance.Any()) _context.AttendanceRecords.RemoveRange(attendance);
 
                 var studentSummaries = await _context.StudentWeeklySummaries.Where(s => s.StudentId == id).ToListAsync();
                 if (studentSummaries.Any()) _context.StudentWeeklySummaries.RemoveRange(studentSummaries);
