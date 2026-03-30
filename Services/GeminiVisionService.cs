@@ -77,11 +77,42 @@ Return ONLY the JSON, nothing else.";
                 });
 
                 // 3. Reference Student Photos
+                using var fetchClient = new HttpClient();
+                fetchClient.Timeout = TimeSpan.FromSeconds(10);
+                
+                string serverUrl = AppConfig.ApiUrl;
+                if (serverUrl.EndsWith("/api", StringComparison.OrdinalIgnoreCase))
+                {
+                    serverUrl = serverUrl.Substring(0, serverUrl.Length - 4);
+                }
+
                 foreach (var student in enrolledStudents)
                 {
-                    if (File.Exists(student.PhotoPath))
+                    byte[]? photoBytes = null;
+                        
+                    if (student.PhotoPath.StartsWith("http", StringComparison.OrdinalIgnoreCase) || student.PhotoPath.StartsWith("/"))
                     {
-                        byte[] photoBytes = File.ReadAllBytes(student.PhotoPath);
+                        try
+                        {
+                            string fileUrl = student.PhotoPath.StartsWith("/")
+                                ? serverUrl + student.PhotoPath
+                                : student.PhotoPath;
+                                
+                            Console.WriteLine($"[GEMINI] Downloading reference photo: {fileUrl}");
+                            photoBytes = await fetchClient.GetByteArrayAsync(fileUrl);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[GEMINI] Failed to download photo for {student.FullName}: {ex.Message}");
+                        }
+                    }
+                    else if (File.Exists(student.PhotoPath))
+                    {
+                        photoBytes = File.ReadAllBytes(student.PhotoPath);
+                    }
+
+                    if (photoBytes != null)
+                    {
                         parts.Add(new
                         {
                             inline_data = new

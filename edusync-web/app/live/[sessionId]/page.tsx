@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, useCallback, use } from 'react';
+import { useRouter } from 'next/navigation';
 import { studentApi } from '@/lib/studentApi';
 import toast from 'react-hot-toast';
 
-export default function LiveClassroomPage() {
-    const params = useParams();
+export default function LiveClassroomPage(props: { params: Promise<{ sessionId: string }> }) {
+    const params = use(props.params);
     const router = useRouter();
-    const sessionId = params.sessionId as string;
+    const sessionId = params.sessionId;
     const [streamInfo, setStreamInfo] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isInCall, setIsInCall] = useState(false);
@@ -68,85 +68,95 @@ export default function LiveClassroomPage() {
     }, []);
 
     const handleJoinClass = useCallback(() => {
-        if (!streamInfo || !jitsiContainerRef.current) return;
+        if (!streamInfo) return;
+        setIsInCall(true);
+    }, [streamInfo]);
 
-        const studentUser = typeof window !== 'undefined'
-            ? JSON.parse(localStorage.getItem('studentUser') || '{"fullName":"Student"}')
-            : { fullName: 'Student' };
+    // Initialize Jitsi only when isInCall is true and container is rendered
+    useEffect(() => {
+        if (isInCall && jitsiContainerRef.current && !jitsiApiRef.current) {
+            let studentUser = { fullName: 'Student' };
+            if (typeof window !== 'undefined') {
+                try {
+                    const stored = localStorage.getItem('studentUser');
+                    if (stored) studentUser = JSON.parse(stored);
+                } catch { }
+            }
 
-        const displayName = studentUser.fullName || 'Student';
+            const displayName = studentUser.fullName || 'Student';
 
-        // Load the Jitsi IFrame API script dynamically
-        const script = document.createElement('script');
-        script.src = 'https://meet.viicsoft.dev/external_api.js';
-        script.async = true;
-        script.onload = () => {
-            // Create Jitsi Meet API instance with full control
-            const api = new (window as any).JitsiMeetExternalAPI('meet.viicsoft.dev', {
-                roomName: streamInfo.roomName,
-                parentNode: jitsiContainerRef.current,
-                width: '100%',
-                height: '100%',
-                userInfo: {
-                    displayName: displayName,
-                },
-                configOverwrite: {
-                    prejoinConfig: { enabled: false },
-                    prejoinPageEnabled: false,
-                    startWithAudioMuted: true,
-                    startWithVideoMuted: true,
-                    disableDeepLinking: true,
-                    hideConferenceSubject: true,
-                    enableInsecureRoomNameWarning: false,
-                    enableClosePage: false,
-                    disableInviteFunctions: true,
-                    toolbarButtons: [
-                        'microphone', 'camera', 'chat', 'raisehand',
-                        'tileview', 'hangup'
-                    ],
-                },
-                interfaceConfigOverwrite: {
-                    SHOW_JITSI_WATERMARK: false,
-                    SHOW_WATERMARK_FOR_GUESTS: false,
-                    SHOW_BRAND_WATERMARK: false,
-                    SHOW_POWERED_BY: false,
-                    MOBILE_APP_PROMO: false,
-                    APP_NAME: 'EduSync AI',
-                    NATIVE_APP_NAME: 'EduSync AI',
-                    PROVIDER_NAME: 'EduSync AI',
-                    DEFAULT_REMOTE_DISPLAY_NAME: 'Student',
-                    TOOLBAR_ALWAYS_VISIBLE: true,
-                },
-            });
+            // Load the Jitsi IFrame API script dynamically
+            const script = document.createElement('script');
+            script.src = 'https://meet.viicsoft.dev/external_api.js';
+            script.async = true;
+            script.onload = () => {
+                // Create Jitsi Meet API instance with full control
+                const api = new (window as any).JitsiMeetExternalAPI('meet.viicsoft.dev', {
+                    roomName: streamInfo.roomName,
+                    parentNode: jitsiContainerRef.current,
+                    width: '100%',
+                    height: '100%',
+                    userInfo: {
+                        displayName: displayName,
+                    },
+                    configOverwrite: {
+                        prejoinConfig: { enabled: false },
+                        prejoinPageEnabled: false,
+                        startWithAudioMuted: true,
+                        startWithVideoMuted: true,
+                        disableDeepLinking: true,
+                        hideConferenceSubject: true,
+                        enableInsecureRoomNameWarning: false,
+                        enableClosePage: false,
+                        disableInviteFunctions: true,
+                        toolbarButtons: [
+                            'microphone', 'camera', 'chat', 'raisehand',
+                            'tileview', 'hangup'
+                        ],
+                    },
+                    interfaceConfigOverwrite: {
+                        SHOW_JITSI_WATERMARK: false,
+                        SHOW_WATERMARK_FOR_GUESTS: false,
+                        SHOW_BRAND_WATERMARK: false,
+                        SHOW_POWERED_BY: false,
+                        MOBILE_APP_PROMO: false,
+                        APP_NAME: 'EduSync AI',
+                        NATIVE_APP_NAME: 'EduSync AI',
+                        PROVIDER_NAME: 'EduSync AI',
+                        DEFAULT_REMOTE_DISPLAY_NAME: 'Student',
+                        TOOLBAR_ALWAYS_VISIBLE: true,
+                    },
+                });
 
-            jitsiApiRef.current = api;
-            setIsInCall(true);
+                jitsiApiRef.current = api;
 
-            // When the user hangs up, redirect back to dashboard
-            api.addEventListener('readyToClose', () => {
-                console.log('[JITSI] Call ended, redirecting to dashboard');
-                api.dispose();
-                jitsiApiRef.current = null;
-                router.push('/student/dashboard');
-            });
-
-            // Also handle video conference left
-            api.addEventListener('videoConferenceLeft', () => {
-                console.log('[JITSI] Left conference, redirecting to dashboard');
-                setTimeout(() => {
-                    if (jitsiApiRef.current) {
-                        jitsiApiRef.current.dispose();
-                        jitsiApiRef.current = null;
-                    }
+                // When the user hangs up, redirect back to dashboard
+                api.addEventListener('readyToClose', () => {
+                    console.log('[JITSI] Call ended, redirecting to dashboard');
+                    api.dispose();
+                    jitsiApiRef.current = null;
                     router.push('/student/dashboard');
-                }, 500);
-            });
-        };
-        script.onerror = () => {
-            toast.error('Failed to load Jitsi. Please try again.');
-        };
-        document.body.appendChild(script);
-    }, [streamInfo, router]);
+                });
+
+                // Also handle video conference left
+                api.addEventListener('videoConferenceLeft', () => {
+                    console.log('[JITSI] Left conference, redirecting to dashboard');
+                    setTimeout(() => {
+                        if (jitsiApiRef.current) {
+                            jitsiApiRef.current.dispose();
+                            jitsiApiRef.current = null;
+                        }
+                        router.push('/student/dashboard');
+                    }, 500);
+                });
+            };
+            script.onerror = () => {
+                toast.error('Failed to load Jitsi. Please try again.');
+                setIsInCall(false);
+            };
+            document.body.appendChild(script);
+        }
+    }, [isInCall, streamInfo, router]);
 
     if (isLoading) {
         return (

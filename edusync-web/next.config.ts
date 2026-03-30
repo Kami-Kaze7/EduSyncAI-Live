@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         source: '/api/:path*',
         destination: 'http://localhost:5152/api/:path*',
       },
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:5152/uploads/:path*',
+      },
     ];
   },
 };
