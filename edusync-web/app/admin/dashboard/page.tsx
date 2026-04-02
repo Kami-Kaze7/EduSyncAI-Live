@@ -11,7 +11,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 export default function AdminDashboard() {
     const router = useRouter();
     const queryClient = useQueryClient();
-    const [activeTab, setActiveTab] = useState<'lecturers' | 'courses' | 'students'>('lecturers');
+    const [activeTab, setActiveTab] = useState<'lecturers' | 'courses' | 'students' | 'repository'>('lecturers');
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
@@ -33,6 +33,7 @@ export default function AdminDashboard() {
         { id: 'lecturers', label: 'Lecturers', icon: '👨‍🏫' },
         { id: 'courses', label: 'Courses', icon: '🎓' },
         { id: 'students', label: 'Students', icon: '👨‍🎓' },
+        { id: 'repository', label: '3D Repository', icon: '🌐' },
     ];
 
     return (
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
                 {activeTab === 'lecturers' && <LecturersTab />}
                 {activeTab === 'courses' && <CoursesTab />}
                 {activeTab === 'students' && <StudentsTab />}
+                {activeTab === 'repository' && <RepositoryTab />}
             </div>
         </DashboardLayout>
     );
@@ -1074,6 +1076,180 @@ function ImportStudentsModal({ onClose }: { onClose: () => void }) {
                         </div>
                     </form>
                 )}
+            </div>
+        </div>
+    );
+}
+// ═══════════════════════════
+//  RepositoryTab (NEW)
+// ═══════════════════════════
+const DISCIPLINES = [
+    'Architecture',
+    'Biology',
+    'Engineering',
+    'Geology',
+    'Chemistry',
+    'Physics'
+];
+
+function RepositoryTab() {
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        discipline: '',
+        modelFile: null as File | null,
+        thumbnailFile: null as File | null,
+    });
+    const [previewModelSource, setPreviewModelSource] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'model' | 'thumbnail') => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (type === 'model') {
+            setFormData({ ...formData, modelFile: file });
+            setPreviewModelSource(file.name);
+        } else {
+            setFormData({ ...formData, thumbnailFile: file });
+        }
+    };
+
+    const handleUpload = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.modelFile || !formData.title || !formData.discipline) {
+            toast.error('Please fill all required fields and select a model.');
+            return;
+        }
+
+        try {
+            setIsUploading(true);
+            toast.loading('Uploading 3D Model...', { id: 'upload-model' });
+            
+            await adminApi.upload3DModelAsset({
+                title: formData.title,
+                description: formData.description,
+                discipline: formData.discipline,
+                modelFile: formData.modelFile,
+                thumbnailFile: formData.thumbnailFile || undefined,
+            });
+
+            toast.success('Model uploaded successfully!', { id: 'upload-model' });
+            setFormData({ title: '', description: '', discipline: '', modelFile: null, thumbnailFile: null });
+            setPreviewModelSource(null);
+            (document.getElementById('modelUploadForm') as HTMLFormElement)?.reset();
+        } catch (error: any) {
+            console.error('Upload Error', error);
+            toast.error(error.response?.data?.error || 'Failed to upload model.', { id: 'upload-model' });
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h2 className="text-xl font-semibold text-gray-900">3D Asset Repository</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">Upload new 3D models specifically for the desktop whiteboard</p>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <form id="modelUploadForm" onSubmit={handleUpload} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Left Column - Metadata */}
+                    <div className="space-y-5">
+                        <h3 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2 mb-4">Metadata</h3>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Asset Title *</label>
+                            <input
+                                type="text"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                placeholder="e.g. Human Heart Diagram, V8 Engine..."
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Discipline *</label>
+                            <select
+                                value={formData.discipline}
+                                onChange={(e) => setFormData({ ...formData, discipline: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                required
+                            >
+                                <option value="">-- Assign a discipline category --</option>
+                                {DISCIPLINES.map(d => (
+                                    <option key={d} value={d}>{d}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                placeholder="Details about this model..."
+                                rows={3}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Right Column - Files */}
+                    <div className="space-y-5">
+                        <h3 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2 mb-4">Files</h3>
+
+                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center bg-gray-50 hover:bg-gray-100 transition-colors relative">
+                            {formData.modelFile ? (
+                                <div>
+                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-xl mx-auto mb-2 font-bold text-indigo-600">
+                                        🧊
+                                    </div>
+                                    <p className="font-semibold text-gray-800 text-sm truncate">{previewModelSource}</p>
+                                    <p className="text-xs text-gray-500 mt-1">{(formData.modelFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                                    <label className="cursor-pointer text-indigo-600 font-medium text-xs hover:text-indigo-800 mt-3 inline-block">
+                                        Change File
+                                        <input type="file" accept=".obj,.stl" className="hidden" onChange={(e) => handleFileChange(e, 'model')} />
+                                    </label>
+                                </div>
+                            ) : (
+                                <label className="cursor-pointer block">
+                                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-xl mx-auto mb-2 text-gray-400">
+                                        📁
+                                    </div>
+                                    <p className="text-gray-600 text-sm font-medium">Click to select 3D Model</p>
+                                    <p className="text-gray-400 text-xs mt-1">Accepts .obj and .stl formats</p>
+                                    <input type="file" accept=".obj,.stl" className="hidden" onChange={(e) => handleFileChange(e, 'model')} required />
+                                </label>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail Preview (Optional)</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleFileChange(e, 'thumbnail')}
+                                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                            />
+                        </div>
+
+                        <div className="pt-4">
+                            <button
+                                type="submit"
+                                disabled={isUploading || !formData.modelFile}
+                                className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                            >
+                                {isUploading ? 'Uploading & Processing...' : 'Upload Asset to Repository'}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     );

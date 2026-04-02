@@ -215,6 +215,41 @@
                                 </Border>
                             </StackPanel>
 
+                            <!-- 3D Shapes Tools -->
+                            <StackPanel Orientation="Vertical" Margin="0,0,16,0">
+                                <TextBlock Text="3D SHAPES" FontSize="10" Foreground="#95A5A6" FontWeight="Bold" Margin="4,0,0,4"/>
+                                <Border Background="#F8F9FA" BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="6" Padding="4">
+                                    <StackPanel Orientation="Horizontal">
+
+                                        <Button x:Name="ImportModelButton" Content="📁 Model" Click="ImportModel_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Import 3D Model (.obj, .stl) from PC"/>
+                                        <Button x:Name="RepositoryButton" Content="🌐 Repo" Click="RepositoryButton_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Browse EduSync 3D Repository" Foreground="#16A085"/>
+                                        <Button x:Name="Pen3DButton" Content="🖌️ 3D Pen" Click="Pen3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Draw Annotations Over 3D Scene" Foreground="#E74C3C"/>
+                                        <Button x:Name="Paint3DButton" Content="🎨 Model Paint" Click="Paint3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Colorize 3D Shapes" Foreground="#2980B9"/>
+                                        <Button x:Name="Slice3DButton" Content="✂️ Slice" Click="Slice3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Slice to Detach 3D Parts" Foreground="#8E44AD"/>
+                                        <Button x:Name="CubeButton" Content="🧊" Click="Cube3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Cube" Width="36"/>
+                                        <Button x:Name="SphereButton" Content="🔵" Click="Sphere3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Sphere" Width="36"/>
+                                        <Button x:Name="CylinderButton" Content="🔷" Click="Cylinder3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Cylinder" Width="36"/>
+                                        <Button x:Name="PyramidButton" Content="📐" Click="Pyramid3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Pyramid" Width="36"/>
+                                        <Button x:Name="ConeButton" Content="📎" Click="Cone3D_Click" Style="{StaticResource ToolButtonStyle}" ToolTip="Cone" Width="36"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- 3D Background -->
+                            <StackPanel Orientation="Vertical" Margin="0,0,16,0">
+                                <TextBlock Text="3D BG" FontSize="10" Foreground="#95A5A6" FontWeight="Bold" Margin="4,0,0,4"/>
+                                <Border Background="#F8F9FA" BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="6" Padding="4">
+                                    <ComboBox x:Name="BgColorComboBox" Width="90" Height="28" SelectionChanged="BgColorComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Default" Tag="#F0F4F8" IsSelected="True"/>
+                                        <ComboBoxItem Content="White" Tag="#FFFFFF"/>
+                                        <ComboBoxItem Content="Studio" Tag="#1A1A1A"/>
+                                        <ComboBoxItem Content="Black" Tag="#000000"/>
+                                        <ComboBoxItem Content="Green" Tag="#00FF00"/>
+                                        <ComboBoxItem Content="Blue" Tag="#0A3055"/>
+                                    </ComboBox>
+                                </Border>
+                            </StackPanel>
+
                             <!-- Insert Tools -->
                             <StackPanel Orientation="Vertical" Margin="0,0,16,0">
                                 <TextBlock Text="INSERT" FontSize="10" Foreground="#95A5A6" FontWeight="Bold" Margin="4,0,0,4"/>
@@ -245,6 +280,7 @@
                                 <Border Background="#F8F9FA" BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="6" Padding="4">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Background="Black" Click="ColorButton_Click" Tag="Black" Style="{StaticResource ColorButtonStyle}" BorderBrush="#3498DB" BorderThickness="3"/>
+                                        <Button Background="White" Click="ColorButton_Click" Tag="White" Style="{StaticResource ColorButtonStyle}"/>
                                         <Button Background="Red" Click="ColorButton_Click" Tag="Red" Style="{StaticResource ColorButtonStyle}"/>
                                         <Button Background="Blue" Click="ColorButton_Click" Tag="Blue" Style="{StaticResource ColorButtonStyle}"/>
                                         <Button Background="Green" Click="ColorButton_Click" Tag="Green" Style="{StaticResource ColorButtonStyle}"/>
@@ -252,6 +288,10 @@
                                         <Button Background="Orange" Click="ColorButton_Click" Tag="Orange" Style="{StaticResource ColorButtonStyle}"/>
                                         <Button Background="Purple" Click="ColorButton_Click" Tag="Purple" Style="{StaticResource ColorButtonStyle}"/>
                                         <Button Background="Brown" Click="ColorButton_Click" Tag="Brown" Style="{StaticResource ColorButtonStyle}"/>
+                                        <Button Background="DeepPink" Click="ColorButton_Click" Tag="DeepPink" Style="{StaticResource ColorButtonStyle}"/>
+                                        <Button Background="Cyan" Click="ColorButton_Click" Tag="Cyan" Style="{StaticResource ColorButtonStyle}"/>
+                                        <Button Background="Lime" Click="ColorButton_Click" Tag="Lime" Style="{StaticResource ColorButtonStyle}"/>
+                                        <Button Content="✕" ToolTip="Reset / Transparent" Foreground="#E74C3C" Background="Transparent" Click="ColorButton_Click" Tag="Transparent" Style="{StaticResource ColorButtonStyle}"/>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -261,6 +301,7 @@
                                 <TextBlock Text="ACTIONS" FontSize="10" Foreground="#95A5A6" FontWeight="Bold" Margin="4,0,0,4"/>
                                 <Border Background="#F8F9FA" BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="6" Padding="4">
                                     <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="UndoButton" Content="↩ Undo" Click="Undo3D_Click" Style="{StaticResource ToolButtonStyle}" Background="#8E44AD" Foreground="White" BorderThickness="0" ToolTip="Undo last 3D action (Ctrl+Z)"/>
                                         <Button Content="🗑️ Clear" Click="ClearButton_Click" Style="{StaticResource ToolButtonStyle}" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
                                         <Button Content="💾 Save" Click="SaveButton_Click" Style="{StaticResource ToolButtonStyle}" Background="#27AE60" Foreground="White" BorderThickness="0"/>
                                     </StackPanel>
@@ -305,27 +346,147 @@
                     </Grid>
                 </Border>
 
-                <!-- Main Whiteboard Canvas with Zoom Support -->
-                <ScrollViewer x:Name="WhiteboardScrollViewer" 
-                              HorizontalScrollBarVisibility="Auto" 
-                              VerticalScrollBarVisibility="Auto"
-                              PreviewMouseWheel="WhiteboardScrollViewer_PreviewMouseWheel"
-                              IsManipulationEnabled="True"
-                              ManipulationDelta="WhiteboardScrollViewer_ManipulationDelta">
-                    <Border Background="White" Margin="10" CornerRadius="5" 
-                            BorderBrush="#BDC3C7" BorderThickness="1"
-                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Border.LayoutTransform>
-                            <ScaleTransform x:Name="CanvasScale" ScaleX="1.0" ScaleY="1.0" />
-                        </Border.LayoutTransform>
-                        <InkCanvas x:Name="WhiteboardCanvas" 
-                                  Background="White"
-                                  Width="1920" Height="1080"
-                                  MouseDown="WhiteboardCanvas_MouseDown"
-                                  MouseMove="WhiteboardCanvas_MouseMove"
-                                  MouseUp="WhiteboardCanvas_MouseUp"/>
-                    </Border>
-                </ScrollViewer>
+                <!-- Main Whiteboard Canvas (hidden - legacy 2D) -->
+                <Grid>
+                    <ScrollViewer x:Name="WhiteboardScrollViewer" Visibility="Collapsed"
+                                  HorizontalScrollBarVisibility="Auto" 
+                                  VerticalScrollBarVisibility="Auto">
+                        <Border Background="White" Margin="10" CornerRadius="5" 
+                                BorderBrush="#BDC3C7" BorderThickness="1"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Border.LayoutTransform>
+                                <ScaleTransform x:Name="CanvasScale" ScaleX="1.0" ScaleY="1.0" />
+                            </Border.LayoutTransform>
+                            <InkCanvas x:Name="WhiteboardCanvas" 
+                                      Background="White"
+                                      Width="1920" Height="1080"/>
+                        </Border>
+                    </ScrollViewer>
+
+                    <!-- ==================== 3D VIEWPORT (DEFAULT WORKSPACE) ==================== -->
+                    <Grid x:Name="Viewport3DOverlay" Background="#F0F4F8"
+                          MouseDown="Viewport3D_MouseDown"
+                          MouseMove="Viewport3D_MouseMove"
+                          MouseUp="Viewport3D_MouseUp"
+                          MouseWheel="Viewport3D_MouseWheel"
+                          KeyDown="Viewport3D_KeyDown"
+                          IsManipulationEnabled="True"
+                          ManipulationStarting="Viewport3D_ManipulationStarting"
+                          ManipulationDelta="Viewport3D_ManipulationDelta"
+                          Focusable="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Row 0: Viewport + Overlays -->
+                        <Grid Grid.Row="0">
+                            <!-- 3D Viewport -->
+                            <Viewport3D x:Name="MainViewport3D" ClipToBounds="True">
+                                <Viewport3D.Camera>
+                                    <PerspectiveCamera x:Name="Camera3D"
+                                                       Position="0,2,6"
+                                                       LookDirection="0,-0.3,-1"
+                                                       UpDirection="0,1,0"
+                                                       FieldOfView="55">
+                                        <PerspectiveCamera.Transform>
+                                            <RotateTransform3D>
+                                                <RotateTransform3D.Rotation>
+                                                    <QuaternionRotation3D x:Name="CameraQuaternion" />
+                                                </RotateTransform3D.Rotation>
+                                            </RotateTransform3D>
+                                        </PerspectiveCamera.Transform>
+                                    </PerspectiveCamera>
+                                </Viewport3D.Camera>
+                                <!-- Lighting -->
+                                <ModelVisual3D>
+                                    <ModelVisual3D.Content>
+                                        <Model3DGroup>
+                                            <DirectionalLight Color="White" Direction="-0.5,-1,-0.8"/>
+                                            <DirectionalLight Color="#80FFFFFF" Direction="0.5,1,0.8"/>
+                                            <AmbientLight Color="#606060"/>
+                                        </Model3DGroup>
+                                    </ModelVisual3D.Content>
+                                </ModelVisual3D>
+                                <!-- Grid plane for reference -->
+                                <ModelVisual3D x:Name="GridPlaneVisual">
+                                    <ModelVisual3D.Content>
+                                        <GeometryModel3D>
+                                            <GeometryModel3D.Geometry>
+                                                <MeshGeometry3D Positions="-5,0,-5 5,0,-5 5,0,5 -5,0,5"
+                                                                TriangleIndices="0 1 2 0 2 3"
+                                                                Normals="0,1,0 0,1,0 0,1,0 0,1,0"/>
+                                            </GeometryModel3D.Geometry>
+                                            <GeometryModel3D.Material>
+                                                <DiffuseMaterial>
+                                                    <DiffuseMaterial.Brush>
+                                                        <SolidColorBrush Color="#E8ECF0" Opacity="0.6"/>
+                                                    </DiffuseMaterial.Brush>
+                                                </DiffuseMaterial>
+                                            </GeometryModel3D.Material>
+                                        </GeometryModel3D>
+                                    </ModelVisual3D.Content>
+                                </ModelVisual3D>
+                            </Viewport3D>
+
+                            <!-- Ink Overlay (pen, highlighter, eraser strokes) -->
+                            <InkCanvas x:Name="Pen3DOverlayCanvas"
+                                       Visibility="Visible"
+                                       IsHitTestVisible="False"/>
+
+                            <!-- 2D Shapes/Images Overlay — null background lets clicks pass through to viewport on empty areas -->
+                            <Canvas x:Name="Shapes3DOverlayCanvas" 
+                                    IsHitTestVisible="True"
+                                    MouseDown="Shapes3DOverlay_MouseDown"
+                                    MouseMove="Shapes3DOverlay_MouseMove"
+                                    MouseUp="Shapes3DOverlay_MouseUp"/>
+
+                            <!-- Status indicator -->
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                    Background="#CC8E44AD" CornerRadius="0,0,8,0" Padding="12,6"
+                                    IsHitTestVisible="False">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🧊" FontSize="12"/>
+                                    <TextBlock x:Name="Shape3DStatusText" Text="  |  Ready" Foreground="#DDD" FontSize="11" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Focused shape info -->
+                            <Border x:Name="FocusInfoBadge" Visibility="Collapsed"
+                                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"
+                                    Background="#CC2C3E50" CornerRadius="8" Padding="16,8"
+                                    IsHitTestVisible="True">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="FocusInfoText" Text="Drag = Rotate · Right-Click Drag = Move · Scroll/Pinch = Scale · Esc = Deselect" 
+                                               Foreground="White" FontSize="12" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                                    <Button Content="🗑️ Delete" Click="DeleteFocused3D_Click" 
+                                            Background="#E74C3C" Foreground="White" BorderThickness="0" Padding="8,4" Cursor="Hand">
+                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></Button.Resources>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Row 1: Screen Tab Bar -->
+                        <Border Grid.Row="1" Background="#1A252F" Padding="0" Height="40">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                    <StackPanel x:Name="ScreenTabsPanel" Orientation="Horizontal" Margin="4,4,0,4"/>
+                                </ScrollViewer>
+                                <Button Grid.Column="1" Content="＋" Click="AddScreen_Click" 
+                                        Width="36" Height="32" Margin="6,4" Cursor="Hand"
+                                        FontSize="18" FontWeight="Bold"
+                                        Background="#2C3E50" Foreground="#3498DB" BorderThickness="1" BorderBrush="#3498DB">
+                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
             </DockPanel>
 
             <!-- ==================== OVERLAY PANELS ==================== -->

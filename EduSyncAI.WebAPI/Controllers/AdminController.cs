@@ -223,15 +223,87 @@ namespace EduSyncAI.WebAPI.Controllers
                     return NotFound(new { error = "Lecturer not found" });
                 }
 
-                _context.Lecturers.Remove(lecturer);
-                await _context.SaveChangesAsync();
+                // --- Pure raw SQL cascade delete for maximum reliability ---
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    // Get all course IDs for this lecturer
+                    var lecturerCourseIds = await _context.Courses
+                        .Where(c => c.LecturerId == id)
+                        .Select(c => c.Id)
+                        .ToListAsync();
 
-                return NoContent();
+                    // LAYER 1: Clean ALL FK references via raw SQL (handles tracked + untracked tables)
+                    // Attendance (via sessions)
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM Attendance WHERE SessionId IN (SELECT Id FROM ClassSessions WHERE CourseId IN (SELECT Id FROM Courses WHERE LecturerId = {id}) OR LecturerId = {id})");
+                    // Nullify VerifiedBy references
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"UPDATE Attendance SET VerifiedBy = NULL WHERE VerifiedBy = {id}");
+                    // LectureNotes (via sessions)
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM LectureNotes WHERE SessionId IN (SELECT Id FROM ClassSessions WHERE CourseId IN (SELECT Id FROM Courses WHERE LecturerId = {id}) OR LecturerId = {id})");
+                    // LectureMaterials (via sessions)
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM LectureMaterials WHERE SessionId IN (SELECT Id FROM ClassSessions WHERE CourseId IN (SELECT Id FROM Courses WHERE LecturerId = {id}) OR LecturerId = {id})");
+                    // StudentWeeklySummaries (via WeeklySummaries)
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM StudentWeeklySummaries WHERE WeeklySummaryId IN (SELECT Id FROM WeeklySummaries WHERE LecturerId = {id})");
+                    // LecturePreps (via Lectures, untracked)
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM LecturePreps WHERE LectureId IN (SELECT Id FROM Lectures WHERE CourseId IN (SELECT Id FROM Courses WHERE LecturerId = {id}))");
+                    // Lectures (untracked)
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM Lectures WHERE CourseId IN (SELECT Id FROM Courses WHERE LecturerId = {id})");
+
+                    // LAYER 2: Intermediate tables
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM WeeklySummaries WHERE LecturerId = {id}");
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM CourseSyllabi WHERE LecturerId = {id}");
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM ClassSummaries WHERE LecturerId = {id}");
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM ClassSessions WHERE LecturerId = {id}");
+
+                    // LAYER 3: Course-level children
+                    if (lecturerCourseIds.Any())
+                    {
+                        var ids = string.Join(",", lecturerCourseIds);
+                        await _context.Database.ExecuteSqlRawAsync(
+                            $"DELETE FROM ClassSessions WHERE CourseId IN ({ids})");
+                        await _context.Database.ExecuteSqlRawAsync(
+                            $"DELETE FROM CourseEnrollments WHERE CourseId IN ({ids})");
+                        await _context.Database.ExecuteSqlRawAsync(
+                            $"DELETE FROM ClassSummaries WHERE CourseId IN ({ids})");
+                        await _context.Database.ExecuteSqlRawAsync(
+                            $"DELETE FROM CourseSyllabi WHERE CourseId IN ({ids})");
+                        await _context.Database.ExecuteSqlRawAsync(
+                            $"DELETE FROM WeeklySummaries WHERE CourseId IN ({ids})");
+                    }
+
+                    // LAYER 4: Courses owned by this lecturer
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM Courses WHERE LecturerId = {id}");
+
+                    // LAYER 5: The lecturer itself
+                    await _context.Database.ExecuteSqlRawAsync(
+                        $"DELETE FROM Lecturers WHERE Id = {id}");
+
+                    await transaction.CommitAsync();
+                    return NoContent();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
             catch (Exception ex)
             {
+                var inner = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 _logger.LogError(ex, "Error deleting lecturer {LecturerId}", id);
-                return StatusCode(500, new { error = "Failed to delete lecturer" });
+                return StatusCode(500, new { error = $"Failed to delete lecturer: {inner}" });
             }
         }
 
@@ -397,8 +469,8 @@ namespace EduSyncAI.WebAPI.Controllers
                 var enrollments = await _context.CourseEnrollments.Where(e => e.StudentId == id).ToListAsync();
                 if (enrollments.Any()) _context.CourseEnrollments.RemoveRange(enrollments);
 
-                var attendance = await _context.AttendanceRecords.Where(a => a.StudentId == id).ToListAsync();
-                if (attendance.Any()) _context.AttendanceRecords.RemoveRange(attendance);
+                var attendance = await _context.Attendance.Where(a => a.StudentId == id).ToListAsync();
+                if (attendance.Any()) _context.Attendance.RemoveRange(attendance);
 
                 var studentSummaries = await _context.StudentWeeklySummaries.Where(s => s.StudentId == id).ToListAsync();
                 if (studentSummaries.Any()) _context.StudentWeeklySummaries.RemoveRange(studentSummaries);
@@ -412,6 +484,51 @@ namespace EduSyncAI.WebAPI.Controllers
             {
                 _logger.LogError(ex, "Error deleting student {StudentId}", id);
                 return StatusCode(500, new { error = "Failed to delete student" });
+            }
+        }
+
+        // GET: api/admin/debug-delete
+        [HttpGet("debug-delete")]
+        public async Task<IActionResult> DebugDelete()
+        {
+            try 
+            {
+                var studentId = await _context.Attendance.Select(a => a.StudentId).FirstOrDefaultAsync();
+                if (studentId == 0) return Ok("No student with attendance");
+                
+                using var tx = await _context.Database.BeginTransactionAsync();
+                try 
+                {
+                    var student = await _context.Students.FindAsync(studentId);
+                    
+                    var enrollments = await _context.CourseEnrollments.Where(e => e.StudentId == studentId).ToListAsync();
+                    if (enrollments.Any()) _context.CourseEnrollments.RemoveRange(enrollments);
+
+                    var attendance = await _context.Attendance.Where(a => a.StudentId == studentId).ToListAsync();
+                    if (attendance.Any()) _context.Attendance.RemoveRange(attendance);
+
+                    var studentSummaries = await _context.StudentWeeklySummaries.Where(s => s.StudentId == studentId).ToListAsync();
+                    if (studentSummaries.Any()) _context.StudentWeeklySummaries.RemoveRange(studentSummaries);
+                    
+                    _context.Students.Remove(student);
+                    await _context.SaveChangesAsync();
+                    
+                    await tx.RollbackAsync();
+                    return Ok($"SUCCESS: Deleted {studentId}");
+                }
+                catch (Exception ex)
+                {
+                    await tx.RollbackAsync();
+                    return StatusCode(500, new { 
+                        error = ex.Message, 
+                        inner = ex.InnerException?.Message ?? "No inner exception",
+                        stack = ex.StackTrace 
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -498,21 +615,79 @@ namespace EduSyncAI.WebAPI.Controllers
                 if (course == null)
                     return NotFound(new { error = "Course not found" });
 
-                var sessions = await _context.ClassSessions.Where(s => s.CourseId == id).ToListAsync();
-                _context.ClassSessions.RemoveRange(sessions);
+                // --- Full cascade delete for course ---
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    // 1. Get all session IDs for this course
+                    var sessionIds = await _context.ClassSessions
+                        .Where(s => s.CourseId == id)
+                        .Select(s => s.Id)
+                        .ToListAsync();
 
-                var enrollments = await _context.CourseEnrollments.Where(e => e.CourseId == id).ToListAsync();
-                _context.CourseEnrollments.RemoveRange(enrollments);
+                    // LAYER 1: Deepest children
+                    var attendance = await _context.Attendance.Where(a => sessionIds.Contains(a.SessionId)).ToListAsync();
+                    if (attendance.Any()) _context.Attendance.RemoveRange(attendance);
 
-                _context.Courses.Remove(course);
-                await _context.SaveChangesAsync();
+                    var lectureNotes = await _context.LectureNotes.Where(n => sessionIds.Contains(n.SessionId)).ToListAsync();
+                    if (lectureNotes.Any()) _context.LectureNotes.RemoveRange(lectureNotes);
 
-                return NoContent();
+                    var lectureMaterials = await _context.LectureMaterials.Where(m => sessionIds.Contains(m.SessionId)).ToListAsync();
+                    if (lectureMaterials.Any()) _context.LectureMaterials.RemoveRange(lectureMaterials);
+
+                    var weeklySummaryIds = await _context.WeeklySummaries
+                        .Where(ws => ws.CourseId == id)
+                        .Select(ws => ws.Id)
+                        .ToListAsync();
+
+                    var studentWeeklySummaries = await _context.StudentWeeklySummaries
+                        .Where(sws => weeklySummaryIds.Contains(sws.WeeklySummaryId)).ToListAsync();
+                    if (studentWeeklySummaries.Any()) _context.StudentWeeklySummaries.RemoveRange(studentWeeklySummaries);
+
+                    await _context.SaveChangesAsync();
+
+                    // RAW SQL: Delete from untracked tables (Lectures/LecturePreps not in DbContext)
+                    await _context.Database.ExecuteSqlRawAsync($"DELETE FROM LecturePreps WHERE LectureId IN (SELECT Id FROM Lectures WHERE CourseId = {id})");
+                    await _context.Database.ExecuteSqlRawAsync($"DELETE FROM Lectures WHERE CourseId = {id}");
+
+                    // LAYER 2: WeeklySummaries
+                    var weeklySummaries = await _context.WeeklySummaries.Where(ws => ws.CourseId == id).ToListAsync();
+                    if (weeklySummaries.Any()) _context.WeeklySummaries.RemoveRange(weeklySummaries);
+                    await _context.SaveChangesAsync();
+
+                    // LAYER 3: Intermediate children
+                    var sessions = await _context.ClassSessions.Where(s => s.CourseId == id).ToListAsync();
+                    if (sessions.Any()) _context.ClassSessions.RemoveRange(sessions);
+
+                    var enrollments = await _context.CourseEnrollments.Where(e => e.CourseId == id).ToListAsync();
+                    if (enrollments.Any()) _context.CourseEnrollments.RemoveRange(enrollments);
+
+                    var classSummaries = await _context.ClassSummaries.Where(cs => cs.CourseId == id).ToListAsync();
+                    if (classSummaries.Any()) _context.ClassSummaries.RemoveRange(classSummaries);
+
+                    var syllabi = await _context.CourseSyllabi.Where(cs => cs.CourseId == id).ToListAsync();
+                    if (syllabi.Any()) _context.CourseSyllabi.RemoveRange(syllabi);
+
+                    await _context.SaveChangesAsync();
+
+                    // LAYER 4: Course
+                    _context.Courses.Remove(course);
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                    return NoContent();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
             catch (Exception ex)
             {
+                var inner = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 _logger.LogError(ex, "Error deleting course {CourseId}", id);
-                return StatusCode(500, new { error = $"Failed to delete course: {ex.Message}" });
+                return StatusCode(500, new { error = $"Failed to delete course: {inner}" });
             }
         }
 

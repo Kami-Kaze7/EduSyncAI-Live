@@ -141,4 +141,35 @@ export const adminApi = {
             headers: { Authorization: `Bearer ${token}` },
         });
     },
+
+    // 3D Repository
+    upload3DModelAsset: async (data: {
+        title: string;
+        description: string;
+        discipline: string;
+        modelFile: File;
+        thumbnailFile?: File;
+    }) => {
+        const token = localStorage.getItem('adminToken');
+        const formData = new FormData();
+        formData.append('title', data.title);
+        formData.append('description', data.description || '');
+        formData.append('discipline', data.discipline);
+        formData.append('modelFile', data.modelFile);
+        if (data.thumbnailFile) {
+            formData.append('thumbnailFile', data.thumbnailFile);
+        }
+
+        const response = await axios.post(
+            `${API_BASE_URL}/ModelAssets`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    },
 };

@@ -81,10 +81,15 @@ app.UseCors("AllowWebApp");
 // Serve uploaded files (profile photos, etc.) from Data/uploads via /uploads/...
 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "..", "Data", "uploads");
 Directory.CreateDirectory(uploadsPath);
+var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+provider.Mappings[".obj"] = "application/x-tgif";
+provider.Mappings[".stl"] = "application/sla";
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.GetFullPath(uploadsPath)),
-    RequestPath = "/uploads"
+    RequestPath = "/uploads",
+    ContentTypeProvider = provider
 });
 
 app.UseAuthentication();
@@ -97,12 +102,29 @@ app.MapHub<EduSyncAI.WebAPI.Hubs.ClassroomHub>("/hubs/classroom");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<EduSyncDbContext>();
-    context.Database.EnsureCreated();
+    try {
+        context.Database.EnsureCreated();
+    } catch { /* Ignore if it fails due to existing tables not tracked by EF */ }
     
     // Add DayNumber column if it doesn't exist (schema migration)
     try {
         context.Database.ExecuteSqlRaw("ALTER TABLE WeeklySummaries ADD COLUMN DayNumber INTEGER NOT NULL DEFAULT 1");
     } catch { /* Column already exists — ignore */ }
+
+    // 3D Repository ModelAssets Schema Migration (Ensures creation on the production live server)
+    try {
+        context.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ModelAssets (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Title TEXT NOT NULL,
+                Description TEXT,
+                Discipline TEXT NOT NULL,
+                ModelUrl TEXT NOT NULL,
+                ThumbnailUrl TEXT,
+                UploadedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+        ");
+    } catch { /* Ignore if it exists */ }
     
     // Seed test user
     DatabaseSeeder.SeedTestUser(context);

@@ -23,6 +23,7 @@ namespace EduSyncAI.WebAPI.Data
         public DbSet<WeeklySummary> WeeklySummaries { get; set; }
         public DbSet<StudentWeeklySummary> StudentWeeklySummaries { get; set; }
         public DbSet<AttendanceRecord> Attendance { get; set; }
+        public DbSet<Model3DAsset> ModelAssets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,7 @@ namespace EduSyncAI.WebAPI.Data
             modelBuilder.Entity<WeeklySummary>().ToTable("WeeklySummaries");
             modelBuilder.Entity<StudentWeeklySummary>().ToTable("StudentWeeklySummaries");
             modelBuilder.Entity<AttendanceRecord>().ToTable("Attendance");
+            modelBuilder.Entity<Model3DAsset>().ToTable("ModelAssets");
             
             // Ignore navigation properties to prevent EF from trying to load them
             modelBuilder.Entity<Course>().Ignore(c => c.Enrollments);

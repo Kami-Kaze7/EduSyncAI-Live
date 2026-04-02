@@ -1,0 +1,142 @@
+<Window x:Class="EduSyncAI.Views.RepositoryBrowserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="3D Repository" Height="600" Width="900"
+        WindowStartupLocation="CenterOwner"
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
+
+    <Border Background="White" CornerRadius="12" BorderBrush="#2C3E50" BorderThickness="1"
+            Margin="20">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="20" Opacity="0.3" Direction="270"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="#2C3E50" CornerRadius="11,11,0,0" Padding="20,15">
+                <Grid>
+                    <TextBlock Text="🌐 3D Model Repository" Foreground="White" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="18"
+                            Cursor="Hand" Click="CloseButton_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Body -->
+            <Grid Grid.Row="1" Margin="20">
+                <!-- Disciplines View -->
+                <Grid x:Name="DisciplinesGrid" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Select a Discipline to Browse Models" FontSize="16" Foreground="#34495E" Margin="0,0,0,15"/>
+                    <WrapPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!-- Discipline Cards will be generated in code-behind or we can define them here -->
+                        <Button Click="DisciplineCard_Click" Tag="Architecture" Width="200" Height="150" Margin="10" Background="#F0F4F8" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="🏛️" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="Architecture" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="DisciplineCard_Click" Tag="Biology" Width="200" Height="150" Margin="10" Background="#F0F4F8" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="🧬" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="Biology" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="DisciplineCard_Click" Tag="Engineering" Width="200" Height="150" Margin="10" Background="#F0F4F8" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="⚙️" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="Engineering" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="DisciplineCard_Click" Tag="Geology" Width="200" Height="150" Margin="10" Background="#F0F4F8" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="🌋" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="Geology" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="DisciplineCard_Click" Tag="Chemistry" Width="200" Height="150" Margin="10" Background="#F0F4F8" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="🧪" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="Chemistry" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="DisciplineCard_Click" Tag="Physics" Width="200" Height="150" Margin="10" Background="#F0F4F8" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="⚛️" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="Physics" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                            </StackPanel>
+                        </Button>
+                    </WrapPanel>
+                </Grid>
+
+                <!-- Models Grid View -->
+                <Grid x:Name="ModelsGrid" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                        <Button Content="← Back" Click="BackButton_Click" Background="Transparent" Foreground="#3498DB" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
+                        <TextBlock x:Name="CurrentDisciplineText" Text="Architecture Models" FontSize="18" FontWeight="SemiBold" Foreground="#34495E" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <TextBlock x:Name="LoadingText" Grid.Row="1" Text="Loading models from server..." FontSize="14" Foreground="#7F8C8D" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <TextBlock x:Name="EmptyText" Grid.Row="1" Text="No models found in this discipline." FontSize="14" Foreground="#7F8C8D" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="ModelsItemsControl">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#F9F9F9" BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="8" Margin="10" Width="180">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="120"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <!-- Thumbnail -->
+                                            <Border Grid.Row="0" CornerRadius="8,8,0,0" Background="#EBEBEB" ClipToBounds="True">
+                                                <Grid>
+                                                    <!-- Fallback text seen if image is transparent or missing -->
+                                                    <TextBlock Text="🧊" FontSize="48" Foreground="#BDC3C7" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"/>
+                                                    <TextBlock Text="{Binding Discipline}" FontSize="10" FontWeight="SemiBold" Foreground="#95A5A6" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                                                    <!-- Actual image (will perfectly cover fallback if exists) -->
+                                                    <Image Source="{Binding ThumbnailUrl}" Stretch="UniformToFill" />
+                                                </Grid>
+                                            </Border>
+                                            
+                                            <!-- Info -->
+                                            <TextBlock Grid.Row="1" Text="{Binding Title}" FontWeight="Bold" FontSize="14" Foreground="#2C3E50" Margin="10,10,10,2" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Row="2" Text="{Binding Description}" FontSize="11" Foreground="#7F8C8D" Margin="10,0,10,10" TextTrimming="WordEllipsis" MaxHeight="32"/>
+
+                                            <!-- Invisible Click Area -->
+                                            <Button Grid.RowSpan="3" Click="ModelItem_Click" Tag="{Binding}" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

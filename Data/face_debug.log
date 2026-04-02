@@ -917,3 +917,209 @@
 [13:57:47.427] [FACE] MarkAttendanceAsync returning markedCount=1
 [16:01:13.810] [FACE] Service initialized
 [16:08:49.732] [FACE] Service initialized
+[14:19:57.082] [FACE] Service initialized
+[14:53:59.854] [FACE] Service initialized
+[19:17:36.058] [FACE] Service initialized
+[17:42:31.090] [FACE] Service initialized
+[18:09:25.803] [FACE] Service initialized
+[18:49:43.813] [FACE] Service initialized
+[19:22:21.600] [FACE] Service initialized
+[19:37:16.704] [FACE] Service initialized
+[20:06:51.555] [FACE] Service initialized
+[09:56:17.703] [FACE] Service initialized
+[10:35:30.745] [FACE] Service initialized
+[11:06:08.290] [FACE] Service initialized
+[11:53:54.277] [FACE] Service initialized
+[13:03:13.937] [FACE] Service initialized
+[13:06:24.011] [FACE] Service initialized
+[13:07:09.792] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=11479
+[13:07:09.794] [FACE] Session found, courseId=4
+[13:07:09.795] [FACE] Using remote server to fetch students
+[13:07:10.720] [FACE] ERROR: No students with profile pictures found
+[13:07:24.736] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=11991
+[13:07:24.737] [FACE] Session found, courseId=4
+[13:07:24.738] [FACE] Using remote server to fetch students
+[13:07:25.140] [FACE] ERROR: No students with profile pictures found
+[13:07:39.733] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=11319
+[13:07:39.734] [FACE] Session found, courseId=4
+[13:07:39.735] [FACE] Using remote server to fetch students
+[13:07:40.138] [FACE] ERROR: No students with profile pictures found
+[13:07:54.747] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14103
+[13:07:54.748] [FACE] Session found, courseId=4
+[13:07:54.749] [FACE] Using remote server to fetch students
+[13:07:55.161] [FACE] ERROR: No students with profile pictures found
+[13:08:09.727] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14355
+[13:08:09.729] [FACE] Session found, courseId=4
+[13:08:09.730] [FACE] Using remote server to fetch students
+[13:08:10.233] [FACE] ERROR: No students with profile pictures found
+[13:08:24.728] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14083
+[13:08:24.729] [FACE] Session found, courseId=4
+[13:08:24.730] [FACE] Using remote server to fetch students
+[13:08:25.143] [FACE] ERROR: No students with profile pictures found
+[13:08:39.749] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14011
+[13:08:39.750] [FACE] Session found, courseId=4
+[13:08:39.751] [FACE] Using remote server to fetch students
+[13:08:40.153] [FACE] ERROR: No students with profile pictures found
+[13:08:54.749] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=13871
+[13:08:54.750] [FACE] Session found, courseId=4
+[13:08:54.751] [FACE] Using remote server to fetch students
+[13:08:55.251] [FACE] ERROR: No students with profile pictures found
+[13:09:09.791] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14091
+[13:09:09.793] [FACE] Session found, courseId=4
+[13:09:09.793] [FACE] Using remote server to fetch students
+[13:09:10.895] [FACE] ERROR: No students with profile pictures found
+[13:09:24.763] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14063
+[13:09:24.764] [FACE] Session found, courseId=4
+[13:09:24.765] [FACE] Using remote server to fetch students
+[13:09:25.189] [FACE] ERROR: No students with profile pictures found
+[13:09:39.743] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=14019
+[13:09:39.744] [FACE] Session found, courseId=4
+[13:09:39.745] [FACE] Using remote server to fetch students
+[13:09:40.273] [FACE] ERROR: No students with profile pictures found
+[13:09:54.766] [FACE] RecognizeFacesAsync called, sessionId=110, imageLen=2235
+[13:09:54.768] [FACE] Session found, courseId=4
+[13:09:54.769] [FACE] Using remote server to fetch students
+[13:09:55.182] [FACE] ERROR: No students with profile pictures found
+[13:15:46.133] [FACE] Service initialized
+[13:16:07.283] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=13399
+[13:16:07.284] [FACE] Session found, courseId=4
+[13:16:07.284] [FACE] Using remote server to fetch students
+[13:16:09.424] [FACE] ERROR: No students with profile pictures found
+[13:16:22.278] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=12755
+[13:16:22.279] [FACE] Session found, courseId=4
+[13:16:22.280] [FACE] Using remote server to fetch students
+[13:16:22.714] [FACE] ERROR: No students with profile pictures found
+[13:16:37.259] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=15435
+[13:16:37.261] [FACE] Session found, courseId=4
+[13:16:37.262] [FACE] Using remote server to fetch students
+[13:16:37.743] [FACE] ERROR: No students with profile pictures found
+[13:16:52.260] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=14351
+[13:16:52.262] [FACE] Session found, courseId=4
+[13:16:52.263] [FACE] Using remote server to fetch students
+[13:16:52.674] [FACE] ERROR: No students with profile pictures found
+[13:17:07.262] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=14059
+[13:17:07.263] [FACE] Session found, courseId=4
+[13:17:07.264] [FACE] Using remote server to fetch students
+[13:17:07.785] [FACE] ERROR: No students with profile pictures found
+[13:17:22.263] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=14371
+[13:17:22.264] [FACE] Session found, courseId=4
+[13:17:22.265] [FACE] Using remote server to fetch students
+[13:17:23.274] [FACE] ERROR: No students with profile pictures found
+[13:17:37.264] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=14575
+[13:17:37.265] [FACE] Session found, courseId=4
+[13:17:37.266] [FACE] Using remote server to fetch students
+[13:17:38.818] [FACE] ERROR: No students with profile pictures found
+[13:17:52.314] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=13387
+[13:17:52.319] [FACE] Session found, courseId=4
+[13:17:52.320] [FACE] Using remote server to fetch students
+[13:17:53.207] [FACE] ERROR: No students with profile pictures found
+[13:18:28.780] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=53864
+[13:18:28.782] [FACE] Session found, courseId=4
+[13:18:28.782] [FACE] Using remote server to fetch students
+[13:18:29.675] [FACE] ERROR: No students with profile pictures found
+[13:18:38.794] [FACE] RecognizeFacesAsync called, sessionId=111, imageLen=55600
+[13:18:38.795] [FACE] Session found, courseId=4
+[13:18:38.796] [FACE] Using remote server to fetch students
+[13:18:39.197] [FACE] ERROR: No students with profile pictures found
+[16:53:42.687] [FACE] Service initialized
+[08:54:51.859] [FACE] Service initialized
+[08:55:11.790] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=13507
+[08:55:11.791] [FACE] Session found, courseId=4
+[08:55:11.792] [FACE] Using remote server to fetch students
+[08:55:13.147] [FACE] Found 1 students with photos, calling Gemini...
+[08:55:13.149] [FACE] Classroom image size: 10113 bytes
+[08:55:18.441] [FACE] Gemini result: Success=True, Matches=2, Error=none
+[08:55:18.445] [FACE] MarkAttendanceAsync: sessionId=113, matches=2
+[08:55:18.453] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.98
+[08:55:18.459] [FACE] MarkAttendance returned id=25
+[08:55:18.460] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.98
+[08:55:18.464] [FACE] MarkAttendance DB ERROR: SQLite Error 19: 'UNIQUE constraint failed: Attendance.SessionId, Attendance.StudentId'.
+[08:55:18.465] [FACE] MarkAttendanceAsync returning markedCount=2
+[08:55:26.801] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=13135
+[08:55:26.803] [FACE] Session found, courseId=4
+[08:55:26.805] [FACE] Using remote server to fetch students
+[08:55:26.986] [FACE] Found 1 students with photos, calling Gemini...
+[08:55:26.987] [FACE] Classroom image size: 9834 bytes
+[08:55:31.258] [FACE] Gemini result: Success=True, Matches=2, Error=none
+[08:56:09.333] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=15559
+[08:56:09.335] [FACE] Session found, courseId=4
+[08:56:09.337] [FACE] Using remote server to fetch students
+[08:56:09.517] [FACE] Found 1 students with photos, calling Gemini...
+[08:56:09.519] [FACE] Classroom image size: 11651 bytes
+[08:56:13.999] [FACE] Gemini result: Success=True, Matches=2, Error=none
+[08:56:14.000] [FACE] MarkAttendanceAsync: sessionId=113, matches=2
+[08:56:14.002] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.98
+[08:56:14.005] [FACE] MarkAttendance DB ERROR: SQLite Error 19: 'UNIQUE constraint failed: Attendance.SessionId, Attendance.StudentId'.
+[08:56:14.007] [FACE] Marking: StudentId=1, Name=Cyril Jeremiah, Confidence=0.98
+[08:56:14.009] [FACE] MarkAttendance DB ERROR: SQLite Error 19: 'UNIQUE constraint failed: Attendance.SessionId, Attendance.StudentId'.
+[08:56:14.010] [FACE] MarkAttendanceAsync returning markedCount=2
+[08:56:24.346] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=25291
+[08:56:24.348] [FACE] Session found, courseId=4
+[08:56:24.349] [FACE] Using remote server to fetch students
+[08:56:24.525] [FACE] Found 1 students with photos, calling Gemini...
+[08:56:24.527] [FACE] Classroom image size: 18950 bytes
+[08:56:28.411] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[08:56:39.363] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=20091
+[08:56:39.366] [FACE] Session found, courseId=4
+[08:56:39.367] [FACE] Using remote server to fetch students
+[08:56:39.525] [FACE] Found 1 students with photos, calling Gemini...
+[08:56:39.526] [FACE] Classroom image size: 15051 bytes
+[08:56:44.643] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[08:56:54.383] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=21159
+[08:56:54.389] [FACE] Session found, courseId=4
+[08:56:54.392] [FACE] Using remote server to fetch students
+[08:56:54.543] [FACE] Found 1 students with photos, calling Gemini...
+[08:56:54.545] [FACE] Classroom image size: 15851 bytes
+[08:56:59.721] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[08:57:09.385] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=26767
+[08:57:09.388] [FACE] Session found, courseId=4
+[08:57:09.391] [FACE] Using remote server to fetch students
+[08:57:09.551] [FACE] Found 1 students with photos, calling Gemini...
+[08:57:09.554] [FACE] Classroom image size: 20058 bytes
+[08:57:12.656] [FACE] Gemini result: Success=True, Matches=3, Error=none
+[08:57:24.386] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=26351
+[08:57:24.388] [FACE] Session found, courseId=4
+[08:57:24.389] [FACE] Using remote server to fetch students
+[08:57:24.546] [FACE] Found 1 students with photos, calling Gemini...
+[08:57:24.547] [FACE] Classroom image size: 19746 bytes
+[08:57:29.402] [FACE] Gemini result: Success=True, Matches=3, Error=none
+[08:57:39.414] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=45759
+[08:57:39.416] [FACE] Session found, courseId=4
+[08:57:39.416] [FACE] Using remote server to fetch students
+[08:57:39.569] [FACE] Found 1 students with photos, calling Gemini...
+[08:57:39.570] [FACE] Classroom image size: 34300 bytes
+[08:57:47.083] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[08:57:54.412] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=35327
+[08:57:54.415] [FACE] Session found, courseId=4
+[08:57:54.416] [FACE] Using remote server to fetch students
+[08:57:54.602] [FACE] Found 1 students with photos, calling Gemini...
+[08:57:54.604] [FACE] Classroom image size: 26478 bytes
+[08:58:03.468] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[08:58:09.398] [FACE] RecognizeFacesAsync called, sessionId=113, imageLen=41463
+[08:58:09.400] [FACE] Session found, courseId=4
+[08:58:09.402] [FACE] Using remote server to fetch students
+[08:58:09.568] [FACE] Found 1 students with photos, calling Gemini...
+[08:58:09.570] [FACE] Classroom image size: 31078 bytes
+[08:58:20.989] [FACE] Gemini result: Success=True, Matches=1, Error=none
+[09:21:42.548] [FACE] Service initialized
+[10:01:52.314] [FACE] Service initialized
+[10:30:05.497] [FACE] Service initialized
+[13:50:29.620] [FACE] Service initialized
+[13:58:50.511] [FACE] Service initialized
+[11:06:29.405] [FACE] Service initialized
+[11:11:41.440] [FACE] Service initialized
+[11:40:59.335] [FACE] Service initialized
+[11:54:49.836] [FACE] Service initialized
+[12:11:51.689] [FACE] Service initialized
+[12:21:50.217] [FACE] Service initialized
+[12:59:16.060] [FACE] Service initialized
+[14:34:40.216] [FACE] Service initialized
+[11:36:53.944] [FACE] Service initialized
+[12:28:50.681] [FACE] Service initialized
+[13:41:09.026] [FACE] Service initialized
+[13:44:05.208] [FACE] Service initialized
+[14:27:37.590] [FACE] Service initialized
+[14:48:07.963] [FACE] Service initialized
+[15:00:23.497] [FACE] Service initialized
+[15:28:39.516] [FACE] Service initialized
+[15:39:56.492] [FACE] Service initialized

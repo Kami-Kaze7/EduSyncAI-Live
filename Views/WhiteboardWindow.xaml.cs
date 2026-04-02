@@ -10,7 +10,9 @@ using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
+using HelixToolkit.Wpf;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Win32;
@@ -47,6 +49,7 @@ namespace EduSyncAI
         private Image? _selectedImage;
         private Point _dragStartPoint;
         private bool _isDraggingImage = false;
+        private UIElement? _focused2DElement;
 
         // Shape drawing fields
         private DrawingMode _currentMode = DrawingMode.Pen;
@@ -138,6 +141,33 @@ namespace EduSyncAI
             StartSidebarRecBlink();
 
             Closing += WhiteboardWindow_Closing;
+
+            // Track 3D pen strokes for undo
+            Pen3DOverlayCanvas.StrokeCollected += (s, ev) =>
+            {
+                _undo3DStack.Push(new Undo3DPenStroke(this, ev.Stroke));
+            };
+
+            // Initialize the first screen (S1)
+            _screens.Add(new ScreenState { Name = "S1" });
+            _activeScreenIndex = 0;
+
+            // Pre-configure overlay canvas drawing attributes (ready for when user activates pen)
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.None;
+            Pen3DOverlayCanvas.DefaultDrawingAttributes.Color = Colors.Black;
+            Pen3DOverlayCanvas.DefaultDrawingAttributes.Width = 5;
+            Pen3DOverlayCanvas.DefaultDrawingAttributes.Height = 5;
+            Pen3DOverlayCanvas.DefaultDrawingAttributes.FitToCurve = true;
+
+            // Default: 3D interact mode — viewport takes mouse events, overlays are visible but non-interactive
+            ActivateInteractMode();
+
+            // Focus the 3D viewport on load
+            Loaded += (s, ev) =>
+            {
+                Viewport3DOverlay.Focus();
+                UpdateTabBar();
+            };
         }
 
         private void WhiteboardWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -167,38 +197,137 @@ namespace EduSyncAI
             WhiteboardCanvas.DefaultDrawingAttributes.IgnorePressure = false;
         }
 
+        /// <summary>
+        /// Restores "3D Interact" mode: viewport receives all mouse events,
+        /// overlays are visible (showing existing strokes/shapes) but non-interactive,
+        /// and ZIndex is reset so neither overlay blocks the other.
+        /// </summary>
+        private void ActivateInteractMode()
+        {
+            // InkCanvas: non-interactive, no background, low ZIndex
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.None;
+            Pen3DOverlayCanvas.IsHitTestVisible = false;
+            Pen3DOverlayCanvas.Background = null;
+            Panel.SetZIndex(Pen3DOverlayCanvas, 1);
+
+            // ShapesCanvas: non-interactive (null bg lets child shapes still render), low ZIndex
+            Shapes3DOverlayCanvas.Background = null;
+            Panel.SetZIndex(Shapes3DOverlayCanvas, 2);
+
+            // Viewport: receives all mouse events
+            MainViewport3D.IsHitTestVisible = true;
+        }
+
         private void PenButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentMode == DrawingMode.Pen && _is3DPenActive == false && MainViewport3D.IsHitTestVisible == false)
+            {
+                // Toggle OFF -> 3D Interact
+                ActivateInteractMode();
+                UpdateToolButtonStyles(null);
+                Shape3DStatusText.Text = "  |  3D Interact — select, rotate, move shapes";
+                return;
+            }
+
             _currentMode = DrawingMode.Pen;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Ink;
             WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter = false;
+            // Bring InkCanvas to top for pen input
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Ink;
+            Pen3DOverlayCanvas.DefaultDrawingAttributes.IsHighlighter = false;
+            Pen3DOverlayCanvas.Background = Brushes.Transparent;
+            Pen3DOverlayCanvas.IsHitTestVisible = true;
+            Panel.SetZIndex(Pen3DOverlayCanvas, 10);
+            Panel.SetZIndex(Shapes3DOverlayCanvas, 5);
+            Shapes3DOverlayCanvas.Background = null;
+            MainViewport3D.IsHitTestVisible = false;
+            _is3DPenActive = false;
+            _is3DPaintActive = false;
+            _is3DSliceActive = false;
             UpdateToolButtonStyles(PenButton);
         }
 
         private void HighlighterButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentMode == DrawingMode.Highlighter && MainViewport3D.IsHitTestVisible == false)
+            {
+                ActivateInteractMode();
+                UpdateToolButtonStyles(null);
+                Shape3DStatusText.Text = "  |  3D Interact — select, rotate, move shapes";
+                return;
+            }
+
             _currentMode = DrawingMode.Highlighter;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Ink;
             WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter = true;
+            // Bring InkCanvas to top for highlighter input
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Ink;
+            Pen3DOverlayCanvas.DefaultDrawingAttributes.IsHighlighter = true;
+            Pen3DOverlayCanvas.Background = Brushes.Transparent;
+            Pen3DOverlayCanvas.IsHitTestVisible = true;
+            Panel.SetZIndex(Pen3DOverlayCanvas, 10);
+            Panel.SetZIndex(Shapes3DOverlayCanvas, 5);
+            Shapes3DOverlayCanvas.Background = null;
+            MainViewport3D.IsHitTestVisible = false;
+            _is3DPenActive = false;
+            _is3DPaintActive = false;
+            _is3DSliceActive = false;
             UpdateToolButtonStyles(HighlighterButton);
         }
 
         private void EraserButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentMode == DrawingMode.Eraser && MainViewport3D.IsHitTestVisible == false)
+            {
+                ActivateInteractMode();
+                UpdateToolButtonStyles(null);
+                Shape3DStatusText.Text = "  |  3D Interact — select, rotate, move shapes";
+                return;
+            }
+
             _currentMode = DrawingMode.Eraser;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+            // Bring InkCanvas to top for eraser input
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+            Pen3DOverlayCanvas.Background = Brushes.Transparent;
+            Pen3DOverlayCanvas.IsHitTestVisible = true;
+            Panel.SetZIndex(Pen3DOverlayCanvas, 10);
+            Panel.SetZIndex(Shapes3DOverlayCanvas, 5);
+            Shapes3DOverlayCanvas.Background = null;
+            MainViewport3D.IsHitTestVisible = false;
+            _is3DPenActive = false;
+            _is3DPaintActive = false;
+            _is3DSliceActive = false;
             UpdateToolButtonStyles(EraserButton);
         }
 
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentMode == DrawingMode.Select && MainViewport3D.IsHitTestVisible == false)
+            {
+                ActivateInteractMode();
+                UpdateToolButtonStyles(null);
+                Shape3DStatusText.Text = "  |  3D Interact — select, rotate, move shapes";
+                return;
+            }
+
             _currentMode = DrawingMode.Select;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Select;
+            // Bring ShapesCanvas to top for shape/image selection, InkCanvas below for stroke select
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Select;
+            Pen3DOverlayCanvas.Background = Brushes.Transparent;
+            Pen3DOverlayCanvas.IsHitTestVisible = true;
+            Panel.SetZIndex(Shapes3DOverlayCanvas, 10);
+            Panel.SetZIndex(Pen3DOverlayCanvas, 5);
+            Shapes3DOverlayCanvas.Background = null; // null so clicks pass through to ink select on empty areas
+            MainViewport3D.IsHitTestVisible = false;
+            _is3DPenActive = false;
+            _is3DPaintActive = false;
+            _is3DSliceActive = false;
             UpdateToolButtonStyles(SelectButton);
-            // Select/Move mode activated silently
         }
 
-        private void UpdateToolButtonStyles(Button activeButton)
+        private void UpdateToolButtonStyles(Button? activeButton)
         {
             PenButton.Style = (Style)FindResource("ToolButtonStyle");
             HighlighterButton.Style = (Style)FindResource("ToolButtonStyle");
@@ -209,7 +338,11 @@ namespace EduSyncAI
             LineButton.Style = (Style)FindResource("ToolButtonStyle");
             ArrowButton.Style = (Style)FindResource("ToolButtonStyle");
             TriangleButton.Style = (Style)FindResource("ToolButtonStyle");
-            activeButton.Style = (Style)FindResource("ActiveToolButtonStyle");
+            
+            if (activeButton != null)
+            {
+                activeButton.Style = (Style)FindResource("ActiveToolButtonStyle");
+            }
         }
 
         private void ColorButton_Click(object sender, RoutedEventArgs e)
@@ -221,8 +354,16 @@ namespace EduSyncAI
                     _activeColorButton.BorderThickness = new Thickness(2);
                     _activeColorButton.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BDC3C7"));
                 }
-                var color = (Color)ColorConverter.ConvertFromString(colorName);
-                WhiteboardCanvas.DefaultDrawingAttributes.Color = color;
+                if (colorName == "Transparent")
+                {
+                    WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter = false;
+                    WhiteboardCanvas.DefaultDrawingAttributes.Color = Colors.Transparent;
+                }
+                else
+                {
+                    var color = (Color)ColorConverter.ConvertFromString(colorName);
+                    WhiteboardCanvas.DefaultDrawingAttributes.Color = color;
+                }
                 button.BorderThickness = new Thickness(3);
                 button.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498DB"));
                 _activeColorButton = button;
@@ -230,6 +371,9 @@ namespace EduSyncAI
                 {
                     PenButton_Click(PenButton, null);
                 }
+                // Always sync to 3D pen overlay
+                Pen3DOverlayCanvas.DefaultDrawingAttributes.Color = WhiteboardCanvas.DefaultDrawingAttributes.Color;
+                Pen3DOverlayCanvas.DefaultDrawingAttributes.IsHighlighter = WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter;
             }
         }
 
@@ -241,6 +385,9 @@ namespace EduSyncAI
                 var size = double.Parse(thickness);
                 WhiteboardCanvas.DefaultDrawingAttributes.Width = size;
                 WhiteboardCanvas.DefaultDrawingAttributes.Height = size;
+                // Always sync to 3D pen overlay
+                Pen3DOverlayCanvas.DefaultDrawingAttributes.Width = size;
+                Pen3DOverlayCanvas.DefaultDrawingAttributes.Height = size;
             }
         }
 
@@ -266,32 +413,26 @@ namespace EduSyncAI
                         Cursor = Cursors.SizeAll
                     };
 
-                    image.MouseLeftButtonDown += Image_MouseLeftButtonDown;
-                    image.MouseLeftButtonUp += Image_MouseLeftButtonUp;
-                    image.MouseMove += Image_MouseMove;
+                    // Place in center of the 3D overlay
+                    var centerX = (Shapes3DOverlayCanvas.ActualWidth / 2) - (image.Width / 2);
+                    var centerY = (Shapes3DOverlayCanvas.ActualHeight / 2) - (image.Height / 2);
+                    if (centerX < 0) centerX = 50;
+                    if (centerY < 0) centerY = 50;
 
-                    var centerX = WhiteboardScrollViewer.HorizontalOffset + (WhiteboardScrollViewer.ViewportWidth / 2);
-                    var centerY = WhiteboardScrollViewer.VerticalOffset + (WhiteboardScrollViewer.ViewportHeight / 2);
-                    
-                    if (WhiteboardScrollViewer.ViewportWidth == 0) centerX = WhiteboardCanvas.ActualWidth / 2;
-                    if (WhiteboardScrollViewer.ViewportHeight == 0) centerY = WhiteboardCanvas.ActualHeight / 2;
+                    Canvas.SetLeft(image, centerX);
+                    Canvas.SetTop(image, centerY);
+                    Shapes3DOverlayCanvas.Children.Add(image);
 
-                    var absoluteX = centerX / CanvasScale.ScaleX;
-                    var absoluteY = centerY / CanvasScale.ScaleY;
+                    // Make draggable and push undo
+                    MakeOverlayElementDraggable(image);
+                    _undo3DStack.Push(new Undo2DOverlayElement(this, image, "2D Image"));
 
-                    var imageLeft = absoluteX - (image.Width / 2);
-                    var imageTop = absoluteY - (image.Height / 2);
-
-                    InkCanvas.SetLeft(image, imageLeft);
-                    InkCanvas.SetTop(image, imageTop);
-                    WhiteboardCanvas.Children.Add(image);
                     SaveToImageLibrary(openFileDialog.FileName);
-                    // Image added silently
+                    Shape3DStatusText.Text = "  |  Image added — drag to move";
                 }
                 catch (Exception ex)
                 {
                     System.Windows.MessageBox.Show($"Could not load the requested image: {ex.Message}", "Image Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    System.Diagnostics.Debug.WriteLine($"Error adding image: {ex.Message}");
                 }
             }
         }
@@ -311,15 +452,37 @@ namespace EduSyncAI
             catch { }
         }
 
-        private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
-        private void Image_MouseMove(object sender, MouseEventArgs e) { }
-        private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) { }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            // Clear without confirmation dialog
-            WhiteboardCanvas.Strokes.Clear();
-            WhiteboardCanvas.Children.Clear();
+            // Clear all 3D shapes
+            foreach (var shape in _placed3DShapes.ToList())
+            {
+                MainViewport3D.Children.Remove(shape);
+                if (shape.Content != null) RemoveMaterials(shape.Content);
+            }
+            _placed3DShapes.Clear();
+            _shapeRotations.Clear();
+            _baseScales.Clear();
+            _focused3DShape = null;
+            _unfocused3DBackgroundColor = (Color)ColorConverter.ConvertFromString("#F0F4F8");
+            FocusInfoBadge.Visibility = Visibility.Collapsed;
+            RestoreAllMaterialsAndScales();
+
+            // Restore background
+            Viewport3DOverlay.Background = new SolidColorBrush(_unfocused3DBackgroundColor);
+            GridPlaneVisual.Content.Transform = new ScaleTransform3D(1, 1, 1);
+
+            // Clear ink overlay
+            Pen3DOverlayCanvas.Strokes.Clear();
+
+            // Clear shapes overlay
+            Shapes3DOverlayCanvas.Children.Clear();
+
+            // Clear undo stack
+            _undo3DStack.Clear();
+
+            Shape3DStatusText.Text = "  |  Screen cleared";
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -411,40 +574,29 @@ namespace EduSyncAI
             }
         }
 
-        private void RectangleButton_Click(object sender, RoutedEventArgs e)
+        private void ActivateShapeMode(DrawingMode mode, Button button)
         {
-            _currentMode = DrawingMode.Rectangle;
+            _currentMode = mode;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.None;
-            UpdateToolButtonStyles(RectangleButton);
+            // Bring ShapesCanvas to top with Transparent bg to capture mouse events for shape drawing
+            Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.None;
+            Pen3DOverlayCanvas.IsHitTestVisible = false;
+            Pen3DOverlayCanvas.Background = null;
+            Panel.SetZIndex(Shapes3DOverlayCanvas, 10);
+            Panel.SetZIndex(Pen3DOverlayCanvas, 5);
+            Shapes3DOverlayCanvas.Background = Brushes.Transparent;
+            MainViewport3D.IsHitTestVisible = false;
+            _is3DPenActive = false;
+            _is3DPaintActive = false;
+            _is3DSliceActive = false;
+            UpdateToolButtonStyles(button);
         }
 
-        private void CircleButton_Click(object sender, RoutedEventArgs e)
-        {
-            _currentMode = DrawingMode.Circle;
-            WhiteboardCanvas.EditingMode = InkCanvasEditingMode.None;
-            UpdateToolButtonStyles(CircleButton);
-        }
-
-        private void LineButton_Click(object sender, RoutedEventArgs e)
-        {
-            _currentMode = DrawingMode.Line;
-            WhiteboardCanvas.EditingMode = InkCanvasEditingMode.None;
-            UpdateToolButtonStyles(LineButton);
-        }
-
-        private void ArrowButton_Click(object sender, RoutedEventArgs e)
-        {
-            _currentMode = DrawingMode.Arrow;
-            WhiteboardCanvas.EditingMode = InkCanvasEditingMode.None;
-            UpdateToolButtonStyles(ArrowButton);
-        }
-
-        private void TriangleButton_Click(object sender, RoutedEventArgs e)
-        {
-            _currentMode = DrawingMode.Triangle;
-            WhiteboardCanvas.EditingMode = InkCanvasEditingMode.None;
-            UpdateToolButtonStyles(TriangleButton);
-        }
+        private void RectangleButton_Click(object sender, RoutedEventArgs e) => ActivateShapeMode(DrawingMode.Rectangle, RectangleButton);
+        private void CircleButton_Click(object sender, RoutedEventArgs e) => ActivateShapeMode(DrawingMode.Circle, CircleButton);
+        private void LineButton_Click(object sender, RoutedEventArgs e) => ActivateShapeMode(DrawingMode.Line, LineButton);
+        private void ArrowButton_Click(object sender, RoutedEventArgs e) => ActivateShapeMode(DrawingMode.Arrow, ArrowButton);
+        private void TriangleButton_Click(object sender, RoutedEventArgs e) => ActivateShapeMode(DrawingMode.Triangle, TriangleButton);
 
         private Shape? CreateShape(DrawingMode mode, Point start, Point end)
         {
@@ -678,94 +830,41 @@ namespace EduSyncAI
         {
             if (pageIndex < 0 || pageIndex >= _documentPages.Count) return;
             _currentPageIndex = pageIndex;
-            if (_docImage != null && WhiteboardCanvas.Children.Contains(_docImage))
-                WhiteboardCanvas.Children.Remove(_docImage);
+            if (_docImage != null && Shapes3DOverlayCanvas.Children.Contains(_docImage))
+                Shapes3DOverlayCanvas.Children.Remove(_docImage);
             var pageSource = _documentPages[pageIndex];
             _docImage = new Image
             {
                 Source = pageSource, Stretch = Stretch.Uniform,
-                Width = Math.Min(600, WhiteboardCanvas.ActualWidth * 0.6),
+                Width = Math.Min(600, Shapes3DOverlayCanvas.ActualWidth * 0.6),
                 Cursor = Cursors.SizeAll, Tag = "DocPage"
             };
             var aspectRatio = (double)pageSource.PixelHeight / pageSource.PixelWidth;
             _docImage.Height = _docImage.Width * aspectRatio;
-            double currentScrollX = WhiteboardScrollViewer.HorizontalOffset;
-            double currentScrollY = WhiteboardScrollViewer.VerticalOffset;
-            double viewportWidth = WhiteboardScrollViewer.ViewportWidth;
-            double viewportHeight = WhiteboardScrollViewer.ViewportHeight;
             
-            if (viewportWidth == 0) viewportWidth = Math.Min(800, WhiteboardCanvas.ActualWidth);
-            if (viewportHeight == 0) viewportHeight = Math.Min(600, WhiteboardCanvas.ActualHeight);
+            // Center in viewport
+            var viewportWidth = Math.Max(800, Shapes3DOverlayCanvas.ActualWidth);
+            var viewportHeight = Math.Max(600, Shapes3DOverlayCanvas.ActualHeight);
 
-            double unscaledViewportCenterX = (currentScrollX + viewportWidth / 2) / CanvasScale.ScaleX;
-            double unscaledViewportCenterY = (currentScrollY + viewportHeight / 2) / CanvasScale.ScaleY;
+            var centerX = Math.Max(0, (viewportWidth - _docImage.Width) / 2);
+            var centerY = Math.Max(0, (viewportHeight - _docImage.Height) / 2);
+            
+            Canvas.SetLeft(_docImage, centerX);
+            Canvas.SetTop(_docImage, centerY);
+            Shapes3DOverlayCanvas.Children.Add(_docImage);
+            
+            // Allow user to drag and zoom the document page!
+            MakeOverlayElementDraggable(_docImage);
 
-            var centerX = Math.Max(0, unscaledViewportCenterX - (_docImage.Width / 2));
-            var centerY = Math.Max(0, unscaledViewportCenterY - (_docImage.Height / 2));
-            InkCanvas.SetLeft(_docImage, centerX);
-            InkCanvas.SetTop(_docImage, centerY);
-            WhiteboardCanvas.Children.Add(_docImage);
             PageIndicator.Text = $"Page {pageIndex + 1} of {_documentPages.Count}";
             PrevPageBtn.IsEnabled = pageIndex > 0;
             NextPageBtn.IsEnabled = pageIndex < _documentPages.Count - 1;
-        }
-
-        private void DoZoom(double targetScale, Point centerOfZoomScreenPos)
-        {
-            if (targetScale == CanvasScale.ScaleX) return;
-
-            Point centerOfZoomCanvasPos = WhiteboardScrollViewer.TranslatePoint(centerOfZoomScreenPos, WhiteboardCanvas);
-
-            CanvasScale.ScaleX = targetScale;
-            CanvasScale.ScaleY = targetScale;
-            
-            WhiteboardScrollViewer.UpdateLayout();
-
-            Point newScreenPos = WhiteboardCanvas.TranslatePoint(centerOfZoomCanvasPos, WhiteboardScrollViewer);
-            
-            double dx = newScreenPos.X - centerOfZoomScreenPos.X;
-            double dy = newScreenPos.Y - centerOfZoomScreenPos.Y;
-
-            WhiteboardScrollViewer.ScrollToHorizontalOffset(WhiteboardScrollViewer.HorizontalOffset + dx);
-            WhiteboardScrollViewer.ScrollToVerticalOffset(WhiteboardScrollViewer.VerticalOffset + dy);
-        }
-
-        private void WhiteboardScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                double zoomDelta = e.Delta > 0 ? 0.1 : -0.1;
-                double newScale = CanvasScale.ScaleX + zoomDelta;
-                newScale = Math.Max(0.3, Math.Min(4.0, newScale));
-                
-                Point mousePos = e.GetPosition(WhiteboardScrollViewer);
-                DoZoom(newScale, mousePos);
-                
-                e.Handled = true;
-            }
-        }
-
-        private void WhiteboardScrollViewer_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
-        {
-            if (e.DeltaManipulation.Scale.X != 1.0 || e.DeltaManipulation.Scale.Y != 1.0)
-            {
-                double newScale = CanvasScale.ScaleX * e.DeltaManipulation.Scale.X;
-                newScale = Math.Max(0.3, Math.Min(4.0, newScale));
-                
-                Point manipulationCenter = e.ManipulationOrigin;
-                DoZoom(newScale, manipulationCenter);
-                
-                e.Handled = true;
-            }
         }
 
         private void ShowDocNavBar()
         {
             DocNavBar.Visibility = Visibility.Visible;
             DocNameText.Text = _currentDocName;
-            _currentMode = DrawingMode.Select;
-            WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Select;
-            UpdateToolButtonStyles(SelectButton);
         }
 
         private void PrevPage_Click(object sender, RoutedEventArgs e) { if (_currentPageIndex > 0) ShowDocumentPage(_currentPageIndex - 1); }
@@ -773,8 +872,8 @@ namespace EduSyncAI
 
         private void CloseDocument_Click(object sender, RoutedEventArgs e)
         {
-            if (_docImage != null && WhiteboardCanvas.Children.Contains(_docImage))
-                WhiteboardCanvas.Children.Remove(_docImage);
+            if (_docImage != null && Shapes3DOverlayCanvas.Children.Contains(_docImage))
+                Shapes3DOverlayCanvas.Children.Remove(_docImage);
             _docImage = null;
             _documentPages.Clear();
             _currentPageIndex = 0;
@@ -1698,6 +1797,1481 @@ namespace EduSyncAI
                 SidebarRecDot.Opacity = visible ? 1.0 : 0.2;
             };
             _recBlinkTimer.Start();
+        }
+
+        // ==================== 3D VIEWER ====================
+
+        private enum Shape3DType { None, Cube, Sphere, Cylinder, Pyramid, Cone }
+
+        private bool _is3DMode = true; // Always true — 3D viewport is the default workspace
+        private Shape3DType _pendingShape3D = Shape3DType.None;
+        private readonly List<ModelVisual3D> _placed3DShapes = new();
+        private ModelVisual3D? _focused3DShape = null;
+        private readonly Dictionary<GeometryModel3D, Material> _originalMaterials = new();
+        private readonly Dictionary<ModelVisual3D, Quaternion> _shapeRotations = new();
+        private readonly Dictionary<ModelVisual3D, double> _baseScales = new();  // stores pre-focus scale
+        private Helpers.Trackball3D _trackball = new(sensitivity: 1.5);
+        
+        // 3D Pen state
+        private bool _is3DPenActive = false;
+        private TubeVisual3D? _current3DStroke = null;
+        private ModelVisual3D? _penTarget = null;  // shape being drawn on
+
+        // Shape overlay drawing state (2D shapes on 3D viewport)
+        private bool _isDrawingOverlayShape = false;
+        private Point _overlayShapeStart;
+        private Shape? _currentOverlayShape;
+
+        // ==================== MULTI-SCREEN SYSTEM ====================
+        private class ScreenState
+        {
+            public string Name { get; set; } = "S1";
+            public StrokeCollection InkStrokes { get; set; } = new StrokeCollection();
+            public List<UIElement> ShapeElements { get; set; } = new List<UIElement>();
+            public List<ModelVisual3D> Shapes3D { get; set; } = new List<ModelVisual3D>();
+            public Dictionary<GeometryModel3D, Material> Materials { get; set; } = new();
+            public Dictionary<ModelVisual3D, Quaternion> Rotations { get; set; } = new();
+            public Dictionary<ModelVisual3D, double> Scales { get; set; } = new();
+            public Stack<IUndo3DAction> UndoStack { get; set; } = new();
+            public Color BackgroundColor { get; set; } = (Color)ColorConverter.ConvertFromString("#F0F4F8");
+        }
+
+        private readonly List<ScreenState> _screens = new();
+        private int _activeScreenIndex = 0;
+
+        // ==================== 3D UNDO SYSTEM ====================
+        private readonly Stack<IUndo3DAction> _undo3DStack = new();
+
+        private interface IUndo3DAction
+        {
+            void Undo();
+            string Description { get; }
+        }
+
+        // Undo placing a 3D shape
+        private class Undo3DPlace : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly ModelVisual3D _shape;
+            public string Description => "Place Shape";
+            public Undo3DPlace(WhiteboardWindow w, ModelVisual3D shape) { _w = w; _shape = shape; }
+            public void Undo()
+            {
+                _w.MainViewport3D.Children.Remove(_shape);
+                _w._placed3DShapes.Remove(_shape);
+                if (_shape.Content != null) _w.RemoveMaterials(_shape.Content);
+                _w._baseScales.Remove(_shape);
+                _w._shapeRotations.Remove(_shape);
+            }
+        }
+
+        // Undo painting a model part
+        private class Undo3DPaint : IUndo3DAction
+        {
+            private readonly GeometryModel3D _gm;
+            private readonly Material? _oldMat;
+            private readonly Material? _oldBackMat;
+            public string Description => "Paint";
+            public Undo3DPaint(GeometryModel3D gm, Material? oldMat, Material? oldBackMat)
+            { _gm = gm; _oldMat = oldMat; _oldBackMat = oldBackMat; }
+            public void Undo()
+            {
+                _gm.Material = _oldMat;
+                _gm.BackMaterial = _oldBackMat;
+            }
+        }
+
+        // Undo slicing — removes the sliced pieces and restores the original shape
+        private class Undo3DSlice : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly ModelVisual3D _originalShape;
+            public List<ModelVisual3D> NewShapes { get; set; }
+            public string Description => "Slice";
+            public Undo3DSlice(WhiteboardWindow w, ModelVisual3D originalShape, List<ModelVisual3D> newShapes)
+            { _w = w; _originalShape = originalShape; NewShapes = newShapes; }
+            public void Undo()
+            {
+                // Remove sliced pieces
+                foreach (var ns in NewShapes)
+                {
+                    _w.MainViewport3D.Children.Remove(ns);
+                    _w._placed3DShapes.Remove(ns);
+                    if (ns.Content != null) _w.RemoveMaterials(ns.Content);
+                    _w._baseScales.Remove(ns);
+                    _w._shapeRotations.Remove(ns);
+                }
+                // Restore original
+                _w.MainViewport3D.Children.Add(_originalShape);
+                _w._placed3DShapes.Add(_originalShape);
+                _w.StoreMaterials(_originalShape.Content);
+                _w._shapeRotations[_originalShape] = Quaternion.Identity;
+                _w._baseScales[_originalShape] = 1.0;
+            }
+        }
+
+        // Undo deleting a shape
+        private class Undo3DDelete : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly ModelVisual3D _shape;
+            private readonly Quaternion _rotation;
+            private readonly double _scale;
+            public string Description => "Delete";
+            public Undo3DDelete(WhiteboardWindow w, ModelVisual3D shape, Quaternion rotation, double scale)
+            { _w = w; _shape = shape; _rotation = rotation; _scale = scale; }
+            public void Undo()
+            {
+                _w.MainViewport3D.Children.Add(_shape);
+                _w._placed3DShapes.Add(_shape);
+                _w.StoreMaterials(_shape.Content);
+                _w._shapeRotations[_shape] = _rotation;
+                _w._baseScales[_shape] = _scale;
+            }
+        }
+
+        // Undo a 3D pen stroke
+        private class Undo3DPenStroke : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly System.Windows.Ink.Stroke _stroke;
+            public string Description => "3D Pen Stroke";
+            public Undo3DPenStroke(WhiteboardWindow w, System.Windows.Ink.Stroke stroke)
+            { _w = w; _stroke = stroke; }
+            public void Undo()
+            {
+                if (_w.Pen3DOverlayCanvas.Strokes.Contains(_stroke))
+                    _w.Pen3DOverlayCanvas.Strokes.Remove(_stroke);
+            }
+        }
+
+        private class Undo2DOverlayElement : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly UIElement _element;
+            public string Description { get; }
+            public Undo2DOverlayElement(WhiteboardWindow w, UIElement element, string desc = "2D Shape")
+            { _w = w; _element = element; Description = desc; }
+            public void Undo()
+            {
+                if (_w.Shapes3DOverlayCanvas.Children.Contains(_element))
+                    _w.Shapes3DOverlayCanvas.Children.Remove(_element);
+            }
+        }
+
+        // Undo deleting an overlay element
+        private class Undo2DDeleteElement : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly UIElement _element;
+            public string Description { get; }
+            public Undo2DDeleteElement(WhiteboardWindow w, UIElement element, string desc = "Delete 2D Element")
+            { _w = w; _element = element; Description = desc; }
+            public void Undo()
+            {
+                if (!_w.Shapes3DOverlayCanvas.Children.Contains(_element))
+                    _w.Shapes3DOverlayCanvas.Children.Add(_element);
+            }
+        }
+
+        private void Undo3D()
+        {
+            if (_undo3DStack.Count == 0)
+            {
+                Shape3DStatusText.Text = "  |  Nothing to undo";
+                return;
+            }
+            var action = _undo3DStack.Pop();
+            action.Undo();
+            Unfocus3D();
+            Shape3DStatusText.Text = $"  |  Undid: {action.Description}";
+        }
+
+        private void Undo3D_Click(object sender, RoutedEventArgs e)
+        {
+            Undo3D();
+        }
+
+        // --- Mode Toggle (legacy, no-op) ---
+        private void Toggle3D_Click(object sender, RoutedEventArgs e) { }
+
+        // --- Import Model ---
+        private void ImportModel_Click(object sender, RoutedEventArgs e)
+        {
+
+            var dlg = new OpenFileDialog
+            {
+                Filter = "3D Models (*.obj;*.stl)|*.obj;*.stl|All files (*.*)|*.*",
+                Title = "Import 3D Model"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                Load3DModelFromFile(dlg.FileName, System.IO.Path.GetFileName(dlg.FileName));
+            }
+        }
+
+        private async void RepositoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            var browserDlg = new EduSyncAI.Views.RepositoryBrowserWindow
+            {
+                Owner = this
+            };
+
+            if (browserDlg.ShowDialog() == true && browserDlg.SelectedAsset != null)
+            {
+                Shape3DStatusText.Text = $"  |  Downloading {browserDlg.SelectedAsset.Title}...";
+                var repoService = new EduSyncAI.Services.RepositoryService();
+                var localFilePath = await repoService.DownloadAndCacheModelAsync(browserDlg.SelectedAsset);
+
+                if (!string.IsNullOrEmpty(localFilePath))
+                {
+                    Load3DModelFromFile(localFilePath, browserDlg.SelectedAsset.Title);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to download model from the repository.", "Repository Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void Load3DModelFromFile(string filePath, string displayTitle)
+        {
+            try
+            {
+                var importer = new ModelImporter();
+                var modelGroup = importer.Load(filePath);
+
+                // Auto-scale and center the model
+                var bounds = modelGroup.Bounds;
+                if (!bounds.IsEmpty)
+                {
+                    double maxDim = Math.Max(bounds.SizeX, Math.Max(bounds.SizeY, bounds.SizeZ));
+                    double scaleTarget = 3.0; // Fit inside a 3-unit box
+                    double scaleFactor = (maxDim > 0) ? (scaleTarget / maxDim) : 1.0;
+
+                    double cx = bounds.X + bounds.SizeX / 2.0;
+                    double cy = bounds.Y + bounds.SizeY / 2.0;
+                    double cz = bounds.Z + bounds.SizeZ / 2.0;
+
+                    var localTransform = new Transform3DGroup();
+                    localTransform.Children.Add(new TranslateTransform3D(-cx, -cy, -cz));
+                    localTransform.Children.Add(new ScaleTransform3D(scaleFactor, scaleFactor, scaleFactor));
+                    modelGroup.Transform = localTransform;
+                }
+
+                // Provide a default material if the model lacks one
+                if (modelGroup.Children.Count > 0 && modelGroup.Children[0] is GeometryModel3D gm && gm.Material == null)
+                {
+                    var mat = new MaterialGroup();
+                    mat.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(255, 200, 200, 200))));
+                    mat.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromArgb(50, 255, 255, 255)), 40));
+                    gm.Material = mat;
+                    gm.BackMaterial = mat;
+                }
+
+                var visual = new ModelVisual3D { Content = modelGroup };
+                
+                var transform = new Transform3DGroup();
+                transform.Children.Add(new ScaleTransform3D(1, 1, 1)); // [0] Scale
+                transform.Children.Add(new RotateTransform3D(new QuaternionRotation3D(Quaternion.Identity))); // [1] Rotate
+                transform.Children.Add(new TranslateTransform3D(0, 0, -3)); // [2] Translate
+                
+                visual.Transform = transform;
+
+                MainViewport3D.Children.Add(visual);
+                _placed3DShapes.Add(visual);
+                StoreMaterials(modelGroup);
+                _shapeRotations[visual] = Quaternion.Identity;
+                _undo3DStack.Push(new Undo3DPlace(this, visual));
+
+                Shape3DStatusText.Text = $"  |  Imported {displayTitle}";
+                Viewport3DOverlay.Focus();
+
+                // Auto-return to 3D Interact mode so the user can immediately drag/rotate the new arrival!
+                _currentMode = DrawingMode.Pen; // Reset baseline
+                ActivateInteractMode();
+                UpdateToolButtonStyles(null);
+                Shape3DStatusText.Text = $"  |  Imported {displayTitle} — select, rotate, move shapes";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load 3D model: {ex.Message}", "Import Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // --- 3D Paint Bucket ---
+        private bool _is3DPaintActive = false;
+        private Color _unfocused3DBackgroundColor = (Color)ColorConverter.ConvertFromString("#F0F4F8");
+
+        private void Paint3D_Click(object sender, RoutedEventArgs e)
+        {
+            Set3DPaintActive(!_is3DPaintActive);
+        }
+
+        private void Set3DPaintActive(bool active)
+        {
+            _is3DPaintActive = active;
+            Paint3DButton.Background = _is3DPaintActive ? new SolidColorBrush(Color.FromArgb(255, 41, 128, 185)) : new SolidColorBrush(Colors.White);
+            Paint3DButton.Foreground = _is3DPaintActive ? new SolidColorBrush(Colors.White) : new SolidColorBrush(Color.FromArgb(255, 41, 128, 185));
+
+            if (_is3DPaintActive)
+            {
+                if (_is3DPenActive) Set3DPenActive(false);
+                if (_is3DSliceActive) Set3DSliceActive(false);
+                ActivateInteractMode();
+                Shape3DStatusText.Text = "  |  3D PAINT ACTIVE — Click a shape part to colorize it";
+                _pendingShape3D = Shape3DType.None;
+            }
+            else
+            {
+                Shape3DStatusText.Text = "  |  3D Paint disabled";
+            }
+        }
+
+        // --- 3D Background ---
+        private void BgColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (BgColorComboBox != null && BgColorComboBox.SelectedItem is ComboBoxItem item && Viewport3DOverlay != null)
+            {
+                if (item.Tag is string colorHex)
+                {
+                    _unfocused3DBackgroundColor = (Color)ColorConverter.ConvertFromString(colorHex);
+                    if (_focused3DShape == null)
+                    {
+                        Viewport3DOverlay.Background = new SolidColorBrush(_unfocused3DBackgroundColor);
+                    }
+                }
+            }
+        }
+
+        // --- 3D Pen ---
+        private void Pen3D_Click(object sender, RoutedEventArgs e)
+        {
+            Set3DPenActive(!_is3DPenActive);
+        }
+
+        private void Set3DPenActive(bool active)
+        {
+            _is3DPenActive = active;
+            Pen3DButton.Background = _is3DPenActive ? new SolidColorBrush(Color.FromArgb(255, 231, 76, 60)) : new SolidColorBrush(Colors.White);
+            Pen3DButton.Foreground = _is3DPenActive ? new SolidColorBrush(Colors.White) : new SolidColorBrush(Color.FromArgb(255, 231, 76, 60));
+            
+            if (_is3DPenActive)
+            {
+                if (_is3DPaintActive) Set3DPaintActive(false);
+                if (_is3DSliceActive) Set3DSliceActive(false);
+
+                // Copy current pen settings to the 3D overlay canvas
+                var da = new System.Windows.Ink.DrawingAttributes
+                {
+                    Color = WhiteboardCanvas.DefaultDrawingAttributes.Color,
+                    Width = WhiteboardCanvas.DefaultDrawingAttributes.Width,
+                    Height = WhiteboardCanvas.DefaultDrawingAttributes.Height,
+                    IsHighlighter = WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter,
+                    StylusTip = WhiteboardCanvas.DefaultDrawingAttributes.StylusTip
+                };
+                Pen3DOverlayCanvas.DefaultDrawingAttributes = da;
+                Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Ink;
+                Pen3DOverlayCanvas.Background = Brushes.Transparent;
+                Pen3DOverlayCanvas.IsHitTestVisible = true;
+                Panel.SetZIndex(Pen3DOverlayCanvas, 10);
+                Panel.SetZIndex(Shapes3DOverlayCanvas, 5);
+                Shapes3DOverlayCanvas.Background = null;
+                MainViewport3D.IsHitTestVisible = false;
+                
+                Shape3DStatusText.Text = "  |  3D PEN ACTIVE — Draw annotations over the 3D scene";
+                _pendingShape3D = Shape3DType.None;
+            }
+            else
+            {
+                Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.None;
+                ActivateInteractMode();
+                Shape3DStatusText.Text = "  |  3D Pen disabled";
+            }
+        }
+
+        // --- 3D Slice / Detach ---
+        private bool _is3DSliceActive = false;
+
+        private void Slice3D_Click(object sender, RoutedEventArgs e)
+        {
+            Set3DSliceActive(!_is3DSliceActive);
+        }
+
+        private void Set3DSliceActive(bool active)
+        {
+            _is3DSliceActive = active;
+            Slice3DButton.Background = _is3DSliceActive ? new SolidColorBrush(Color.FromArgb(255, 142, 68, 173)) : new SolidColorBrush(Colors.White);
+            Slice3DButton.Foreground = _is3DSliceActive ? new SolidColorBrush(Colors.White) : new SolidColorBrush(Color.FromArgb(255, 142, 68, 173));
+
+            if (_is3DSliceActive)
+            {
+                if (_is3DPaintActive) Set3DPaintActive(false);
+                if (_is3DPenActive) Set3DPenActive(false);
+                ActivateInteractMode();
+                Shape3DStatusText.Text = "  |  3D SLICE ACTIVE — Drag across a model to slice and detach parts!";
+                _pendingShape3D = Shape3DType.None;
+            }
+            else
+            {
+                Shape3DStatusText.Text = "  |  3D Slice disabled";
+            }
+        }
+
+        // --- Shape Selectors ---
+        private void Cube3D_Click(object sender, RoutedEventArgs e) { Select3DShape(Shape3DType.Cube); }
+        private void Sphere3D_Click(object sender, RoutedEventArgs e) { Select3DShape(Shape3DType.Sphere); }
+        private void Cylinder3D_Click(object sender, RoutedEventArgs e) { Select3DShape(Shape3DType.Cylinder); }
+        private void Pyramid3D_Click(object sender, RoutedEventArgs e) { Select3DShape(Shape3DType.Pyramid); }
+        private void Cone3D_Click(object sender, RoutedEventArgs e) { Select3DShape(Shape3DType.Cone); }
+
+        private void Select3DShape(Shape3DType type)
+        {
+            _pendingShape3D = type;
+            Set3DPenActive(false);
+            Set3DPaintActive(false);
+            Set3DSliceActive(false);
+            ActivateInteractMode();
+            Shape3DStatusText.Text = $"  |  Click on canvas to place {type}";
+            Viewport3DOverlay.Focus();
+        }
+
+        // --- Placement ---
+        private void Place3DShape(Point clickPoint)
+        {
+            var model = _pendingShape3D switch
+            {
+                Shape3DType.Cube => Helpers.Shape3DFactory.CreateCube(1.0),
+                Shape3DType.Sphere => Helpers.Shape3DFactory.CreateSphere(0.5, 24),
+                Shape3DType.Cylinder => Helpers.Shape3DFactory.CreateCylinder(0.4, 1.0, 24),
+                Shape3DType.Pyramid => Helpers.Shape3DFactory.CreatePyramid(1.0, 1.2),
+                Shape3DType.Cone => Helpers.Shape3DFactory.CreateCone(0.4, 1.0, 24),
+                _ => null
+            };
+            if (model == null) return;
+
+            // Map screen click to 3D world position (spread shapes across the ground plane)
+            double viewW = Viewport3DOverlay.ActualWidth;
+            double viewH = Viewport3DOverlay.ActualHeight;
+            double nx = (clickPoint.X / viewW - 0.5) * 6.0;  // -3 to +3 range
+            double nz = (clickPoint.Y / viewH - 0.5) * -4.0; // map Y to Z depth
+
+            var transform = new Transform3DGroup();
+            transform.Children.Add(new ScaleTransform3D(1, 1, 1)); // [0] Scale
+            transform.Children.Add(new RotateTransform3D(new QuaternionRotation3D(Quaternion.Identity))); // [1] Rotate
+            transform.Children.Add(new TranslateTransform3D(nx, 0.5, nz)); // [2] Translate
+
+            var visual = new ModelVisual3D { Content = model, Transform = transform };
+
+            MainViewport3D.Children.Add(visual);
+            _placed3DShapes.Add(visual);
+            StoreMaterials(model);
+            _shapeRotations[visual] = Quaternion.Identity;
+            _undo3DStack.Push(new Undo3DPlace(this, visual));
+
+            Shape3DStatusText.Text = $"  |  {_pendingShape3D} placed — click it to rotate";
+            _pendingShape3D = Shape3DType.None;
+        }
+
+        private Point _lastPanPoint;
+        private bool _isPanning = false;
+        private bool _isSlicingDragging = false;
+        private Point _sliceStartPoint;
+        private Point _sliceEndPoint;
+
+        private void Viewport3D_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(Viewport3DOverlay);
+
+            if (e.ClickCount == 2)
+            {
+                Unfocus3D();
+                e.Handled = true;
+                return;
+            }
+
+            if (_is3DSliceActive && e.LeftButton == MouseButtonState.Pressed)
+            {
+                _isSlicingDragging = true;
+                _sliceStartPoint = pos;
+                _sliceEndPoint = pos;
+                Viewport3DOverlay.CaptureMouse();
+                e.Handled = true;
+                return;
+            }
+
+            // If right click -> pan (works globally, not only when focused)
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                _isPanning = true;
+                _lastPanPoint = pos;
+                Viewport3DOverlay.CaptureMouse();
+                e.Handled = true;
+                return;
+            }
+
+            // If we have a pending shape to place, place it
+            if (_pendingShape3D != Shape3DType.None)
+            {
+                Place3DShape(pos);
+                e.Handled = true;
+                return;
+            }
+
+            // Hit-test to find a shape
+            var rootShape = HitTest3D(pos);
+            var hitRes = VisualTreeHelper.HitTest(MainViewport3D, pos) as RayMeshGeometry3DHitTestResult;
+
+            // If 3D Paint is active
+            if (_is3DPaintActive && e.LeftButton == MouseButtonState.Pressed)
+            {
+                var color = WhiteboardCanvas.DefaultDrawingAttributes.Color;
+                if (rootShape != null && hitRes != null && hitRes.ModelHit is GeometryModel3D gm && !(gm is TubeVisual3D))
+                {
+                    // Save old materials for undo BEFORE changing them
+                    var oldMat = gm.Material?.Clone();
+                    var oldBackMat = gm.BackMaterial?.Clone();
+
+                    if (color == Colors.Transparent)
+                    {
+                        if (_originalMaterials.TryGetValue(gm, out var origMat))
+                        {
+                            gm.Material = origMat;
+                            gm.BackMaterial = origMat;
+                            Shape3DStatusText.Text = "  |  Shape part material restored";
+                        }
+                    }
+                    else
+                    {
+                        var mat = new MaterialGroup();
+                        mat.Children.Add(new DiffuseMaterial(new SolidColorBrush(color)));
+                        mat.Children.Add(new EmissiveMaterial(new SolidColorBrush(Color.FromArgb(80, color.R, color.G, color.B))));
+                        mat.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromArgb(100, 255, 255, 255)), 40));
+
+                        gm.Material = mat;
+                        gm.BackMaterial = mat;
+                        _originalMaterials[gm] = mat;
+
+                        Shape3DStatusText.Text = "  |  Shape part painted";
+                    }
+                    // Push undo for this paint action
+                    _undo3DStack.Push(new Undo3DPaint(gm, oldMat, oldBackMat));
+                }
+                e.Handled = true;
+                return;
+            }
+
+            if (rootShape != null && hitRes != null)
+            {
+                Focus3DShape(rootShape);
+
+                // Otherwise only start trackball if using mouse left button
+                if (e.StylusDevice == null && e.LeftButton == MouseButtonState.Pressed)
+                {
+                    _trackball.OnMouseDown(pos);
+                    Viewport3DOverlay.CaptureMouse();
+                }
+            }
+            else
+            {
+                Unfocus3D();
+                
+                // Start global camera trackball
+                if (e.StylusDevice == null && e.LeftButton == MouseButtonState.Pressed && !_isSlicingDragging)
+                {
+                    _trackball.OnMouseDown(pos);
+                    Viewport3DOverlay.CaptureMouse();
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void Viewport3D_MouseMove(object sender, MouseEventArgs e)
+        {
+            var pos = e.GetPosition(Viewport3DOverlay);
+
+            if (_isSlicingDragging)
+            {
+                _sliceEndPoint = pos;
+                e.Handled = true;
+                return;
+            }
+
+            if (_focused3DShape == null) return;
+
+            if (_isPanning)
+            {
+                double dx = pos.X - _lastPanPoint.X;
+                double dy = pos.Y - _lastPanPoint.Y;
+                
+                if (_focused3DShape != null && _focused3DShape.Transform is Transform3DGroup grp && grp.Children.Count >= 3)
+                {
+                    if (grp.Children[2] is TranslateTransform3D tt)
+                    {
+                        // Scale movement to viewport — 6 world units across the full viewport width
+                        double panScale = 6.0 / Math.Max(1, Viewport3DOverlay.ActualWidth);
+                        tt.OffsetX += dx * panScale;
+                        tt.OffsetY -= dy * panScale; // Map Y to Y axis
+                    }
+                }
+                else if (_focused3DShape == null)
+                {
+                    // Global pan (move the camera directly opposite)
+                    double panScale = 6.0 / Math.Max(1, Viewport3DOverlay.ActualWidth);
+                    var newPos = Camera3D.Position;
+                    var right = Vector3D.CrossProduct(Camera3D.LookDirection, Camera3D.UpDirection);
+                    right.Normalize();
+                    var up = Camera3D.UpDirection;
+                    up.Normalize();
+                    newPos -= right * (dx * panScale);
+                    newPos += up * (dy * panScale);
+                    Camera3D.Position = newPos;
+                }
+                _lastPanPoint = pos;
+                e.Handled = true;
+                return;
+            }
+
+            // Removed 3D Pen execution here, it now uses standard WhiteboardCanvas overlay
+
+            if (_trackball.IsDragging && e.LeftButton == MouseButtonState.Pressed)
+            {
+                var size = new Size(Viewport3DOverlay.ActualWidth, Viewport3DOverlay.ActualHeight);
+                var rotation = _trackball.OnMouseMove(pos, size);
+
+                if (rotation != null)
+                {
+                    if (_focused3DShape != null && _focused3DShape.Transform is Transform3DGroup grp && grp.Children.Count >= 2)
+                    {
+                        var existingQ = _shapeRotations[_focused3DShape];
+                        var newQ = Helpers.Trackball3D.Compose(existingQ, rotation.Quaternion);
+                        _shapeRotations[_focused3DShape] = newQ;
+                        if (grp.Children[1] is RotateTransform3D rt)
+                        {
+                            rt.Rotation = new QuaternionRotation3D(newQ);
+                        }
+                    }
+                    else if (_focused3DShape == null)
+                    {
+                        // Global Camera Rotation
+                        if (CameraQuaternion.Quaternion.IsIdentity) CameraQuaternion.Quaternion = Quaternion.Identity;
+                        // For camera, invert quaternion to orbit properly
+                        var inverseCamRotation = new Quaternion(rotation.Quaternion.Axis, -rotation.Quaternion.Angle);
+                        var newCamQ = Helpers.Trackball3D.Compose(CameraQuaternion.Quaternion, inverseCamRotation);
+                        CameraQuaternion.Quaternion = newCamQ;
+                    }
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void Viewport3D_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isPanning)
+            {
+                _isPanning = false;
+                Viewport3DOverlay.ReleaseMouseCapture();
+                e.Handled = true;
+                return;
+            }
+
+            if (_isSlicingDragging)
+            {
+                _isSlicingDragging = false;
+                _sliceEndPoint = e.GetPosition(Viewport3DOverlay);
+                Viewport3DOverlay.ReleaseMouseCapture();
+
+                // Need enough drag distance to define a meaningful cut line
+                double dragLen = ((_sliceEndPoint - _sliceStartPoint)).Length;
+                if (dragLen > 20)
+                {
+                    PerformPlaneSlice(_sliceStartPoint, _sliceEndPoint);
+                }
+                e.Handled = true;
+                return;
+            }
+
+            if (_trackball.IsDragging)
+            {
+                _trackball.OnMouseUp();
+                Viewport3DOverlay.ReleaseMouseCapture();
+            }
+            e.Handled = true;
+        }
+
+        // --- True Plane Bisection Slicing ---
+        private void PerformPlaneSlice(Point screenStart, Point screenEnd)
+        {
+            // Build the cutting plane from the two screen points
+            var (planePoint, planeNormal) = Helpers.MeshSlicer.BuildCuttingPlane(
+                Camera3D, MainViewport3D, screenStart, screenEnd);
+
+            // Find which shapes are under the slice line (check all placed shapes)
+            var shapesToSlice = new List<ModelVisual3D>();
+            foreach (var shape in _placed3DShapes)
+            {
+                if (shape == GridPlaneVisual) continue;
+                shapesToSlice.Add(shape);
+            }
+
+            var newShapes = new List<ModelVisual3D>();
+            var removedShapes = new List<ModelVisual3D>();
+
+            foreach (var shape in shapesToSlice)
+            {
+                var geoModels = Helpers.MeshSlicer.CollectGeometryModelsWithTransform(shape.Content);
+                if (geoModels.Count == 0) continue;
+
+                bool anySliced = false;
+                var allSideA = new List<GeometryModel3D>();
+                var allSideB = new List<GeometryModel3D>();
+
+                foreach (var tuple in geoModels)
+                {
+                    var gm = tuple.gm;
+                    var localTransform = tuple.xform;
+                    if (gm.Geometry is not MeshGeometry3D mesh) continue;
+
+                    // Combine visual transform with model transform to get total world transform
+                    var totalTransformGroup = new Transform3DGroup();
+                    if (localTransform != null && !localTransform.Value.IsIdentity)
+                        totalTransformGroup.Children.Add(localTransform);
+                    if (shape.Transform != null && !shape.Transform.Value.IsIdentity)
+                        totalTransformGroup.Children.Add(shape.Transform);
+
+                    // Bake transform into the mesh vertices — now in world space
+                    var worldMesh = Helpers.MeshSlicer.TransformMesh(mesh, totalTransformGroup);
+
+                    // Slice the mesh in world space
+                    var result = Helpers.MeshSlicer.SliceMesh(worldMesh, planePoint, planeNormal);
+
+                    if (result.SideA != null && result.SideB != null)
+                    {
+                        anySliced = true;
+                        var matA = gm.Material?.Clone();
+                        var matB = gm.Material?.Clone();
+                        var backMatA = gm.BackMaterial?.Clone();
+                        var backMatB = gm.BackMaterial?.Clone();
+                        allSideA.Add(new GeometryModel3D { Geometry = result.SideA, Material = matA, BackMaterial = backMatA });
+                        allSideB.Add(new GeometryModel3D { Geometry = result.SideB, Material = matB, BackMaterial = backMatB });
+                    }
+                    else
+                    {
+                        if (result.SideA != null)
+                            allSideA.Add(new GeometryModel3D { Geometry = result.SideA, Material = gm.Material?.Clone(), BackMaterial = gm.BackMaterial?.Clone() });
+                        else if (result.SideB != null)
+                            allSideB.Add(new GeometryModel3D { Geometry = result.SideB, Material = gm.Material?.Clone(), BackMaterial = gm.BackMaterial?.Clone() });
+                    }
+                }
+
+                if (!anySliced) continue;
+
+                // Record this for undo before modifying state
+                _undo3DStack.Push(new Undo3DSlice(this, shape, new List<ModelVisual3D>()));
+
+                removedShapes.Add(shape);
+
+                // --- Build Side A (vertices are already in world space, no centering needed) ---
+                if (allSideA.Count > 0)
+                {
+                    var groupA = new Model3DGroup();
+                    foreach (var gm in allSideA) groupA.Children.Add(gm);
+
+                    // Identity transform with a tiny nudge along the plane normal to separate the halves
+                    var transformA = new Transform3DGroup();
+                    transformA.Children.Add(new ScaleTransform3D(1, 1, 1));
+                    transformA.Children.Add(new RotateTransform3D(new QuaternionRotation3D(Quaternion.Identity)));
+                    transformA.Children.Add(new TranslateTransform3D(
+                        planeNormal.X * 0.12,
+                        planeNormal.Y * 0.12,
+                        planeNormal.Z * 0.12));
+
+                    var visualA = new ModelVisual3D { Content = groupA, Transform = transformA };
+                    newShapes.Add(visualA);
+                    StoreMaterials(groupA);
+                    _baseScales[visualA] = 1.0;
+                    _shapeRotations[visualA] = Quaternion.Identity;
+                }
+
+                // --- Build Side B ---
+                if (allSideB.Count > 0)
+                {
+                    var groupB = new Model3DGroup();
+                    foreach (var gm in allSideB) groupB.Children.Add(gm);
+
+                    var transformB = new Transform3DGroup();
+                    transformB.Children.Add(new ScaleTransform3D(1, 1, 1));
+                    transformB.Children.Add(new RotateTransform3D(new QuaternionRotation3D(Quaternion.Identity)));
+                    transformB.Children.Add(new TranslateTransform3D(
+                        -planeNormal.X * 0.12,
+                        -planeNormal.Y * 0.12,
+                        -planeNormal.Z * 0.12));
+
+                    var visualB = new ModelVisual3D { Content = groupB, Transform = transformB };
+                    newShapes.Add(visualB);
+                    StoreMaterials(groupB);
+                    _baseScales[visualB] = 1.0;
+                    _shapeRotations[visualB] = Quaternion.Identity;
+                }
+            }
+
+            // Apply changes
+            foreach (var removed in removedShapes)
+            {
+                MainViewport3D.Children.Remove(removed);
+                _placed3DShapes.Remove(removed);
+                if (removed.Content != null) RemoveMaterials(removed.Content);
+                _baseScales.Remove(removed);
+                _shapeRotations.Remove(removed);
+            }
+            foreach (var added in newShapes)
+            {
+                MainViewport3D.Children.Add(added);
+                _placed3DShapes.Add(added);
+            }
+
+            // Update the undo entries with references to the new shapes
+            if (removedShapes.Count > 0)
+            {
+                // The top of the undo stack is the slice undo; update its new shapes reference
+                if (_undo3DStack.Count > 0 && _undo3DStack.Peek() is Undo3DSlice sliceUndo)
+                    sliceUndo.NewShapes = newShapes;
+            }
+
+            if (removedShapes.Count > 0)
+                Shape3DStatusText.Text = $"  |  ✂️ Sliced {removedShapes.Count} model(s) into {newShapes.Count} pieces!";
+            else
+                Shape3DStatusText.Text = "  |  No models were intersected by the slice line";
+        }
+
+        private Vector3D GetTranslation(Transform3D transform)
+        {
+            if (transform is Transform3DGroup grp && grp.Children.Count >= 3 && grp.Children[2] is TranslateTransform3D tt)
+                return new Vector3D(tt.OffsetX, tt.OffsetY, tt.OffsetZ);
+            return new Vector3D(0, 0, 0);
+        }
+
+        private void Viewport3D_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+
+            if (_focused3DShape != null && _focused3DShape.Transform is Transform3DGroup grp && grp.Children.Count >= 3)
+            {
+                // Scale the focused shape
+                if (grp.Children[0] is ScaleTransform3D st)
+                {
+                    double factor = e.Delta > 0 ? 1.1 : 0.9;
+                    st.ScaleX *= factor;
+                    st.ScaleY *= factor;
+                    st.ScaleZ *= factor;
+                    e.Handled = true;
+                }
+            }
+            else
+            {
+                // Global camera zoom — move camera along its look direction
+                double factor = e.Delta > 0 ? 0.3 : -0.3;
+                var direction = Camera3D.LookDirection;
+                direction.Normalize();
+
+                var newPos = Camera3D.Position + direction * factor;
+                
+                // Prevent zooming past the 3D grid center (Z=0) which flips the camera perspective, 
+                // and prevent zooming too far away.
+                if (newPos.Z > 0.2 && newPos.Z < 100.0)
+                {
+                    Camera3D.Position = newPos;
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void Viewport3D_ManipulationStarting(object sender, ManipulationStartingEventArgs e)
+        {
+            e.ManipulationContainer = Viewport3DOverlay;
+            e.Handled = true;
+        }
+
+        private void Viewport3D_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
+        {
+            if (_focused3DShape == null) return;
+            if (_focused3DShape.Transform is Transform3DGroup grp && grp.Children.Count >= 3)
+            {
+                // Scale (Pinch)
+                if (grp.Children[0] is ScaleTransform3D st)
+                {
+                    double scale = e.DeltaManipulation.Scale.X;
+                    if (scale > 0 && Math.Abs(scale - 1.0) > 0.01)
+                    {
+                        st.ScaleX *= scale;
+                        st.ScaleY *= scale;
+                        st.ScaleZ *= scale;
+                    }
+                }
+
+                // Translate (Touch drag / multi-touch pan)
+                if (grp.Children[2] is TranslateTransform3D tt)
+                {
+                    double dx = e.DeltaManipulation.Translation.X;
+                    double dy = e.DeltaManipulation.Translation.Y;
+                    if (Math.Abs(dx) > 0.1 || Math.Abs(dy) > 0.1)
+                    {
+                        if (e.Manipulators.Count() > 1)
+                        {
+                            double panScale = 6.0 / Math.Max(1, Viewport3DOverlay.ActualWidth);
+                            tt.OffsetX += dx * panScale;
+                            tt.OffsetY -= dy * panScale; // Map Y to Y axis
+                        }
+                        else
+                        {
+                            // 1 finger -> rotate!
+                            double ndx = dx / Viewport3DOverlay.ActualWidth * 2.0 * 1.5;
+                            double ndy = dy / Viewport3DOverlay.ActualHeight * 2.0 * 1.5;
+                            var axis = new Vector3D(-ndy, ndx, 0);
+                            double angle = axis.Length * 180.0;
+                            if (angle > 0.001)
+                            {
+                                axis.Normalize();
+                                var deltaQ = new Quaternion(axis, angle);
+                                var existingQ = _shapeRotations[_focused3DShape];
+                                var newQ = Helpers.Trackball3D.Compose(existingQ, deltaQ);
+                                _shapeRotations[_focused3DShape] = newQ;
+                                if (grp.Children[1] is RotateTransform3D rt)
+                                {
+                                    rt.Rotation = new QuaternionRotation3D(newQ);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void Viewport3D_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                // Return to 3D interact mode
+                if (_focused3DShape != null)
+                    Unfocus3D();
+                
+                _is3DPenActive = false;
+                _is3DPaintActive = false;
+                _is3DSliceActive = false;
+                _pendingShape3D = Shape3DType.None;
+                _currentMode = DrawingMode.Pen;
+                ActivateInteractMode();
+                Shape3DStatusText.Text = "  |  3D Interact — select, rotate, move shapes";
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Delete)
+            {
+                if (_focused3DShape != null)
+                {
+                    DeleteFocused3D_Click(null, new RoutedEventArgs());
+                    e.Handled = true;
+                }
+                else if (_focused2DElement != null && Shapes3DOverlayCanvas.Children.Contains(_focused2DElement))
+                {
+                    Shapes3DOverlayCanvas.Children.Remove(_focused2DElement);
+                    _undo3DStack.Push(new Undo2DDeleteElement(this, _focused2DElement));
+                    _focused2DElement = null;
+                    e.Handled = true;
+                }
+            }
+            else if (e.Key == Key.Z && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                Undo3D();
+                e.Handled = true;
+            }
+        }
+
+        private void DeleteFocused3D_Click(object sender, RoutedEventArgs e)
+        {
+            if (_focused3DShape != null)
+            {
+                // Push undo before deleting
+                var rotation = _shapeRotations.ContainsKey(_focused3DShape) ? _shapeRotations[_focused3DShape] : Quaternion.Identity;
+                var scale = _baseScales.ContainsKey(_focused3DShape) ? _baseScales[_focused3DShape] : 1.0;
+                _undo3DStack.Push(new Undo3DDelete(this, _focused3DShape, rotation, scale));
+
+                // Delete focused shape
+                MainViewport3D.Children.Remove(_focused3DShape);
+                _placed3DShapes.Remove(_focused3DShape);
+                // Don't call RemoveMaterials — undo needs the materials intact
+                _shapeRotations.Remove(_focused3DShape);
+                _baseScales.Remove(_focused3DShape);
+                _focused3DShape = null;
+                FocusInfoBadge.Visibility = Visibility.Collapsed;
+                RestoreAllMaterialsAndScales();
+                Shape3DStatusText.Text = "  |  Shape deleted (Ctrl+Z to undo)";
+                
+                // Restore cinematic background blur
+                WhiteboardScrollViewer.Effect = null;
+                Viewport3DOverlay.Background = new SolidColorBrush(_unfocused3DBackgroundColor);
+                GridPlaneVisual.Content.Transform = new ScaleTransform3D(1, 1, 1);
+            }
+        }
+
+        // --- Hit Testing & Materials ---
+        private ModelVisual3D? HitTest3D(Point point)
+        {
+            var result = VisualTreeHelper.HitTest(MainViewport3D, point);
+            if (result is RayMeshGeometry3DHitTestResult meshHit)
+            {
+                DependencyObject? current = meshHit.VisualHit;
+                while (current != null)
+                {
+                    if (current is ModelVisual3D visual && _placed3DShapes.Contains(visual))
+                        return visual;
+                    current = VisualTreeHelper.GetParent(current);
+                }
+            }
+            return null;
+        }
+
+        private void StoreMaterials(Model3D model)
+        {
+            if (model is GeometryModel3D gm && gm.Material != null)
+            {
+                if (!_originalMaterials.ContainsKey(gm))
+                    _originalMaterials[gm] = gm.Material;
+            }
+            else if (model is Model3DGroup mg)
+            {
+                foreach (var child in mg.Children)
+                    StoreMaterials(child);
+            }
+        }
+
+        private void RemoveMaterials(Model3D model)
+        {
+            if (model is GeometryModel3D gm)
+            {
+                _originalMaterials.Remove(gm);
+            }
+            else if (model is Model3DGroup mg)
+            {
+                foreach (var child in mg.Children) RemoveMaterials(child);
+            }
+        }
+
+        private void Focus3DShape(ModelVisual3D shape)
+        {
+            // If re-focusing the same shape, skip
+            if (_focused3DShape == shape) return;
+            
+            _focused3DShape = shape;
+            FocusInfoBadge.Visibility = Visibility.Visible;
+            if (_is3DPenActive)
+                Shape3DStatusText.Text = "  |  3D PEN ACTIVE — Draw on the focused shape";
+            else
+                Shape3DStatusText.Text = "  |  Drag = Rotate · Right-Click Drag = Move · Scroll/Pinch = Scale";
+
+            // Focus highlighting
+            HighlightModel(shape.Content);
+        }
+
+        private void HighlightModel(Model3D? model)
+        {
+            if (model is GeometryModel3D gm && _originalMaterials.ContainsKey(gm))
+            {
+                var highlightMat = new MaterialGroup();
+                highlightMat.Children.Add(_originalMaterials[gm]);
+                highlightMat.Children.Add(new EmissiveMaterial(new SolidColorBrush(Color.FromArgb(100, 80, 200, 255)))); // cyan glow
+                gm.Material = highlightMat;
+            }
+            else if (model is Model3DGroup mg)
+            {
+                foreach (var child in mg.Children) HighlightModel(child);
+            }
+        }
+
+        private void ResetFocusScale(ModelVisual3D shape)
+        {
+            if (shape.Transform is Transform3DGroup grp && grp.Children.Count >= 1 && grp.Children[0] is ScaleTransform3D st)
+            {
+                if (_baseScales.TryGetValue(shape, out double baseScale))
+                {
+                    st.ScaleX = baseScale;
+                    st.ScaleY = baseScale;
+                    st.ScaleZ = baseScale;
+                }
+            }
+        }
+
+        private void SetMaterialOpacity(Model3D model, double opacity)
+        {
+            if (model is GeometryModel3D gm && _originalMaterials.ContainsKey(gm))
+            {
+                gm.Material = new DiffuseMaterial(new SolidColorBrush(Color.FromArgb((byte)(255 * opacity), 128, 128, 128)));
+            }
+            else if (model is Model3DGroup mg)
+            {
+                foreach (var child in mg.Children) SetMaterialOpacity(child, opacity);
+            }
+        }
+
+        private void RestoreMaterial(Model3D model)
+        {
+            if (model is GeometryModel3D gm && _originalMaterials.TryGetValue(gm, out var mat))
+            {
+                gm.Material = mat;
+            }
+            else if (model is Model3DGroup mg)
+            {
+                foreach (var child in mg.Children) RestoreMaterial(child);
+            }
+        }
+
+        private void Unfocus3D()
+        {
+            _focused3DShape = null;
+            FocusInfoBadge.Visibility = Visibility.Collapsed;
+            RestoreAllMaterialsAndScales();
+            Shape3DStatusText.Text = "  |  Ready";
+            _trackball.OnMouseUp();
+        }
+
+        private void RestoreAllMaterialsAndScales()
+        {
+            foreach (var s in _placed3DShapes)
+            {
+                if (s.Content != null) RestoreMaterial(s.Content);
+                if (s.Transform is Transform3DGroup grp && grp.Children.Count >= 1 && grp.Children[0] is ScaleTransform3D st)
+                {
+                    if (_baseScales.TryGetValue(s, out double baseScale))
+                    {
+                        st.ScaleX = baseScale;
+                        st.ScaleY = baseScale;
+                        st.ScaleZ = baseScale;
+                    }
+                }
+            }
+        }
+
+        // ==================== SHAPES OVERLAY HANDLERS ====================
+
+        private void Shapes3DOverlay_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_currentMode >= DrawingMode.Rectangle && _currentMode <= DrawingMode.Triangle)
+            {
+                _isDrawingOverlayShape = true;
+                _overlayShapeStart = e.GetPosition(Shapes3DOverlayCanvas);
+                _currentOverlayShape = CreateShape(_currentMode, _overlayShapeStart, _overlayShapeStart);
+                if (_currentOverlayShape != null)
+                {
+                    // Give shape a semi-transparent fill so it's hit-testable for dragging later
+                    if (_currentOverlayShape.Fill == Brushes.Transparent || _currentOverlayShape.Fill == null)
+                        _currentOverlayShape.Fill = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
+                    Canvas.SetLeft(_currentOverlayShape, _overlayShapeStart.X);
+                    Canvas.SetTop(_currentOverlayShape, _overlayShapeStart.Y);
+                    Shapes3DOverlayCanvas.Children.Add(_currentOverlayShape);
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void Shapes3DOverlay_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isDrawingOverlayShape && _currentOverlayShape != null)
+            {
+                var currentPoint = e.GetPosition(Shapes3DOverlayCanvas);
+                UpdateOverlayShape(_currentOverlayShape, _currentMode, _overlayShapeStart, currentPoint);
+                e.Handled = true;
+            }
+        }
+
+        private void Shapes3DOverlay_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isDrawingOverlayShape && _currentOverlayShape != null)
+            {
+                // Add drag handlers to the finished shape
+                MakeOverlayElementDraggable(_currentOverlayShape);
+                // Push undo
+                _undo3DStack.Push(new Undo2DOverlayElement(this, _currentOverlayShape, "2D Shape"));
+
+                _isDrawingOverlayShape = false;
+                _currentOverlayShape = null;
+                e.Handled = true;
+
+                // Return to 3D interact mode after drawing
+                Shapes3DOverlayCanvas.Background = null;
+            }
+        }
+
+        // Make any overlay element (shape or image) draggable and scalable
+        private void MakeOverlayElementDraggable(UIElement element)
+        {
+            bool isDragging = false;
+            Point dragOffset = new Point();
+
+            element.MouseLeftButtonDown += (s, ev) =>
+            {
+                if (_currentMode == DrawingMode.Eraser)
+                {
+                    Shapes3DOverlayCanvas.Children.Remove(element);
+                    _undo3DStack.Push(new Undo2DDeleteElement(this, element));
+                    if (_focused2DElement == element) _focused2DElement = null;
+                    ev.Handled = true;
+                    return;
+                }
+
+                // Focus element for keyboard deletion
+                _focused2DElement = element;
+                
+                // Only drag when NOT in shape-drawing mode
+                if (_currentMode >= DrawingMode.Rectangle && _currentMode <= DrawingMode.Triangle 
+                    && Shapes3DOverlayCanvas.Background != null) return;
+                    
+                isDragging = true;
+                dragOffset = ev.GetPosition(element as FrameworkElement);
+                element.CaptureMouse();
+                ev.Handled = true;
+            };
+            element.MouseMove += (s, ev) =>
+            {
+                if (isDragging)
+                {
+                    var pos = ev.GetPosition(Shapes3DOverlayCanvas);
+                    Canvas.SetLeft(element, pos.X - dragOffset.X);
+                    Canvas.SetTop(element, pos.Y - dragOffset.Y);
+                    ev.Handled = true;
+                }
+            };
+            element.MouseLeftButtonUp += (s, ev) =>
+            {
+                if (isDragging)
+                {
+                    isDragging = false;
+                    element.ReleaseMouseCapture();
+                    ev.Handled = true;
+                }
+            };
+
+            // Touch Pinch-to-Zoom
+            element.IsManipulationEnabled = true;
+            element.ManipulationStarting += (s, ev) =>
+            {
+                if (_currentMode == DrawingMode.Eraser) { ev.Cancel(); return; }
+                ev.ManipulationContainer = Shapes3DOverlayCanvas;
+                ev.Handled = true;
+            };
+            element.ManipulationDelta += (s, ev) =>
+            {
+                if (element.RenderTransform is not ScaleTransform st)
+                {
+                    st = new ScaleTransform(1.0, 1.0);
+                    element.RenderTransform = st;
+                    element.RenderTransformOrigin = new Point(0.5, 0.5);
+                }
+
+                double scale = ev.DeltaManipulation.Scale.X;
+                if (scale > 0 && Math.Abs(scale - 1.0) > 0.01)
+                {
+                    st.ScaleX *= scale;
+                    st.ScaleY *= scale;
+                }
+                ev.Handled = true;
+            };
+
+            // Mouse Wheel Zoom
+            element.MouseWheel += (s, ev) =>
+            {
+                if (_currentMode == DrawingMode.Eraser) return;
+                
+                if (element.RenderTransform is not ScaleTransform st)
+                {
+                    st = new ScaleTransform(1.0, 1.0);
+                    element.RenderTransform = st;
+                    element.RenderTransformOrigin = new Point(0.5, 0.5);
+                }
+                double factor = ev.Delta > 0 ? 1.1 : 0.9;
+                st.ScaleX *= factor;
+                st.ScaleY *= factor;
+                ev.Handled = true;
+            };
+
+            // Set cursor to indicate draggability
+            if (element is FrameworkElement fe)
+                fe.Cursor = Cursors.SizeAll;
+        }
+
+        private void UpdateOverlayShape(Shape shape, DrawingMode mode, Point start, Point end)
+        {
+            var left = Math.Min(start.X, end.X);
+            var top = Math.Min(start.Y, end.Y);
+            var width = Math.Abs(end.X - start.X);
+            var height = Math.Abs(end.Y - start.Y);
+            switch (mode)
+            {
+                case DrawingMode.Rectangle:
+                case DrawingMode.Circle:
+                    Canvas.SetLeft(shape, left);
+                    Canvas.SetTop(shape, top);
+                    shape.Width = width;
+                    shape.Height = height;
+                    break;
+                case DrawingMode.Line:
+                    if (shape is System.Windows.Shapes.Line line) { line.X2 = end.X - start.X; line.Y2 = end.Y - start.Y; }
+                    break;
+                case DrawingMode.Arrow:
+                    if (shape is System.Windows.Shapes.Polygon arrow) UpdateArrowShape(arrow, start, end);
+                    break;
+                case DrawingMode.Triangle:
+                    if (shape is System.Windows.Shapes.Polygon triangle) UpdateTriangleShape(triangle, start, end);
+                    break;
+            }
+        }
+
+        // ==================== MULTI-SCREEN SYSTEM ====================
+
+        private void SaveCurrentScreen()
+        {
+            if (_activeScreenIndex < 0 || _activeScreenIndex >= _screens.Count) return;
+
+            var screen = _screens[_activeScreenIndex];
+
+            // Save ink strokes
+            screen.InkStrokes = Pen3DOverlayCanvas.Strokes.Clone();
+
+            // Save shape overlay elements
+            screen.ShapeElements.Clear();
+            foreach (UIElement child in Shapes3DOverlayCanvas.Children)
+                screen.ShapeElements.Add(child);
+
+            // Save 3D shapes
+            screen.Shapes3D.Clear();
+            screen.Materials.Clear();
+            screen.Rotations.Clear();
+            screen.Scales.Clear();
+            foreach (var shape in _placed3DShapes)
+            {
+                screen.Shapes3D.Add(shape);
+                if (_shapeRotations.ContainsKey(shape))
+                    screen.Rotations[shape] = _shapeRotations[shape];
+                if (_baseScales.ContainsKey(shape))
+                    screen.Scales[shape] = _baseScales[shape];
+            }
+            // Copy materials
+            foreach (var kvp in _originalMaterials)
+                screen.Materials[kvp.Key] = kvp.Value;
+
+            // Save undo stack
+            screen.UndoStack = new Stack<IUndo3DAction>(_undo3DStack.Reverse());
+
+            // Save background
+            screen.BackgroundColor = _unfocused3DBackgroundColor;
+        }
+
+        private void LoadScreen(int index)
+        {
+            if (index < 0 || index >= _screens.Count) return;
+
+            var screen = _screens[index];
+
+            // Load ink strokes
+            Pen3DOverlayCanvas.Strokes = screen.InkStrokes.Clone();
+
+            // Load shape overlay elements
+            Shapes3DOverlayCanvas.Children.Clear();
+            foreach (var elem in screen.ShapeElements)
+                Shapes3DOverlayCanvas.Children.Add(elem);
+
+            // Clear current 3D shapes from viewport (don't destroy them — they belong to the old screen)
+            foreach (var shape in _placed3DShapes.ToList())
+                MainViewport3D.Children.Remove(shape);
+            _placed3DShapes.Clear();
+            _shapeRotations.Clear();
+            _baseScales.Clear();
+            _originalMaterials.Clear();
+            _focused3DShape = null;
+            FocusInfoBadge.Visibility = Visibility.Collapsed;
+
+            // Load 3D shapes
+            foreach (var shape in screen.Shapes3D)
+            {
+                MainViewport3D.Children.Add(shape);
+                _placed3DShapes.Add(shape);
+                if (screen.Rotations.ContainsKey(shape))
+                    _shapeRotations[shape] = screen.Rotations[shape];
+                if (screen.Scales.ContainsKey(shape))
+                    _baseScales[shape] = screen.Scales[shape];
+            }
+            foreach (var kvp in screen.Materials)
+                _originalMaterials[kvp.Key] = kvp.Value;
+
+            // Load undo stack
+            _undo3DStack.Clear();
+            foreach (var action in screen.UndoStack)
+                _undo3DStack.Push(action);
+
+            // Load background
+            _unfocused3DBackgroundColor = screen.BackgroundColor;
+            Viewport3DOverlay.Background = new SolidColorBrush(_unfocused3DBackgroundColor);
+
+            _activeScreenIndex = index;
+            Shape3DStatusText.Text = $"  |  Screen {screen.Name}";
+        }
+
+        private void SwitchScreen(int index)
+        {
+            if (index == _activeScreenIndex) return;
+            SaveCurrentScreen();
+            LoadScreen(index);
+            UpdateTabBar();
+        }
+
+        private void AddScreen_Click(object sender, RoutedEventArgs e)
+        {
+            SaveCurrentScreen();
+
+            var newScreen = new ScreenState
+            {
+                Name = $"S{_screens.Count + 1}"
+            };
+            _screens.Add(newScreen);
+            LoadScreen(_screens.Count - 1);
+            UpdateTabBar();
+        }
+
+        private void UpdateTabBar()
+        {
+            ScreenTabsPanel.Children.Clear();
+            for (int i = 0; i < _screens.Count; i++)
+            {
+                int idx = i; // capture for closure
+                var isActive = (i == _activeScreenIndex);
+
+                var tab = new Button
+                {
+                    Content = _screens[i].Name,
+                    Width = 64,
+                    Height = 32,
+                    Margin = new Thickness(2, 0, 2, 0),
+                    Cursor = Cursors.Hand,
+                    FontSize = 13,
+                    FontWeight = isActive ? FontWeights.Bold : FontWeights.Normal,
+                    Background = isActive
+                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498DB"))
+                        : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2C3E50")),
+                    Foreground = new SolidColorBrush(Colors.White),
+                    BorderThickness = isActive ? new Thickness(0, 2, 0, 0) : new Thickness(0),
+                    BorderBrush = isActive
+                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5DADE2"))
+                        : null
+                };
+
+                // Rounded corners
+                tab.Resources.Add(typeof(Border), new Style(typeof(Border))
+                {
+                    Setters = { new Setter(Border.CornerRadiusProperty, new CornerRadius(4)) }
+                });
+
+                tab.Click += (s, ev) => SwitchScreen(idx);
+                ScreenTabsPanel.Children.Add(tab);
+            }
         }
     }
 }

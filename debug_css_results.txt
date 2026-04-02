@@ -1,0 +1,122 @@
+
+--- CMD: pm2 list ---
+┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ edusync-api         │ default     │ N/A     │ fork    │ 0        │ 0      │ 441  │ errored   │ 0%       │ 0b       │ root     │ disabled │
+│ 1  │ edusync-web         │ default     │ N/A     │ fork    │ 1207333  │ 0s     │ 5438 │ online    │ 0%       │ 0b       │ root     │ disabled │
+│ 2  │ edusyncai-webapi    │ default     │ N/A     │ fork    │ N/A      │ 24m    │ 177… │ online    │ 0%       │ 0b       │ root     │ disabled │
+└────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+
+--- CMD: ls -la /opt/edusyncai/edusync-web/.next/static/css/ 2>&1 ---
+ls: cannot access '/opt/edusyncai/edusync-web/.next/static/css/': No such file or directory
+
+
+--- CMD: ls /opt/edusyncai/edusync-web/node_modules/tailwindcss/package.json /opt/edusyncai/edusync-web/node_modules/@tailwindcss/postcss/package.json 2>&1 ---
+/opt/edusyncai/edusync-web/node_modules/@tailwindcss/postcss/package.json
+/opt/edusyncai/edusync-web/node_modules/tailwindcss/package.json
+
+
+--- CMD: cat /opt/edusyncai/edusync-web/postcss.config.mjs ---
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+
+--- CMD: cat /opt/edusyncai/edusync-web/app/globals.css ---
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #FAFAFA;
+  --foreground: #1A1A2E;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
+/* Landing page floating animation */
+@keyframes landing-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.landing-float {
+  animation: landing-float 4s ease-in-out infinite;
+}
+
+
+--- CMD: grep -i tailwind /opt/edusyncai/edusync-web/package.json ---
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4"
+
+
+--- CMD: cat /opt/edusyncai/edusync-web/.env.production 2>&1 ---
+NEXT_PUBLIC_API_URL=https://173-212-248-253.nip.io/api
+API_SERVER_URL=https://173-212-248-253.nip.io
+
+
+--- CMD: curl -sSL http://localhost:3000/ 2>&1 | grep -o "stylesheet" ---
+stylesheet
+stylesheet
+
+
+--- CMD: find /opt/edusyncai/edusync-web/.next -name "*.css" -exec ls -la {} \; ---
+-rw-rw-r-- 1 root root 75455 Mar 30 17:12 /opt/edusyncai/edusync-web/.next/static/chunks/fda9c887aa495dd4.css
+
+
+--- CMD: pm2 describe 0 2>&1 | head -30 ---
+ Describing process with id 0 - name edusync-api 
+┌───────────────────┬─────────────────────────────────────────┐
+│ status            │ errored                                 │
+│ name              │ edusync-api                             │
+│ namespace         │ default                                 │
+│ version           │ N/A                                     │
+│ restarts          │ 441                                     │
+│ uptime            │ 0                                       │
+│ script path       │ /opt/edusyncai/publish/EduSyncAI.WebAPI │
+│ script args       │ --urls http://0.0.0.0:5152              │
+│ error log path    │ /root/.pm2/logs/edusync-api-error.log   │
+│ out log path      │ /root/.pm2/logs/edusync-api-out.log     │
+│ pid path          │ /root/.pm2/pids/edusync-api-0.pid       │
+│ interpreter       │ none                                    │
+│ interpreter args  │ N/A                                     │
+│ script id         │ 0                                       │
+│ exec cwd          │ /opt/edusyncai/edusync-web              │
+│ exec mode         │ fork_mode                               │
+│ node.js version   │ N/A                                     │
+│ node env          │ N/A                                     │
+│ watch & reload    │ ✘                                       │
+│ unstable restarts │ 0                                       │
+│ created at        │ N/A                                     │
+└───────────────────┴─────────────────────────────────────────┘
+ Divergent env variables from local env 
+┌────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ PWD            │ /opt/edusyncai/edusync-web                                                                                       │
+│ SSH_CONNECTION │ 102.90.97.160 47280 173.212.248.253 22                                                                           │
+│ XDG_SESSION_ID │ 3429                                                                                                             │
+│ SSH_CLIENT     │ 102.90.97.160 47280 22                                                                                           │
+
+
+--- CMD: ss -tlnp | grep 3000 ---
+LISTEN 0      511                *:3000             *:*    users:(("next-server (v1",pid=2093353,fd=21))                                                                                                                                                 
+
+
+--- CMD: node -v && npm -v ---
+v22.22.1
+10.9.4

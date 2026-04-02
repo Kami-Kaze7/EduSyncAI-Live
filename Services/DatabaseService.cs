@@ -185,9 +185,26 @@ namespace EduSyncAI
                 FOREIGN KEY (VerifiedBy) REFERENCES Lecturers(Id),
                 UNIQUE(SessionId, StudentId)
             );
+
+            CREATE TABLE IF NOT EXISTS ModelAssets (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Title TEXT NOT NULL,
+                Description TEXT,
+                Discipline TEXT NOT NULL,
+                ModelUrl TEXT NOT NULL,
+                ThumbnailUrl TEXT,
+                UploadedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
         ";
 
             command.ExecuteNonQuery();
+
+            // Patch existing databases that were created before the UploadedAt column was added
+            try {
+                var patchCommand = connection.CreateCommand();
+                patchCommand.CommandText = "ALTER TABLE ModelAssets ADD COLUMN UploadedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP;";
+                patchCommand.ExecuteNonQuery();
+            } catch { /* Ignore if column exists */ }
         }
 
         public int CreateCourse(Course course)

@@ -74,8 +74,8 @@ namespace EduSyncAI
             }
             else if (projectPath != null)
             {
-                // Development mode — use dotnet run
-                _webApiProcess = StartProcess("dotnet", $"run --project \"{projectPath}\" --no-launch-profile", Path.GetDirectoryName(projectPath)!);
+                // Development mode — use dotnet run but strongly enforce port 5152
+                _webApiProcess = StartProcess("dotnet", $"run --project \"{projectPath}\" --no-launch-profile --urls \"http://*:5152\"", Path.GetDirectoryName(projectPath)!);
             }
             else
             {
@@ -130,18 +130,10 @@ namespace EduSyncAI
                 npmInstall.WaitForExit(120000); // max 2 minutes
             }
 
-            if (Directory.Exists(nextBuildDir))
-            {
-                // Production mode — use next start via bundled npx
-                _nextJsProcess = StartProcess("cmd.exe", $"/c \"{npxCmd}\" next start -p 3000", webDir);
-            }
-            else
-            {
-                // Dev mode — use npm run dev
-                var npmCmd = Path.Combine(Path.GetDirectoryName(nodeExe)!, "npm.cmd");
-                if (!File.Exists(npmCmd)) npmCmd = "npm";
-                _nextJsProcess = StartProcess("cmd.exe", $"/c \"{npmCmd}\" run dev", webDir);
-            }
+            // Always force Dev mode for live local testing to pick up code changes
+            var npmDevCmd = Path.Combine(Path.GetDirectoryName(nodeExe)!, "npm.cmd");
+            if (!File.Exists(npmDevCmd)) npmDevCmd = "npm";
+            _nextJsProcess = StartProcess("cmd.exe", $"/c \"{npmDevCmd}\" run dev -- -p 3000", webDir);
 
             var healthy = await WaitForHealthAsync("http://localhost:3000", 30);
             if (healthy)
