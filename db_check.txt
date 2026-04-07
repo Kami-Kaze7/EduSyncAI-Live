@@ -1,0 +1,77 @@
+=== CURRENT API DB PATH (from journal) ===
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: 📁 Database: /opt/edusyncai/publish/webapi/../Data/edusync.db
+
+=== ALL edusync.db FILES ON SERVER ===
+-rw-r--r-- 1 root root 450560 Mar 25 14:38 /opt/edusyncai/backups/webapi_backup_2026-03-25_14:38:59/Data/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 25 14:39 /opt/edusyncai/backups/webapi_backup_2026-03-25_14:39:29/Data/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 25 15:36 /opt/edusyncai/backups/webapi_backup_2026-03-25_15:36:53/Data/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 25 16:30 /opt/edusyncai/backups/webapi_backup_2026-03-25_16:30:37/Data/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 25 15:56 /opt/edusyncai/backups/webapi_backup_2026-03-25_15:56:38/Data/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 25 16:30 /opt/edusyncai/backups/webapi_backup_2026-03-25_16:30:27/Data/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 25 16:12 /opt/edusyncai/backups/webapi_backup_2026-03-25_16:12:52/Data/edusync.db
+-rw-r--r-- 1 root root 0 Mar 21 23:02 /opt/edusyncai/publish/edusync.db
+-rw-r--r-- 1 root root 450560 Mar 15 23:44 /opt/edusyncai/publish/webapi/Data/edusync.db
+-rwxrwxrwx 1 root root 622592 Apr  3 09:38 /opt/edusyncai/publish/Data/edusync.db
+-rw-r--r-- 1 root root 622592 Mar 25 12:15 /opt/edusyncai/Data/edusync.db
+-rw-r--r-- 1 root root 0 Mar 23 17:26 /opt/edusyncai/EduSyncAI.WebAPI/edusync.db
+
+=== CHECK /opt/edusyncai/Data/ ===
+total 756
+drwxr-xr-x 11 root root   4096 Mar 25 17:02 .
+drwxr-xr-x 22 root root   4096 Mar 25 14:38 ..
+drwxr-xr-x  2 root root  12288 Mar 24 13:17 LectureMaterials
+drwxr-xr-x  2 root root   4096 Mar 24 08:59 Recordings
+drwxr-xr-x  2 root root   4096 Mar 24 08:59 StudentPhotos
+drwxr-xr-x  5 root root   4096 Mar 20 02:00 Syllabi
+drwxr-xr-x  3 root root   4096 Mar 24 08:59 WebView2_LiveClassroom
+drwxr-xr-x  3 root root   4096 Mar 24 08:59 WebView2_PiP
+drwxr-xr-x  2 root root   4096 Mar 24 08:59 WhiteboardImages
+drwxr-xr-x  2 root root   4096 Mar 24 08:59 Whiteboards
+-rw-r--r--  1 root root   1332 Mar 15 22:32 add_syllabus_tables.sql
+-rw-r--r--  1 root root 622592 Mar 25 12:15 edusync.db
+-rw-r--r--  1 root root  32768 Mar 30 16:14 edusync.db-shm
+-rw-r--r--  1 root root      0 Mar 25 17:02 edusync.db-wal
+-rw-r--r--  1 root root  58689 Mar 24 08:59 face_debug.log
+drwxr-xr-x  3 root root   4096 Mar 15 22:32 uploads
+
+=== CHECK /opt/edusyncai/publish/Data/ ===
+total 1156
+drwxrwxrwx 6 root root   4096 Apr  3 09:47 .
+drwxr-xr-x 5 root root  28672 Mar 25 10:46 ..
+drwxrwxrwx 2 root root   4096 Mar 21 20:15 LectureMaterials
+drwxrwxrwx 2 root root   4096 Mar 17 15:03 ProfilePhotos
+drwxrwxrwx 4 root root   4096 Mar 16 01:59 Syllabi
+-rwxrwxrwx 1 root root   1372 Mar 16 01:56 add_syllabus_tables.sql
+-rwxrwxrwx 1 root root 622592 Apr  3 09:38 edusync.db
+-rwxrwxrwx 1 root root  32768 Apr  3 09:49 edusync.db-shm
+-rwxrwxrwx 1 root root   8272 Apr  3 09:48 edusync.db-wal
+-rwxr-xr-x 1 root root 458752 Mar 21 23:13 edusync.db.bak
+drwx---rwx 4 root root   4096 Apr  3 09:33 uploads
+
+=== CHECK /opt/edusyncai/publish/webapi/../Data/ ===
+total 1156
+drwxrwxrwx 6 root root   4096 Apr  3 09:47 .
+drwxr-xr-x 5 root root  28672 Mar 25 10:46 ..
+drwxrwxrwx 2 root root   4096 Mar 21 20:15 LectureMaterials
+drwxrwxrwx 2 root root   4096 Mar 17 15:03 ProfilePhotos
+drwxrwxrwx 4 root root   4096 Mar 16 01:59 Syllabi
+-rwxrwxrwx 1 root root   1372 Mar 16 01:56 add_syllabus_tables.sql
+-rwxrwxrwx 1 root root 622592 Apr  3 09:38 edusync.db
+-rwxrwxrwx 1 root root  32768 Apr  3 09:49 edusync.db-shm
+-rwxrwxrwx 1 root root   8272 Apr  3 09:48 edusync.db-wal
+-rwxr-xr-x 1 root root 458752 Mar 21 23:13 edusync.db.bak
+drwx---rwx 4 root root   4096 Apr  3 09:33 uploads
+
+=== OLD DB - table counts ===
+OLD DB EXISTS at /opt/edusyncai/Data/edusync.db
+Lecturers:|4
+Students:|2
+Courses:|3
+
+=== NEW DB - table counts ===
+NEW DB EXISTS at /opt/edusyncai/publish/Data/edusync.db
+Lecturers:|1
+Students:|1
+Courses:|0
+ModelAssets:|3
+DONE

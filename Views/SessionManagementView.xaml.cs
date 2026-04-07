@@ -340,6 +340,7 @@ namespace EduSyncAI
 
                 if (_screenRecordProcess != null && !_screenRecordProcess.HasExited)
                 {
+                    // Send 'q' to ffmpeg for graceful shutdown
                     try
                     {
                         _screenRecordProcess.StandardInput.Write("q");
@@ -348,34 +349,101 @@ namespace EduSyncAI
                     }
                     catch { }
 
-                    await Task.Run(() => _screenRecordProcess.WaitForExit(30000));
+                    // Wait max 5 seconds (was 30s) — file is already playable
+                    // thanks to -movflags frag_keyframe+empty_moov
+                    await Task.Run(() => _screenRecordProcess.WaitForExit(5000));
                     if (!_screenRecordProcess.HasExited)
                     {
                         _screenRecordProcess.Kill();
-                        await Task.Delay(500);
+                        await Task.Delay(300);
                     }
                     _screenRecordProcess.Dispose();
                     _screenRecordProcess = null;
                 }
 
+                // === INSTANT LOCAL REGISTRATION ===
+                // The file is on disk. Register it immediately — no upload needed for local save.
                 if (System.IO.File.Exists(_screenRecordingPath))
                 {
                     var fileInfo = new System.IO.FileInfo(_screenRecordingPath);
                     System.Diagnostics.Debug.WriteLine($"Screen recording saved: {_screenRecordingPath} ({fileInfo.Length / 1024}KB)");
+
                     if (fileInfo.Length > 0)
                     {
+                        try { RecStatusText.Text = "SAVED ✅"; } catch { }
+
+                        // Register locally via the fast path (just a POST with the path, no file upload)
                         var fileName = System.IO.Path.GetFileName(_screenRecordingPath);
-                        await UploadRecordingAsync(_screenRecordingPath, fileName, _recordingSessionId);
+                        var registered = await RegisterRecordingLocallyAsync(_screenRecordingPath, fileName, _recordingSessionId);
+
+                        if (!registered)
+                        {
+                            // Fallback: fire-and-forget full upload in background
+                            _ = Task.Run(() => UploadRecordingInBackgroundAsync(_screenRecordingPath, fileName, _recordingSessionId));
+                        }
                     }
+                    else
+                    {
+                        try { RecStatusText.Text = "NO DATA"; } catch { }
+                    }
+                }
+                else
+                {
+                    try { RecStatusText.Text = "NO FILE"; } catch { }
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error stopping screen recording: {ex.Message}");
+                try { RecStatusText.Text = "ERROR"; } catch { }
             }
         }
 
-        private async Task UploadRecordingAsync(string filePath, string fileName, int sessionId)
+        /// <summary>
+        /// Fast path: registers the local file path directly in the WebAPI database
+        /// without uploading the file bytes (both app and API share the same disk).
+        /// </summary>
+        private async Task<bool> RegisterRecordingLocallyAsync(string filePath, string fileName, int sessionId)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                    client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
+
+                    var payload = new Dictionary<string, string>
+                    {
+                        { "filePath", filePath },
+                        { "fileName", fileName }
+                    };
+                    var content = new FormUrlEncodedContent(payload);
+                    var response = await client.PostAsync($"api/materials/session/{sessionId}/register", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Recording registered locally: {fileName}");
+                        return true;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Local registration failed ({response.StatusCode}), will fall back to upload");
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Local registration error: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Background upload (fire-and-forget). Uses streaming instead of ReadAllBytes
+        /// to avoid loading the entire video into RAM. Updates status text on completion.
+        /// </summary>
+        private async Task UploadRecordingInBackgroundAsync(string filePath, string fileName, int sessionId)
         {
             try
             {
@@ -383,15 +451,23 @@ namespace EduSyncAI
                 {
                     client.Timeout = TimeSpan.FromMinutes(10);
                     client.BaseAddress = new Uri($"{AppConfig.ServerUrl}/");
+
                     using (var content = new MultipartFormDataContent())
                     {
-                        var fileContent = new ByteArrayContent(System.IO.File.ReadAllBytes(filePath));
-                        fileContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("video/mp4");
-                        content.Add(fileContent, "file", fileName);
+                        // Stream the file instead of loading it all into RAM
+                        var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+                        var streamContent = new StreamContent(fileStream);
+                        streamContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("video/mp4");
+                        content.Add(streamContent, "file", fileName);
+
                         var response = await client.PostAsync($"api/materials/session/{sessionId}", content);
                         if (response.IsSuccessStatusCode)
                         {
                             System.Diagnostics.Debug.WriteLine($"Recording uploaded successfully: {fileName}");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                try { RecStatusText.Text = "UPLOADED ✅"; } catch { }
+                            }));
                         }
                         else
                         {
@@ -403,7 +479,7 @@ namespace EduSyncAI
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Recording upload error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Recording background upload error: {ex.Message}");
             }
         }
 

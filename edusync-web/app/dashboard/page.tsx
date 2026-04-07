@@ -30,9 +30,9 @@ function OverviewTab() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Courses', value: '—', icon: '🎓', bg: 'bg-[#FFF3E0]', color: 'text-[#FF6B35]' },
-            { label: 'Active Sessions', value: '—', icon: '📡', bg: 'bg-emerald-50', color: 'text-emerald-600' },
+            { label: 'Active Sessions', value: '—', icon: '📡', bg: 'bg-blue-50', color: 'text-blue-600' },
             { label: 'Total Students', value: '—', icon: '👥', bg: 'bg-blue-50', color: 'text-blue-600' },
-            { label: 'Whiteboards', value: '—', icon: '🖊️', bg: 'bg-purple-50', color: 'text-purple-600' },
+            { label: 'Whiteboards', value: '—', icon: '🖊️', bg: 'bg-blue-50', color: 'text-blue-600' },
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-md transition-shadow">
               <div className={`w-10 h-10 ${stat.bg} rounded-xl flex items-center justify-center text-xl mb-3`}>{stat.icon}</div>
@@ -48,10 +48,10 @@ function OverviewTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             { title: 'Course Management', desc: 'Create, edit, and manage your courses.', icon: '🎓', accent: 'border-[#FF6B35]/20 hover:border-[#FF6B35]/50' },
-            { title: 'Lecture Schedule', desc: 'View and manage your lecture schedule.', icon: '📅', accent: 'border-emerald-200 hover:border-emerald-400' },
-            { title: 'Lecture Preparation', desc: 'Upload materials and prepare for lectures.', icon: '📝', accent: 'border-purple-200 hover:border-purple-400' },
+            { title: 'Lecture Schedule', desc: 'View and manage your lecture schedule.', icon: '📅', accent: 'border-emerald-200 hover:border-blue-300' },
+            { title: 'Lecture Preparation', desc: 'Upload materials and prepare for lectures.', icon: '📝', accent: 'border-purple-200 hover:border-blue-300' },
             { title: 'Whiteboards Gallery', desc: 'View saved whiteboard drawings.', icon: '🖊️', accent: 'border-blue-200 hover:border-blue-400' },
-            { title: 'Attendance Records', desc: 'View student attendance.', icon: '📋', accent: 'border-amber-200 hover:border-amber-400' },
+            { title: 'Attendance Records', desc: 'View student attendance.', icon: '📋', accent: 'border-amber-200 hover:border-blue-300' },
           ].map((card, i) => (
             <div key={i} className={`bg-white rounded-2xl p-6 border-2 ${card.accent} hover:shadow-lg transition-all duration-300 h-full`}>
               <div className="text-3xl mb-4">{card.icon}</div>
@@ -122,27 +122,73 @@ interface LecturerCourseSlot {
   dotColor: string;
 }
 
-const LECTURER_COURSES: LecturerCourseSlot[] = [
-  { code: 'CSC301', title: 'Data Structures', days: [1, 3, 5], startTime: '08:00', endTime: '09:00', room: 'LT-A', color: '#7c3aed', bgColor: '#f3e8ff', dotColor: '#7c3aed' },
-  { code: 'CSC307', title: 'Software Eng.', days: [1, 3, 5], startTime: '10:00', endTime: '11:00', room: 'LT-C', color: '#ea580c', bgColor: '#ffedd5', dotColor: '#ea580c' },
-  { code: 'CSC311', title: 'Artificial Intelligence', days: [1, 3], startTime: '11:30', endTime: '12:30', room: 'LT-B', color: '#059669', bgColor: '#d1fae5', dotColor: '#059669' },
-  { code: 'EEE301', title: 'Signal Processing', days: [1, 3, 5], startTime: '14:00', endTime: '15:00', room: 'Lab-2', color: '#db2777', bgColor: '#fce7f3', dotColor: '#db2777' },
+const COURSE_COLORS = [
+    { color: '#2563EB', bgColor: '#DBEAFE', dotColor: '#2563EB' },
+    { color: '#0d9488', bgColor: '#ccfbf1', dotColor: '#0d9488' },
+    { color: '#ea580c', bgColor: '#ffedd5', dotColor: '#ea580c' },
+    { color: '#dc2626', bgColor: '#fee2e2', dotColor: '#dc2626' },
+    { color: '#4f46e5', bgColor: '#e0e7ff', dotColor: '#4f46e5' },
+    { color: '#059669', bgColor: '#d1fae5', dotColor: '#059669' },
+    { color: '#d97706', bgColor: '#fef3c7', dotColor: '#d97706' },
+    { color: '#db2777', bgColor: '#fce7f3', dotColor: '#db2777' },
+    { color: '#475569', bgColor: '#f1f5f9', dotColor: '#475569' },
+    { color: '#7c3aed', bgColor: '#ede9fe', dotColor: '#7c3aed' },
+];
+
+const DEFAULT_SLOTS = [
+    { days: [1, 3, 5], startTime: '08:00', endTime: '09:00', room: 'LT-A' },
+    { days: [1, 3],    startTime: '09:00', endTime: '10:00', room: 'LT-C' },
+    { days: [2, 4, 5], startTime: '08:00', endTime: '09:30', room: 'LT-B' },
+    { days: [1, 3, 5], startTime: '10:00', endTime: '11:00', room: 'Lab-1' },
+    { days: [2, 4],    startTime: '10:00', endTime: '11:00', room: 'LT-A' },
+    { days: [2, 4],    startTime: '11:30', endTime: '12:30', room: 'LT-C' },
+    { days: [1, 3],    startTime: '11:30', endTime: '12:30', room: 'Lab-2' },
+    { days: [2, 4, 5], startTime: '14:00', endTime: '15:00', room: 'LT-A' },
+    { days: [1, 3, 5], startTime: '14:00', endTime: '15:00', room: 'LT-B' },
+    { days: [2, 4],    startTime: '15:30', endTime: '17:00', room: 'LT-C' },
 ];
 
 const L_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const L_DAY_HEADERS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-function getLecturerCoursesForDate(date: Date): LecturerCourseSlot[] {
-  const dayOfWeek = date.getDay();
-  const semEnd = new Date(LECTURER_SEMESTER_START);
-  semEnd.setDate(semEnd.getDate() + LECTURER_SEMESTER_WEEKS * 7);
-  if (date < LECTURER_SEMESTER_START || date >= semEnd) return [];
-  return LECTURER_COURSES.filter(c => c.days.includes(dayOfWeek));
-}
-
 function ScheduleTab() {
+  const { lecturer } = useAuthStore();
   const [viewMonth, setViewMonth] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const [courses, setCourses] = useState<LecturerCourseSlot[]>([]);
+  const { data: rawCourses, isLoading } = useQuery({ 
+      queryKey: ['courses', lecturer?.id], 
+      queryFn: () => courseApi.getAll(lecturer?.id),
+      enabled: !!lecturer?.id
+  });
+
+  useEffect(() => {
+      if (rawCourses) {
+          const events: LecturerCourseSlot[] = rawCourses.map((c: any, i: number) => {
+              const colorSet = COURSE_COLORS[i % COURSE_COLORS.length];
+              const slot = DEFAULT_SLOTS[i % DEFAULT_SLOTS.length];
+              return {
+                  code: c.courseCode,
+                  title: c.courseName || c.courseTitle || 'Unknown Course',
+                  days: slot.days,
+                  startTime: slot.startTime,
+                  endTime: slot.endTime,
+                  room: slot.room,
+                  ...colorSet,
+              };
+          });
+          setCourses(events);
+      }
+  }, [rawCourses]);
+
+  const getLecturerCoursesForDate = (date: Date): LecturerCourseSlot[] => {
+      const dayOfWeek = date.getDay();
+      const semEnd = new Date(LECTURER_SEMESTER_START);
+      semEnd.setDate(semEnd.getDate() + LECTURER_SEMESTER_WEEKS * 7);
+      if (date < LECTURER_SEMESTER_START || date >= semEnd) return [];
+      return courses.filter(c => c.days.includes(dayOfWeek));
+  };
 
   const year = 2025;
   const month = viewMonth;
@@ -157,6 +203,10 @@ function ScheduleTab() {
   while (cells.length % 7 !== 0) cells.push(null);
 
   const selCourses = selectedDate ? getLecturerCoursesForDate(selectedDate) : [];
+
+  if (isLoading) {
+      return <div className="text-center py-12"><div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B35]" /><p className="mt-4 text-gray-600">Loading schedule...</p></div>;
+  }
 
   return (
     <div className="space-y-5 pb-10">
@@ -179,7 +229,7 @@ function ScheduleTab() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <h3 className="text-lg font-bold text-gray-900">{L_MONTH_NAMES[month]} {year}</h3>
-              <span className="text-xs bg-orange-100 text-[#FF6B35] font-bold px-2 py-0.5 rounded-full">{LECTURER_COURSES.length} courses</span>
+              <span className="text-xs bg-blue-600 text-[#FF6B35] font-bold px-2 py-0.5 rounded-full">{courses.length} courses</span>
             </div>
             <div className="flex items-center gap-1">
               <button onClick={() => setViewMonth(m => Math.max(0, m - 1))} disabled={viewMonth === 0} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
@@ -205,7 +255,7 @@ function ScheduleTab() {
               const dayIsToday = isToday(day);
               const isSel = selectedDate?.getDate() === day && selectedDate?.getMonth() === month;
               return (
-                <div key={day} onClick={() => setSelectedDate(date)} className={`min-h-[100px] p-1.5 border-b border-r border-gray-100 cursor-pointer transition-all hover:bg-orange-50/50 ${isSel ? 'bg-orange-50 ring-2 ring-[#FF6B35] ring-inset' : ''}`}>
+                <div key={day} onClick={() => setSelectedDate(date)} className={`min-h-[100px] p-1.5 border-b border-r border-gray-100 cursor-pointer transition-all hover:bg-blue-50/50 ${isSel ? 'bg-blue-50 ring-2 ring-[#FF6B35] ring-inset' : ''}`}>
                   <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${dayIsToday ? 'bg-[#FF6B35] text-white' : 'text-gray-700'}`}>{day}</div>
                   <div className="space-y-0.5">
                     {courses.slice(0, 3).map(c => (
@@ -235,7 +285,7 @@ function ScheduleTab() {
             <div className="grid grid-cols-7 gap-0.5 text-center">
               {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => <div key={d} className="text-[10px] font-bold text-gray-400 py-1">{d}</div>)}
               {cells.map((day, idx) => (
-                <button key={idx} onClick={() => day && setSelectedDate(new Date(year, month, day))} disabled={!day} className={`text-[11px] py-1 rounded-full font-medium transition-all ${!day ? 'invisible' : isToday(day!) ? 'bg-[#FF6B35] text-white font-bold' : selectedDate?.getDate() === day && selectedDate?.getMonth() === month ? 'bg-orange-100 text-[#FF6B35] font-bold' : 'text-gray-600 hover:bg-orange-50'}`}>{day || ''}</button>
+                <button key={idx} onClick={() => day && setSelectedDate(new Date(year, month, day))} disabled={!day} className={`text-[11px] py-1 rounded-full font-medium transition-all ${!day ? 'invisible' : isToday(day!) ? 'bg-[#FF6B35] text-white font-bold' : selectedDate?.getDate() === day && selectedDate?.getMonth() === month ? 'bg-blue-600 text-[#FF6B35] font-bold' : 'text-gray-600 hover:bg-blue-50'}`}>{day || ''}</button>
               ))}
             </div>
           </div>
@@ -244,7 +294,7 @@ function ScheduleTab() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-bold text-gray-900">{selectedDate ? `${L_DAY_HEADERS[selectedDate.getDay()]}, ${L_MONTH_NAMES[selectedDate.getMonth()]} ${selectedDate.getDate()}` : 'Today\'s Classes'}</h4>
-              <span className="text-[10px] font-bold text-[#FF6B35] bg-orange-50 px-2 py-0.5 rounded-full">{selCourses.length || getLecturerCoursesForDate(today).length} classes</span>
+              <span className="text-[10px] font-bold text-[#FF6B35] bg-blue-50 px-2 py-0.5 rounded-full">{selCourses.length || getLecturerCoursesForDate(today).length} classes</span>
             </div>
             <div className="space-y-2">
               {(selCourses.length > 0 ? selCourses : getLecturerCoursesForDate(today)).map(c => (
@@ -267,7 +317,7 @@ function ScheduleTab() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
             <h4 className="text-sm font-bold text-gray-900 mb-3">My Teaching Load</h4>
             <div className="space-y-2">
-              {LECTURER_COURSES.map(c => (
+              {courses.map(c => (
                 <div key={c.code} className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
                   <span className="text-[11px] font-bold text-gray-700">{c.code}</span>

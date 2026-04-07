@@ -1,0 +1,33 @@
+=== MERGING WITH CORRECT SCHEMA ===
+
+=== FINAL COUNTS ===
+Lecturers: 5
+Students: 2
+Courses: 3
+ModelAssets: 3
+Admins: 1
+
+=== DETAIL ===
+Lecturers:
+5|newlecturer|lecturer
+6|testlecturer|Test Lecturer
+7|Bamidele|Bamidele
+8|kami|kami kaze
+9|testlecturer|Test Lecturer
+Students:
+1|2017/123456|Cyril Jeremiah
+2|2022/123456|Namikaze
+Courses:
+1|course 101|computer basics 
+2|contp 101|contuner science 
+4|CSC301|Data Structures
+ModelAssets:
+1|Test Model|Biology
+2|NGINX Test|Physics
+3|Human Skeleton|Biology
+
+API RESTARTED
+MERGE COMPLETE
+
+STDERR:
+Parse error near line 36: table Lectures has no column named LecturerId

@@ -24,6 +24,12 @@ namespace EduSyncAI.WebAPI.Data
         public DbSet<StudentWeeklySummary> StudentWeeklySummaries { get; set; }
         public DbSet<AttendanceRecord> Attendance { get; set; }
         public DbSet<Model3DAsset> ModelAssets { get; set; }
+        
+        // Academic Hierarchy
+        public DbSet<Faculty> Faculties { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<YearOfStudy> YearsOfStudy { get; set; }
+        public DbSet<CourseVideo> CourseVideos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,10 +50,29 @@ namespace EduSyncAI.WebAPI.Data
             modelBuilder.Entity<StudentWeeklySummary>().ToTable("StudentWeeklySummaries");
             modelBuilder.Entity<AttendanceRecord>().ToTable("Attendance");
             modelBuilder.Entity<Model3DAsset>().ToTable("ModelAssets");
-            
+
             // Ignore navigation properties to prevent EF from trying to load them
             modelBuilder.Entity<Course>().Ignore(c => c.Enrollments);
             modelBuilder.Entity<Course>().Ignore(c => c.Sessions);
+            
+            // New Hierarchy Entities
+            modelBuilder.Entity<Faculty>().ToTable("Faculties");
+            modelBuilder.Entity<Department>().ToTable("Departments");
+            modelBuilder.Entity<YearOfStudy>().ToTable("YearsOfStudy");
+            modelBuilder.Entity<CourseVideo>().ToTable("CourseVideos");
+            
+            // Explicit Foreign Keys
+            modelBuilder.Entity<YearOfStudy>()
+                .HasMany(y => y.Courses)
+                .WithOne(c => c.YearOfStudy)
+                .HasForeignKey(c => c.YearOfStudyId)
+                .IsRequired(false);
+                
+            modelBuilder.Entity<YearOfStudy>()
+                .HasMany<Student>()
+                .WithOne(s => s.YearOfStudy)
+                .HasForeignKey(s => s.YearOfStudyId)
+                .IsRequired(false);
         }
     }
 }

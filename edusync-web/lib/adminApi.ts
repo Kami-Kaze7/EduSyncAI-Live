@@ -72,6 +72,7 @@ export const adminApi = {
         fullName: string;
         email?: string;
         password?: string;
+        yearOfStudyId?: number;
     }) => {
         const token = localStorage.getItem('adminToken');
         const response = await axios.post(`${API_BASE_URL}/admin/students`, data, {
@@ -80,10 +81,13 @@ export const adminApi = {
         return response.data;
     },
 
-    importStudents: async (file: File) => {
+    importStudents: async (file: File, yearOfStudyId?: number) => {
         const token = localStorage.getItem('adminToken');
         const formData = new FormData();
         formData.append('file', file);
+        if (yearOfStudyId) {
+            formData.append('yearOfStudyId', yearOfStudyId.toString());
+        }
         const response = await axios.post(
             `${API_BASE_URL}/admin/students/import`,
             formData,
@@ -142,6 +146,14 @@ export const adminApi = {
         });
     },
 
+    assignLecturerToCourse: async (courseId: number, lecturerId: number) => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.put(`${API_BASE_URL}/admin/course-assign-lecturer`, { courseId, lecturerId }, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
     // 3D Repository
     upload3DModelAsset: async (data: {
         title: string;
@@ -172,4 +184,75 @@ export const adminApi = {
         );
         return response.data;
     },
+
+    // Academic Hierarchy
+    getFaculties: async () => {
+        const response = await axios.get(`${API_BASE_URL}/AcademicHierarchy/faculties`);
+        return response.data;
+    },
+    createFaculty: async (name: string) => {
+        const response = await axios.post(`${API_BASE_URL}/AcademicHierarchy/faculties`, { name });
+        return response.data;
+    },
+    getDepartments: async (facultyId: number) => {
+        const response = await axios.get(`${API_BASE_URL}/AcademicHierarchy/faculties/${facultyId}/departments`);
+        return response.data;
+    },
+    createDepartment: async (facultyId: number, name: string) => {
+        const response = await axios.post(`${API_BASE_URL}/AcademicHierarchy/faculties/${facultyId}/departments`, { name });
+        return response.data;
+    },
+    getYears: async (departmentId: number) => {
+        const response = await axios.get(`${API_BASE_URL}/AcademicHierarchy/departments/${departmentId}/years`);
+        return response.data;
+    },
+    createYear: async (departmentId: number, name: string, level: number) => {
+        const response = await axios.post(`${API_BASE_URL}/AcademicHierarchy/departments/${departmentId}/years`, { name, level });
+        return response.data;
+    },
+    assignCourseToYear: async (yearId: number, courseId: number) => {
+        const response = await axios.post(`${API_BASE_URL}/AcademicHierarchy/years/${yearId}/courses/${courseId}`);
+        return response.data;
+    },
+    getHierarchyTree: async () => {
+        const response = await axios.get(`${API_BASE_URL}/AcademicHierarchy/tree`);
+        return response.data;
+    },
+
+    // Inline course management within Academic Structure
+    updateCourse: async (courseId: number, data: { courseCode?: string; courseTitle?: string }) => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.put(`${API_BASE_URL}/AcademicHierarchy/courses/${courseId}`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+    addCourseToYear: async (yearId: number, data?: { courseCode?: string; courseTitle?: string }) => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.post(`${API_BASE_URL}/AcademicHierarchy/years/${yearId}/courses`, data || {}, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+    deleteCourseFromYear: async (courseId: number) => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.delete(`${API_BASE_URL}/AcademicHierarchy/courses/${courseId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    // Course Videos
+    getCourseVideos: async (courseId: number) => {
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/course/${courseId}`);
+        return response.data;
+    },
+    addCourseVideo: async (courseId: number, data: { title: string; description: string; videoUrl: string }) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/course/${courseId}`, data);
+        return response.data;
+    },
+    deleteCourseVideo: async (videoId: number) => {
+        const response = await axios.delete(`${API_BASE_URL}/CourseVideos/${videoId}`);
+        return response.data;
+    }
 };

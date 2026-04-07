@@ -19,7 +19,7 @@ export default function AttendanceOverviewPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
         );
     }
@@ -34,7 +34,7 @@ export default function AttendanceOverviewPage() {
                             <ArrowLeftIcon className="h-6 w-6" />
                         </Link>
                         <div className="flex items-center space-x-3">
-                            <ClipboardDocumentCheckIcon className="h-8 w-8 text-indigo-600" />
+                            <ClipboardDocumentCheckIcon className="h-8 w-8 text-blue-600" />
                             <h1 className="text-2xl font-bold text-gray-900">Attendance Records</h1>
                         </div>
                     </div>
@@ -79,7 +79,7 @@ export default function AttendanceOverviewPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center text-sm font-semibold text-indigo-600">
+                                                <div className="flex items-center text-sm font-semibold text-blue-600">
                                                     <UserGroupIcon className="h-4 w-4 mr-1.5" />
                                                     {session.attendanceCount || 0}
                                                 </div>
@@ -87,7 +87,7 @@ export default function AttendanceOverviewPage() {
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <Link
                                                     href={`/lectures/${session.id}`}
-                                                    className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-md transition-colors"
+                                                    className="text-blue-600 hover:text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md transition-colors"
                                                 >
                                                     View List
                                                 </Link>

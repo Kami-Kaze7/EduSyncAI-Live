@@ -11,10 +11,10 @@ namespace EduSyncAI
         // ===== TOGGLE THIS FOR LOCAL vs REMOTE =====
         // Set to true to use the remote Contabo VPS server
         // Set to false to use localhost for development
-        public static bool UseRemoteServer = true;
+        public static bool UseRemoteServer = false;
 
         private const string LocalServer = "http://localhost:5152";
-        private const string RemoteServer = "https://173-212-248-253.nip.io";
+        private const string RemoteServer = "https://62-171-138-230.nip.io";
 
         /// <summary>
         /// Base server URL (e.g., "http://173.212.248.253" or "http://localhost:5152")

@@ -257,6 +257,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Button x:Name="ImageButton" Content="🖼️ Image" Click="ImageButton_Click" Style="{StaticResource ToolButtonStyle}" Background="#16A085" Foreground="White" BorderThickness="0"/>
                                         <Button x:Name="DocumentButton" Content="📄 Document" Click="DocumentButton_Click" Style="{StaticResource ToolButtonStyle}" Background="#2980B9" Foreground="White" BorderThickness="0"/>
+                                        <Button x:Name="StickyNoteButton" Content="📌 Note" Click="StickyNoteButton_Click" Style="{StaticResource ToolButtonStyle}" Background="#F1C40F" Foreground="#2C3E50" BorderThickness="0" ToolTip="Add a Sticky Note"/>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -440,6 +441,11 @@
                                     MouseDown="Shapes3DOverlay_MouseDown"
                                     MouseMove="Shapes3DOverlay_MouseMove"
                                     MouseUp="Shapes3DOverlay_MouseUp"/>
+
+                            <!-- Sticky Notes Overlay — above ink canvas so embedded InkCanvases receive strokes -->
+                            <Canvas x:Name="StickyNotesCanvas" 
+                                    IsHitTestVisible="True"
+                                    Panel.ZIndex="20"/>
 
                             <!-- Status indicator -->
                             <Border HorizontalAlignment="Left" VerticalAlignment="Top" 

@@ -63,18 +63,36 @@ namespace EduSyncAI.WebAPI.Controllers
 
         // GET: api/admin/lecturers
         [HttpGet("lecturers")]
-        public async Task<ActionResult<IEnumerable<Lecturer>>> GetLecturers()
+        public async Task<ActionResult<IEnumerable<object>>> GetLecturers()
         {
             try
             {
                 var lecturers = await _context.Lecturers.ToListAsync();
-                return Ok(lecturers.Select(l => new
-                {
-                    l.Id,
-                    l.Username,
-                    l.FullName,
-                    l.Email,
-                    l.IsActive
+                var courses = await _context.Courses
+                    .Include(c => c.YearOfStudy)
+                        .ThenInclude(y => y.Department)
+                            .ThenInclude(d => d.Faculty)
+                    .ToListAsync();
+                
+                return Ok(lecturers.Select(l => {
+                    var lecturerCourses = courses.Where(c => c.LecturerId == l.Id).ToList();
+                    var primaryCourse = lecturerCourses.FirstOrDefault();
+                    
+                    return new
+                    {
+                        id = l.Id,
+                        username = l.Username,
+                        fullName = l.FullName,
+                        email = l.Email,
+                        isActive = l.IsActive,
+                        faculty = primaryCourse?.YearOfStudy?.Department?.Faculty?.Name ?? "Unassigned",
+                        department = primaryCourse?.YearOfStudy?.Department?.Name ?? "Unassigned",
+                        courses = lecturerCourses.Select(c => new {
+                            code = c.CourseCode,
+                            name = c.CourseName,
+                            year = c.YearOfStudy?.Level ?? 0
+                        }).ToList()
+                    };
                 }));
             }
             catch (Exception ex)
@@ -309,18 +327,28 @@ namespace EduSyncAI.WebAPI.Controllers
 
         // GET: api/admin/students
         [HttpGet("students")]
-        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
+        public async Task<ActionResult> GetStudents()
         {
             try
             {
-                var students = await _context.Students.ToListAsync();
+                var students = await _context.Students
+                    .Include(s => s.YearOfStudy)
+                        .ThenInclude(y => y.Department)
+                            .ThenInclude(d => d.Faculty)
+                    .ToListAsync();
+                    
                 return Ok(students.Select(s => new
                 {
                     s.Id,
                     s.MatricNumber,
                     s.FullName,
                     s.Email,
-                    s.IsActive
+                    s.IsActive,
+                    FacultyName = s.YearOfStudy?.Department?.Faculty?.Name,
+                    DepartmentName = s.YearOfStudy?.Department?.Name,
+                    YearName = s.YearOfStudy?.Name,
+                    YearLevel = s.YearOfStudy?.Level,
+                    YearOfStudyId = s.YearOfStudyId
                 }));
             }
             catch (Exception ex)
@@ -353,11 +381,17 @@ namespace EduSyncAI.WebAPI.Controllers
                     FullName = request.FullName,
                     Email = request.Email ?? "",
                     PasswordHash = HashPassword(password),
-                    IsActive = true
+                    IsActive = true,
+                    YearOfStudyId = request.YearOfStudyId
                 };
 
                 _context.Students.Add(student);
                 await _context.SaveChangesAsync();
+
+                if (request.YearOfStudyId.HasValue)
+                {
+                    await EnrollStudentInYearCourses(student.Id, request.YearOfStudyId.Value);
+                }
 
                 return Ok(new
                 {
@@ -377,7 +411,7 @@ namespace EduSyncAI.WebAPI.Controllers
 
         // POST: api/admin/students/import
         [HttpPost("students/import")]
-        public async Task<ActionResult> ImportStudents([FromForm] IFormFile file)
+        public async Task<ActionResult> ImportStudents([FromForm] IFormFile file, [FromForm] int? yearOfStudyId)
         {
             try
             {
@@ -396,6 +430,8 @@ namespace EduSyncAI.WebAPI.Controllers
                     {
                         var worksheet = package.Workbook.Worksheets[0];
                         var rowCount = worksheet.Dimension?.Rows ?? 0;
+
+                        var studentsToEnroll = new List<Student>();
 
                         for (int row = 2; row <= rowCount; row++)
                         {
@@ -422,10 +458,12 @@ namespace EduSyncAI.WebAPI.Controllers
                                 FullName = fullName,
                                 Email = "",
                                 PasswordHash = HashPassword(password),
-                                IsActive = true
+                                IsActive = true,
+                                YearOfStudyId = yearOfStudyId
                             };
 
                             _context.Students.Add(student);
+                            studentsToEnroll.Add(student);
                             results.Add(new
                             {
                                 matricNumber,
@@ -435,6 +473,14 @@ namespace EduSyncAI.WebAPI.Controllers
                         }
 
                         await _context.SaveChangesAsync();
+                        
+                        if (yearOfStudyId.HasValue)
+                        {
+                            foreach (var s in studentsToEnroll)
+                            {
+                                await EnrollStudentInYearCourses(s.Id, yearOfStudyId.Value);
+                            }
+                        }
                     }
                 }
 
@@ -538,7 +584,11 @@ namespace EduSyncAI.WebAPI.Controllers
         {
             try
             {
-                var courses = await _context.Courses.ToListAsync();
+                var courses = await _context.Courses
+                    .Include(c => c.YearOfStudy)
+                        .ThenInclude(y => y.Department)
+                            .ThenInclude(d => d.Faculty)
+                    .ToListAsync();
                 var lecturers = await _context.Lecturers.ToListAsync();
 
                 var result = courses.Select(c => new
@@ -551,7 +601,13 @@ namespace EduSyncAI.WebAPI.Controllers
                     c.LecturerId,
                     c.SyllabusPath,
                     c.CreatedAt,
-                    lecturerName = lecturers.FirstOrDefault(l => l.Id == c.LecturerId)?.FullName ?? "Unassigned"
+                    lecturerName = lecturers.FirstOrDefault(l => l.Id == c.LecturerId)?.FullName ?? "Unassigned",
+                    // Hierarchy info
+                    yearName = c.YearOfStudy?.Name,
+                    yearLevel = c.YearOfStudy?.Level ?? 0,
+                    departmentName = c.YearOfStudy?.Department?.Name ?? "Unassigned",
+                    facultyName = c.YearOfStudy?.Department?.Faculty?.Name ?? "Unassigned",
+                    yearOfStudyId = c.YearOfStudyId
                 });
 
                 return Ok(result);
@@ -560,6 +616,31 @@ namespace EduSyncAI.WebAPI.Controllers
             {
                 _logger.LogError(ex, "Error fetching courses");
                 return StatusCode(500, new { error = "Failed to fetch courses" });
+            }
+        }
+
+        // PUT: api/admin/course-assign-lecturer
+        [HttpPut("course-assign-lecturer")]
+        public async Task<ActionResult> AssignLecturerToCourse([FromBody] AssignLecturerRequest request)
+        {
+            try
+            {
+                var course = await _context.Courses.FindAsync(request.CourseId);
+                if (course == null) return NotFound(new { error = "Course not found" });
+
+                var lecturer = await _context.Lecturers.FindAsync(request.LecturerId);
+                if (lecturer == null) return NotFound(new { error = "Lecturer not found" });
+
+                course.LecturerId = request.LecturerId;
+                _context.Entry(course).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Lecturer assigned successfully.", courseId = course.Id, lecturerName = lecturer.FullName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error assigning lecturer");
+                return StatusCode(500, new { error = "Failed to assign lecturer" });
             }
         }
 
@@ -751,6 +832,42 @@ namespace EduSyncAI.WebAPI.Controllers
         }
 
         // Helper methods
+        private async Task EnrollStudentInYearCourses(int studentId, int yearOfStudyId)
+        {
+            var courses = await _context.Courses
+                .Where(c => c.YearOfStudyId == yearOfStudyId)
+                .ToListAsync();
+
+            foreach (var course in courses)
+            {
+                var exists = await _context.CourseEnrollments
+                    .AnyAsync(e => e.CourseId == course.Id && e.StudentId == studentId);
+                if (!exists)
+                {
+                    _context.CourseEnrollments.Add(new CourseEnrollment
+                    {
+                        CourseId = course.Id,
+                        StudentId = studentId,
+                        EnrolledAt = DateTime.UtcNow
+                    });
+
+                    var existingSummaries = await _context.WeeklySummaries
+                        .Where(ws => ws.CourseId == course.Id)
+                        .ToListAsync();
+                    foreach (var summary in existingSummaries)
+                    {
+                        _context.StudentWeeklySummaries.Add(new StudentWeeklySummary
+                        {
+                            StudentId = studentId,
+                            WeeklySummaryId = summary.Id,
+                            SentAt = DateTime.UtcNow
+                        });
+                    }
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -810,6 +927,7 @@ namespace EduSyncAI.WebAPI.Controllers
         public string FullName { get; set; } = string.Empty;
         public string? Email { get; set; }
         public string? Password { get; set; }
+        public int? YearOfStudyId { get; set; }
     }
 
     public class CreateAdminCourseRequest
@@ -818,6 +936,12 @@ namespace EduSyncAI.WebAPI.Controllers
         public string CourseName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public int CreditHours { get; set; } = 3;
+        public int LecturerId { get; set; }
+    }
+
+    public class AssignLecturerRequest
+    {
+        public int CourseId { get; set; }
         public int LecturerId { get; set; }
     }
 }

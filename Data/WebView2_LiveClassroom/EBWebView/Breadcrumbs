@@ -1,157 +1,3 @@
-0:00:05 Tab1 FinishNav3
-0:00:38 Media.Hidden
-0:00:39 Memory Pressure: Critical
-0:01:08 Media.Shown
-0:01:15 Tab1 StartNav4 #typed
-0:01:15 Tab1 FinishNav4
-0:01:15 Tab1 PageLoad
-0:01:18 Media.Hidden
-0:01:19 Memory Pressure: Critical
-0:05:50 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:01 Tab1 FinishNav2
-0:00:03 Tab1 PageLoad
-0:00:05 Tab1 StartNav3 #renderer-user #link
-0:00:05 Tab1 FinishNav3
-0:02:25 Media.Hidden
-0:02:26 Memory Pressure: Critical
-0:25:35 Media.Shown
-0:25:46 Tab1 StartNav4 #typed
-0:25:46 Tab1 FinishNav4
-0:25:46 Tab1 PageLoad
-0:25:56 Media.Hidden
-0:25:57 Memory Pressure: Critical
-0:26:14 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:01 Tab1 FinishNav2
-0:00:03 Tab1 PageLoad
-0:00:05 Tab1 StartNav3 #renderer-script #link
-0:00:05 Tab1 FinishNav3
-0:00:16 Media.Hidden
-0:00:17 Memory Pressure: Critical
-0:03:07 Media.Shown
-0:03:13 Tab1 StartNav4 #typed
-0:03:13 Tab1 FinishNav4
-0:03:13 Tab1 PageLoad
-0:03:19 Media.Hidden
-0:03:20 Memory Pressure: Critical
-0:03:39 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:01 Tab1 FinishNav2
-0:00:04 Tab1 PageLoad
-0:00:06 Tab1 StartNav3 #renderer-user #link
-0:00:06 Tab1 FinishNav3
-0:00:26 Tab1 StartNav4 #typed
-0:00:26 Tab1 FinishNav4
-0:00:26 Tab1 PageLoad
-0:00:32 Media.Hidden
-0:00:33 Memory Pressure: Critical
-0:01:14 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:01 Tab1 FinishNav2
-0:00:04 Tab1 PageLoad
-0:00:06 Tab1 StartNav3 #renderer-script #link
-0:00:06 Tab1 FinishNav3
-0:00:19 Media.Hidden
-0:00:20 Memory Pressure: Critical
-0:00:50 Media.Shown
-0:03:06 Tab1 StartNav4 #renderer-user #link
-0:03:06 Tab1 FinishNav4 ERR_ABORTED
-0:03:06 Tab1 StartNav5 #typed
-0:03:06 Microsoft.PipelineStatus.ReportNonSuccess
-0:03:06 Microsoft.PipelineStatus.ReportNonSuccess
-0:03:06 Microsoft.PipelineStatus.ReportNonSuccess
-0:03:06 Tab1 FinishNav5
-0:03:06 Tab1 PageLoad
-0:03:09 Media.Hidden
-0:03:10 Memory Pressure: Critical
-0:03:19 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:01 Tab1 FinishNav2
-0:00:04 Tab1 PageLoad
-0:00:06 Tab1 StartNav3 #renderer-user #link
-0:00:06 Tab1 FinishNav3
-0:02:12 Tab1 StartNav4 #typed
-0:02:12 Tab1 FinishNav4
-0:02:12 Tab1 PageLoad
-0:02:17 Media.Hidden
-0:02:18 Memory Pressure: Critical
-0:03:21 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
-0:00:00 Startup
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
-0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
-0:00:00 Microsoft.NewBrowser_Popup
-0:00:00 Microsoft.BrowserList.AddBrowser
-0:00:00 Browser1 Insert active Tab1 at 0
-0:00:00 Tab1 StartNav1 #auto_toplevel
-0:00:00 Tab1 StartNav2 #typed
-0:00:00 Tab1 FinishNav1
-0:00:00 Tab1 PageLoad
-0:00:01 Tab1 FinishNav2
-0:00:03 Tab1 PageLoad
-0:00:06 Tab1 StartNav3 #renderer-user #link
-0:00:06 Tab1 FinishNav3
-0:00:34 Tab1 StartNav4 #renderer-user #link
-0:00:34 Tab1 FinishNav4 ERR_ABORTED
-0:00:34 Tab1 StartNav5 #typed
-0:00:34 Tab1 FinishNav5
-0:00:34 Tab1 PageLoad
-0:00:39 Media.Hidden
-0:00:40 Memory Pressure: Critical
-0:00:42 Media.Shown
-0:00:42 Tab1 StartNav6 #typed
-0:00:43 Tab1 FinishNav6
-0:00:45 Tab1 PageLoad
-0:00:47 Tab1 StartNav7 #renderer-script #link
-0:00:47 Tab1 FinishNav7
-0:02:48 Media.Hidden
-0:02:49 Memory Pressure: Critical
-0:03:10 Media.Shown
 0:03:18 Tab1 StartNav8 #renderer-user #link
 0:03:18 Tab1 FinishNav8 ERR_ABORTED
 0:03:18 Tab1 StartNav9 #typed
@@ -160,3 +6,75 @@
 0:03:36 Media.Hidden
 0:03:37 Memory Pressure: Critical
 0:04:34 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+0:00:00 Startup
+0:00:00 Microsoft.DeleteProfileHelper.CleanUpEphemeralProfiles
+0:00:00 Microsoft.DeleteProfileHelper.CleanUpDeletedProfiles
+0:00:00 Microsoft.NewBrowser_Popup
+0:00:00 Microsoft.BrowserList.AddBrowser
+0:00:00 Browser1 Insert active Tab1 at 0
+0:00:00 Tab1 StartNav1 #auto_toplevel
+0:00:00 Tab1 StartNav2 #typed
+0:00:00 Tab1 FinishNav1
+0:00:00 Tab1 PageLoad
+0:00:22 Tab1 FinishNav2
+0:00:28 Tab1 PageLoad
+0:00:30 Tab1 StartNav3 #renderer-user #link
+0:00:30 Tab1 FinishNav3
+0:01:15 Tab1 StartNav4 #renderer-user #link
+0:01:15 Tab1 FinishNav4 ERR_ABORTED
+0:01:15 Tab1 StartNav5 #typed
+0:01:15 Microsoft.PipelineStatus.ReportNonSuccess
+0:01:15 Microsoft.PipelineStatus.ReportNonSuccess
+0:01:15 Tab1 FinishNav5
+0:01:15 Tab1 PageLoad
+0:01:20 Media.Hidden
+0:01:21 Memory Pressure: Critical
+0:02:13 Media.Shown
+0:02:13 Tab1 StartNav6 #typed
+0:02:14 Tab1 FinishNav6
+0:02:17 Tab1 PageLoad
+0:02:19 Tab1 StartNav7 #renderer-user #link
+0:02:19 Tab1 FinishNav7
+0:03:02 Media.Hidden
+0:03:03 Memory Pressure: Critical
+0:03:18 Tab1 StartNav8 #renderer-user #link
+0:03:19 Tab1 FinishNav8
+0:03:19 Tab1 StartNav9 #typed
+0:03:19 Tab1 PageLoad
+0:03:20 Tab1 FinishNav9
+0:03:20 Tab1 PageLoad
+0:04:17 Microsoft.NewBrowser_Popup
+0:04:17 Microsoft.BrowserList.AddBrowser
+0:04:17 Browser2 Insert active Tab2 at 0
+0:04:17 Tab2 StartNav10 #auto_toplevel
+0:04:17 Tab2 StartNav11 #typed
+0:04:17 Tab2 FinishNav10
+0:04:17 Tab2 PageLoad
+0:04:17 Tab2 FinishNav11
+0:04:20 Tab2 PageLoad
+0:04:21 Tab2 StartNav12 #renderer-script #link
+0:04:21 Tab2 FinishNav12
+0:07:05 Media.Hidden
+0:07:06 Memory Pressure: Critical
+0:07:31 Media.Shown
+0:07:38 Media.Hidden
+0:07:39 Memory Pressure: Critical
+0:08:32 Media.Shown
+0:09:18 Media.Hidden
+0:09:19 Memory Pressure: Critical
+0:10:11 Media.Shown
+0:10:22 Media.Hidden
+0:10:23 Memory Pressure: Critical
+0:22:58 Media.Shown
+0:23:05 Media.Hidden
+0:23:06 Memory Pressure: Critical
+0:23:52 Media.Shown
+0:23:55 Tab2 StartNav13 #renderer-user #link
+0:23:56 Tab2 FinishNav13
+0:23:56 Tab2 StartNav14 #typed
+0:23:56 Tab2 PageLoad
+0:23:56 Tab2 FinishNav14
+0:23:56 Tab2 PageLoad
+0:24:02 Media.Hidden
+0:24:03 Memory Pressure: Critical
+0:25:24 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp

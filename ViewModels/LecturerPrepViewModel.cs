@@ -83,7 +83,11 @@ namespace EduSyncAI
         {
             try
             {
-                var courses = _dbService.GetAllCourses();
+                var authService = new AuthenticationService();
+                var currentLecturer = authService.GetCurrentLecturer();
+                if (currentLecturer == null) return;
+
+                var courses = _dbService.GetCoursesByLecturer(currentLecturer.Id);
                 AvailableLectures.Clear();
                 
                 foreach (var course in courses)

@@ -13,7 +13,7 @@ export default function LecturesIndexPage() {
                             <ArrowLeftIcon className="h-6 w-6" />
                         </Link>
                         <div className="flex items-center space-x-3">
-                            <DocumentTextIcon className="h-8 w-8 text-purple-600" />
+                            <DocumentTextIcon className="h-8 w-8 text-blue-600" />
                             <h1 className="text-2xl font-bold text-gray-900">Lecture Preparation</h1>
                         </div>
                     </div>
@@ -30,7 +30,7 @@ export default function LecturesIndexPage() {
                     </p>
                     <Link
                         href="/schedule"
-                        className="inline-flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+                        className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
                     >
                         <span>Go to Schedule</span>
                         <span>→</span>

@@ -1,0 +1,148 @@
+===SERVICE_FILE===
+[Unit]
+Description=EduSync AI WebAPI
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/edusyncai/publish/webapi
+ExecStart=/root/.dotnet/dotnet /opt/edusyncai/publish/webapi/EduSyncAI.WebAPI.dll
+Restart=always
+RestartSec=10
+Environment=ASPNETCORE_URLS=http://localhost:5152
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_ROOT=/root/.dotnet
+
+[Install]
+WantedBy=multi-user.target
+===JOURNAL===
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]:       Now listening on: http://localhost:5152
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]: info: Microsoft.Hosting.Lifetime[0]
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]:       Application started. Press Ctrl+C to shut down.
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]: info: Microsoft.Hosting.Lifetime[0]
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]:       Hosting environment: Production
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]: info: Microsoft.Hosting.Lifetime[0]
+Mar 25 17:08:53 vmi3122170 dotnet[2721573]:       Content root path: /opt/edusyncai/publish/webapi
+Apr 03 08:35:19 vmi3122170 systemd[1]: Stopping edusyncai-api.service - EduSync AI WebAPI...
+Apr 03 08:35:19 vmi3122170 dotnet[2721573]: info: Microsoft.Hosting.Lifetime[0]
+Apr 03 08:35:19 vmi3122170 dotnet[2721573]:       Application is shutting down...
+Apr 03 08:35:19 vmi3122170 systemd[1]: edusyncai-api.service: Deactivated successfully.
+Apr 03 08:35:19 vmi3122170 systemd[1]: Stopped edusyncai-api.service - EduSync AI WebAPI.
+Apr 03 08:35:19 vmi3122170 systemd[1]: edusyncai-api.service: Consumed 23min 33.468s CPU time, 74.9M memory peak, 0B memory swap peak.
+Apr 03 08:35:19 vmi3122170 systemd[1]: Started edusyncai-api.service - EduSync AI WebAPI.
+Apr 03 08:35:21 vmi3122170 dotnet[3991151]: fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+Apr 03 08:35:21 vmi3122170 dotnet[3991151]:       Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+Apr 03 08:35:21 vmi3122170 dotnet[3991151]:       ALTER TABLE WeeklySummaries ADD COLUMN DayNumber INTEGER NOT NULL DEFAULT 1
+Apr 03 08:35:21 vmi3122170 dotnet[3991151]: 🔍 Database schema verification complete (all 14 tables checked).
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: ✅ EduSyncAI Web API starting...
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: 📁 Database: /opt/edusyncai/publish/webapi/../Data/edusync.db
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: 🌐 Swagger UI: http://localhost:5152/swagger
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: 📡 SignalR Hub: http://localhost:5152/hubs/classroom
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: info: Microsoft.Hosting.Lifetime[14]
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]:       Now listening on: http://localhost:5152
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: info: Microsoft.Hosting.Lifetime[0]
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]:       Application started. Press Ctrl+C to shut down.
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: info: Microsoft.Hosting.Lifetime[0]
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]:       Hosting environment: Production
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]: info: Microsoft.Hosting.Lifetime[0]
+Apr 03 08:35:22 vmi3122170 dotnet[3991151]:       Content root path: /opt/edusyncai/publish/webapi
+===NGINX_CONF===
+
+# HTTPS for nip.io domain (EduSync AI)
+server {
+    listen 443 ssl;
+    server_name 173-212-248-253.nip.io;
+
+    ssl_certificate /etc/letsencrypt/live/173-212-248-253.nip.io/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/173-212-248-253.nip.io/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    client_max_body_size 200M;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /api {
+        proxy_pass http://127.0.0.1:5005;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+# HTTP for nip.io + direct IP (redirect to HTTPS for nip.io, serve directly for IP)
+server {
+    listen 80;
+    server_name 173-212-248-253.nip.io;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 80;
+    server_name 173.212.248.253;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /api {
+        proxy_pass http://127.0.0.1:5005;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+# meet.viicsoft.dev
+server {
+    listen 80;
+    server_name meet.viicsoft.dev;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /api {
+        proxy_pass http://127.0.0.1:5005;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+===LISTENING_PORTS===
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                                                                                                                                                              
+LISTEN 0      200          0.0.0.0:5432       0.0.0.0:*    users:(("postgres",pid=177219,fd=6))                                                                                                                                                                
+LISTEN 0      512        127.0.0.1:5152       0.0.0.0:*    users:(("dotnet",pid=3991151,fd=301))                                                                                                                                                               
+LISTEN 0      4096       127.0.0.1:33589      0.0.0.0:*    users:(("containerd",pid=3152498,fd=9))                                                                                                                                                             
+LISTEN 0      511          0.0.0.0:443        0.0.0.0:*    users:(("nginx",pid=3975713,fd=5),("nginx",pid=3975712,fd=5),("nginx",pid=3975711,fd=5),("nginx",pid=3975710,fd=5),("nginx",pid=3975709,fd=5),("nginx",pid=3975708,fd=5),("nginx",pid=2432012,fd=5))
+LISTEN 0      511          0.0.0.0:80         0.0.0.0:*    users:(("nginx",pid=3975713,fd=6),("nginx",pid=3975712,fd=6),("nginx",pid=3975711,fd=6),("nginx",pid=3975710,fd=6),("nginx",pid=3975709,fd=6),("nginx",pid=3975708,fd=6),("nginx",pid=2432012,fd=6))
+LISTEN 0      4096         0.0.0.0:22         0.0.0.0:*    users:(("sshd",pid=309765,fd=3),("systemd",pid=1,fd=191))                                                                                                                                           
+LISTEN 0      4096      127.0.0.54:53         0.0.0.0:*    users:(("systemd-resolve",pid=2428241,fd=17))                                                                                                                                                       
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*    users:(("systemd-resolve",pid=2428241,fd=15))                                                                                                                                                       
+LISTEN 0      200             [::]:5432          [::]:*    users:(("postgres",pid=177219,fd=7))                                                                                                                                                                
+LISTEN 0      4096            [::]:22            [::]:*    users:(("sshd",pid=309765,fd=4),("systemd",pid=1,fd=192))                                                                                                                                           
+LISTEN 0      512            [::1]:5152          [::]:*    users:(("dotnet",pid=3991151,fd=302))                                                                                                                                                               
+LISTEN 0      511                *:3000             *:*    users:(("next-server (v1",pid=3868602,fd=21))                                                                                                                                                       
+===END===

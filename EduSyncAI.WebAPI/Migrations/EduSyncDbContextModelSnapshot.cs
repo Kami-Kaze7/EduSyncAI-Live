@@ -187,7 +187,12 @@ namespace EduSyncAI.WebAPI.Migrations
                     b.Property<string>("SyllabusPath")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("YearOfStudyId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("YearOfStudyId");
 
                     b.ToTable("Courses", (string)null);
                 });
@@ -249,6 +254,77 @@ namespace EduSyncAI.WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CourseSyllabi", (string)null);
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.CourseVideo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseVideos", (string)null);
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FacultyId");
+
+                    b.ToTable("Departments", (string)null);
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.Faculty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Faculties", (string)null);
                 });
 
             modelBuilder.Entity("EduSyncAI.WebAPI.Models.LectureMaterial", b =>
@@ -490,6 +566,29 @@ namespace EduSyncAI.WebAPI.Migrations
                     b.ToTable("WeeklySummaries", (string)null);
                 });
 
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.YearOfStudy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("YearsOfStudy", (string)null);
+                });
+
             modelBuilder.Entity("EduSyncAI.WebAPI.Models.ClassSession", b =>
                 {
                     b.HasOne("EduSyncAI.WebAPI.Models.Course", "Course")
@@ -499,6 +598,15 @@ namespace EduSyncAI.WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.Course", b =>
+                {
+                    b.HasOne("EduSyncAI.WebAPI.Models.YearOfStudy", "YearOfStudy")
+                        .WithMany("Courses")
+                        .HasForeignKey("YearOfStudyId");
+
+                    b.Navigation("YearOfStudy");
                 });
 
             modelBuilder.Entity("EduSyncAI.WebAPI.Models.CourseEnrollment", b =>
@@ -518,6 +626,28 @@ namespace EduSyncAI.WebAPI.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.CourseVideo", b =>
+                {
+                    b.HasOne("EduSyncAI.WebAPI.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.Department", b =>
+                {
+                    b.HasOne("EduSyncAI.WebAPI.Models.Faculty", "Faculty")
+                        .WithMany("Departments")
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
                 });
 
             modelBuilder.Entity("EduSyncAI.WebAPI.Models.LectureMaterial", b =>
@@ -561,11 +691,37 @@ namespace EduSyncAI.WebAPI.Migrations
                     b.Navigation("WeeklySummary");
                 });
 
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.YearOfStudy", b =>
+                {
+                    b.HasOne("EduSyncAI.WebAPI.Models.Department", "Department")
+                        .WithMany("YearsOfStudy")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
             modelBuilder.Entity("EduSyncAI.WebAPI.Models.ClassSession", b =>
                 {
                     b.Navigation("Materials");
 
                     b.Navigation("Notes");
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.Department", b =>
+                {
+                    b.Navigation("YearsOfStudy");
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.Faculty", b =>
+                {
+                    b.Navigation("Departments");
+                });
+
+            modelBuilder.Entity("EduSyncAI.WebAPI.Models.YearOfStudy", b =>
+                {
+                    b.Navigation("Courses");
                 });
 #pragma warning restore 612, 618
         }

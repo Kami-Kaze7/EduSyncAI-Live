@@ -9,6 +9,9 @@ namespace EduSyncAI.WebAPI.Models
         public string CourseTitle { get; set; } = string.Empty;
         public string? SyllabusPath { get; set; }
         
+        public int? YearOfStudyId { get; set; }
+        public virtual YearOfStudy? YearOfStudy { get; set; }
+        
         // API compatibility properties
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
         public string CourseName 
@@ -62,6 +65,9 @@ namespace EduSyncAI.WebAPI.Models
         public int? Age { get; set; }
         public string? Hobbies { get; set; }
         public string? Bio { get; set; }
+        
+        public int? YearOfStudyId { get; set; }
+        public virtual YearOfStudy? YearOfStudy { get; set; }
     }
 
     public class ClassSession
@@ -231,5 +237,48 @@ namespace EduSyncAI.WebAPI.Models
         public string StudentName { get; set; } = string.Empty;
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
         public string MatricNumber { get; set; } = string.Empty;
+    }
+
+    public class Faculty
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
+        public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
+    }
+
+    public class Department
+    {
+        public int Id { get; set; }
+        public int FacultyId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        
+        public virtual Faculty? Faculty { get; set; }
+        public virtual ICollection<YearOfStudy> YearsOfStudy { get; set; } = new List<YearOfStudy>();
+    }
+
+    public class YearOfStudy
+    {
+        public int Id { get; set; }
+        public int DepartmentId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int Level { get; set; }
+        
+        public virtual Department? Department { get; set; }
+        public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
+    }
+
+    public class CourseVideo
+    {
+        public int Id { get; set; }
+        public int CourseId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string VideoUrl { get; set; } = string.Empty;
+        public int OrderIndex { get; set; } = 0;
+        public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+        
+        public virtual Course? Course { get; set; }
     }
 }

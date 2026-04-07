@@ -101,11 +101,16 @@ namespace EduSyncAI
                 else
                 {
                     // Load courses from local DB
-                    var courses = _dbService.GetAllCourses();
-                    Courses.Clear();
-                    foreach (var course in courses)
+                    var authService = new AuthenticationService();
+                    var currentLecturer = authService.GetCurrentLecturer();
+                    if (currentLecturer != null)
                     {
-                        Courses.Add(course);
+                        var courses = _dbService.GetCoursesByLecturer(currentLecturer.Id);
+                        Courses.Clear();
+                        foreach (var course in courses)
+                        {
+                            Courses.Add(course);
+                        }
                     }
                 }
 
@@ -160,8 +165,15 @@ namespace EduSyncAI
                     Courses.Clear();
                     if (courses != null)
                     {
+                        var authService = new AuthenticationService();
+                        var currentLecturer = authService.GetCurrentLecturer();
+
                         foreach (var course in courses)
                         {
+                            if (currentLecturer != null && course.LecturerId != currentLecturer.Id)
+                            {
+                                continue;
+                            }
                             Console.WriteLine($"[COURSES] Found: {course.CourseCode} - {course.CourseTitle}");
                             Courses.Add(course);
                             // Sync into local DB so session creation foreign keys work
@@ -179,7 +191,10 @@ namespace EduSyncAI
             {
                 Console.WriteLine($"[COURSES] Error fetching remote courses: {ex.Message}");
                 // Fallback to local DB
-                var courses = _dbService.GetAllCourses();
+                var authService = new AuthenticationService();
+                var currentLecturer = authService.GetCurrentLecturer();
+                var courses = currentLecturer != null ? _dbService.GetCoursesByLecturer(currentLecturer.Id) : _dbService.GetAllCourses();
+                
                 Courses.Clear();
                 foreach (var course in courses)
                 {

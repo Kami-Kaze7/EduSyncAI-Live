@@ -6,5 +6,6 @@ namespace EduSyncAI
         public string CourseCode { get; set; }
         public string CourseTitle { get; set; }
         public string SyllabusPath { get; set; }
+        public int LecturerId { get; set; }
     }
 }

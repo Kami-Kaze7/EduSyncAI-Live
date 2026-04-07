@@ -312,7 +312,7 @@ export default function LandingPage() {
 
             {/* Student Portal */}
             <Link href="/student/login" className="group block">
-              <div className="relative bg-white border-2 border-gray-100 rounded-2xl p-10 text-center hover:border-emerald-400/40 hover:shadow-2xl transition-all duration-500 hover:scale-[1.03]">
+              <div className="relative bg-white border-2 border-gray-100 rounded-2xl p-10 text-center hover:border-blue-300/40 hover:shadow-2xl transition-all duration-500 hover:scale-[1.03]">
                 <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-400 flex items-center justify-center text-4xl shadow-lg shadow-emerald-500/20 group-hover:shadow-xl group-hover:shadow-emerald-500/30 transition-all duration-300">
                   👨‍🎓
                 </div>
@@ -320,7 +320,7 @@ export default function LandingPage() {
                 <p className="text-[#6B7280] text-sm mb-6 leading-relaxed">
                   Browse courses, join live classes, view materials, check attendance records, and more.
                 </p>
-                <div className="inline-flex items-center gap-2 text-emerald-500 font-semibold group-hover:gap-3 transition-all text-sm">
+                <div className="inline-flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all text-sm">
                   Open Dashboard <span className="text-lg">→</span>
                 </div>
               </div>
@@ -328,7 +328,7 @@ export default function LandingPage() {
 
             {/* Admin Portal */}
             <Link href="/admin/login" className="group block">
-              <div className="relative bg-white border-2 border-gray-100 rounded-2xl p-10 text-center hover:border-amber-400/40 hover:shadow-2xl transition-all duration-500 hover:scale-[1.03]">
+              <div className="relative bg-white border-2 border-gray-100 rounded-2xl p-10 text-center hover:border-blue-300/40 hover:shadow-2xl transition-all duration-500 hover:scale-[1.03]">
                 <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-400 flex items-center justify-center text-4xl shadow-lg shadow-amber-500/20 group-hover:shadow-xl group-hover:shadow-amber-500/30 transition-all duration-300">
                   🛡️
                 </div>
@@ -336,7 +336,7 @@ export default function LandingPage() {
                 <p className="text-[#6B7280] text-sm mb-6 leading-relaxed">
                   Manage lecturers, students, system settings, and oversee the entire platform.
                 </p>
-                <div className="inline-flex items-center gap-2 text-amber-500 font-semibold group-hover:gap-3 transition-all text-sm">
+                <div className="inline-flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all text-sm">
                   Open Dashboard <span className="text-lg">→</span>
                 </div>
               </div>

@@ -222,6 +222,73 @@ namespace EduSyncAI.WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Fast local registration: accepts a local file path and registers it in the DB
+        /// without uploading the file bytes. Used when the desktop app and WebAPI share
+        /// the same disk (localhost mode). This makes recording saves instantaneous.
+        /// </summary>
+        // POST: api/materials/session/5/register
+        [HttpPost("session/{sessionId}/register")]
+        public async Task<ActionResult<LectureMaterial>> RegisterLocalMaterial(
+            int sessionId,
+            [FromForm] string filePath,
+            [FromForm] string fileName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+                {
+                    return BadRequest(new { error = $"File not found at path: {filePath}" });
+                }
+
+                // Ensure the session exists
+                var session = await _context.ClassSessions.FindAsync(sessionId);
+                if (session == null)
+                {
+                    _logger.LogInformation("Session {SessionId} not found, creating placeholder for recording.", sessionId);
+                    var placeholder = new ClassSession
+                    {
+                        Id = sessionId,
+                        CourseId = 1,
+                        LectureId = 1,
+                        SessionState = "Ended",
+                        StartTime = DateTime.UtcNow.ToString("O"),
+                        EndTime = DateTime.UtcNow.ToString("O"),
+                        CreatedAt = DateTime.UtcNow.ToString("O"),
+                        Topic = "Desktop Recording Session"
+                    };
+                    _context.ClassSessions.Add(placeholder);
+                    await _context.SaveChangesAsync();
+                }
+
+                var fileInfo = new System.IO.FileInfo(filePath);
+
+                // Create database record pointing to the existing file on disk
+                var material = new LectureMaterial
+                {
+                    SessionId = sessionId,
+                    FileName = fileName,
+                    FilePath = Path.GetFullPath(filePath),
+                    FileType = Path.GetExtension(fileName),
+                    FileSize = fileInfo.Length,
+                    UploadedAt = DateTime.UtcNow
+                };
+
+                _context.LectureMaterials.Add(material);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Recording registered locally: {FileName} ({Size}KB) for session {SessionId}",
+                    fileName, fileInfo.Length / 1024, sessionId);
+
+                return CreatedAtAction(nameof(GetMaterial), new { id = material.Id }, material);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error registering local material for session {SessionId}", sessionId);
+                return StatusCode(500, new { error = $"Failed to register material: {ex.Message}" });
+            }
+        }
+
         // GET: api/materials/5
         [HttpGet("{id}")]
         public async Task<ActionResult<LectureMaterial>> GetMaterial(int id)

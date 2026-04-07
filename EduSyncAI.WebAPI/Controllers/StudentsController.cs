@@ -407,6 +407,7 @@ namespace EduSyncAI.WebAPI.Controllers
                 var lecturer = await _context.Lecturers.FindAsync(ec.Course.LecturerId);
                 result.Add(new
                 {
+                    id = ec.Course.Id,
                     courseCode = ec.Course.CourseCode,
                     courseTitle = ec.Course.CourseTitle,
                     lecturerName = lecturer?.FullName ?? "TBA",

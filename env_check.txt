@@ -1,0 +1,33 @@
+=== .env.local ===
+
+=== .env.production ===
+NEXT_PUBLIC_API_URL=https://173-212-248-253.nip.io/api
+API_SERVER_URL=https://173-212-248-253.nip.io
+
+=== .env ===
+
+=== next.config ===
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5152/api/:path*',
+      },
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:5152/uploads/:path*',
+      },
+    ];
+  },
+};
+
+export default nextConfig;
+
+=== Built client chunks with API URL ===
+
+=== VERIFY GET after POST ===
+[{"id":1,"title":"Test Model","description":"Test","discipline":"Biology","modelUrl":"http://127.0.0.1:5152/uploads/models/biology/e0a6a542-37de-4c35-b905-ca6f74ea19fa.obj","thumbnailUrl":"","uploadedAt":"2026-04-03T07:33:09.4727811"}]
+DONE

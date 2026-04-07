@@ -123,4 +123,12 @@ export const studentApi = {
         const response = await axios.get(`${API_BASE_URL}/stream/active`);
         return response.data;
     },
+
+    getCourseVideos: async (courseId: number) => {
+        const token = localStorage.getItem('studentToken');
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/course/${courseId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
 };

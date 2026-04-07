@@ -79,8 +79,17 @@ namespace EduSyncAI.Services
                 var response = await _httpClient.GetAsync(asset.ModelUrl);
                 response.EnsureSuccessStatusCode();
 
-                using var fs = new FileStream(localFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
-                await response.Content.CopyToAsync(fs);
+                using (var fs = new FileStream(localFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await response.Content.CopyToAsync(fs);
+                }
+
+                // For OBJ files, also try to download the companion .mtl file
+                // so HelixToolkit can load the model's original materials/colors
+                if (extension == ".obj")
+                {
+                    await TryDownloadCompanionMtlAsync(asset.ModelUrl, localFilePath);
+                }
 
                 return localFilePath;
             }
@@ -88,6 +97,69 @@ namespace EduSyncAI.Services
             {
                 Console.WriteLine($"[RepoService] Error downloading model '{asset.Title}': {ex.Message}");
                 return string.Empty;
+            }
+        }
+        /// <summary>
+        /// Attempts to download the .mtl companion file for an OBJ model.
+        /// Tries two strategies: replacing .obj with .mtl in the URL, and parsing
+        /// the OBJ file's mtllib directive for the actual MTL filename.
+        /// </summary>
+        private async Task TryDownloadCompanionMtlAsync(string objUrl, string localObjPath)
+        {
+            try
+            {
+                var localDir = Path.GetDirectoryName(localObjPath) ?? "";
+
+                // Strategy 1: Read the OBJ file and look for "mtllib <filename>.mtl"
+                string? mtlFileName = null;
+                foreach (var line in File.ReadLines(localObjPath))
+                {
+                    var trimmed = line.Trim();
+                    if (trimmed.StartsWith("mtllib ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        mtlFileName = trimmed.Substring(7).Trim();
+                        break;
+                    }
+                }
+
+                // Strategy 2: If no mtllib directive, try replacing .obj with .mtl in the URL
+                var urlsToTry = new List<(string url, string localName)>();
+                if (!string.IsNullOrEmpty(mtlFileName))
+                {
+                    // Build URL relative to the OBJ URL
+                    var baseUrl = objUrl.Substring(0, objUrl.LastIndexOf('/') + 1);
+                    urlsToTry.Add((baseUrl + mtlFileName, mtlFileName));
+                }
+                // Always also try the simple .obj -> .mtl replacement
+                var simpleMtlUrl = System.Text.RegularExpressions.Regex.Replace(objUrl, @"\.obj$", ".mtl", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (simpleMtlUrl != objUrl)
+                {
+                    var simpleMtlName = Path.GetFileNameWithoutExtension(localObjPath) + ".mtl";
+                    urlsToTry.Add((simpleMtlUrl, simpleMtlName));
+                }
+
+                foreach (var (mtlUrl, localName) in urlsToTry)
+                {
+                    var localMtlPath = Path.Combine(localDir, localName);
+                    if (File.Exists(localMtlPath)) break; // Already have it
+
+                    try
+                    {
+                        var mtlResponse = await _httpClient.GetAsync(mtlUrl);
+                        if (mtlResponse.IsSuccessStatusCode)
+                        {
+                            using var fs = new FileStream(localMtlPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                            await mtlResponse.Content.CopyToAsync(fs);
+                            Console.WriteLine($"[RepoService] Downloaded companion MTL: {localName}");
+                            break; // Got it, no need to try more URLs
+                        }
+                    }
+                    catch { /* MTL not available at this URL, try next */ }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[RepoService] Could not download MTL companion: {ex.Message}");
             }
         }
     }

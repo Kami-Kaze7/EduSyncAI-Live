@@ -196,7 +196,7 @@ export default function CourseDetailsPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     <p className="mt-4 text-gray-600">Loading course...</p>
                 </div>
             </div>
@@ -208,7 +208,7 @@ export default function CourseDetailsPage() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Course not found</h2>
-                    <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-800">
+                    <Link href="/dashboard" className="text-blue-600 hover:text-blue-600">
                         ← Back to dashboard
                     </Link>
                 </div>
@@ -239,7 +239,7 @@ export default function CourseDetailsPage() {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-bold text-gray-900">AI Syllabus Analysis</h2>
-                            <SparklesIcon className="h-6 w-6 text-purple-600" />
+                            <SparklesIcon className="h-6 w-6 text-blue-600" />
                         </div>
 
                         <div className="space-y-4">
@@ -254,14 +254,14 @@ export default function CourseDetailsPage() {
                             <button
                                 onClick={() => syllabusInputRef.current?.click()}
                                 disabled={analyzeSyllabusMutation.isPending}
-                                className="w-full flex items-center justify-center space-x-2 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                             >
                                 <DocumentArrowUpIcon className="h-5 w-5" />
                                 <span>{analyzeSyllabusMutation.isPending ? 'Analyzing...' : 'Upload & Analyze Syllabus'}</span>
                             </button>
 
                             {syllabusInfo && (
-                                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                                <div className="p-4 bg-blue-50 rounded-lg border border-purple-200">
                                     <p className="text-sm font-medium text-gray-900">📄 {syllabusInfo.fileName}</p>
                                     <p className="text-sm text-gray-600 mt-1">
                                         📊 {syllabusInfo.totalWeeks} weeks detected
@@ -321,13 +321,13 @@ export default function CourseDetailsPage() {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-bold text-gray-900">Student Enrollment</h2>
-                            <UsersIcon className="h-6 w-6 text-indigo-600" />
+                            <UsersIcon className="h-6 w-6 text-blue-600" />
                         </div>
 
                         <div className="space-y-3">
                             <button
                                 onClick={() => setShowStudentImport(true)}
-                                className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+                                className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors"
                             >
                                 <DocumentArrowUpIcon className="h-5 w-5" />
                                 <span>Import from Excel</span>
@@ -369,7 +369,7 @@ export default function CourseDetailsPage() {
                             <h2 className="text-xl font-bold text-gray-900">Enrolled Students</h2>
                             <p className="text-sm text-gray-500 mt-0.5">{enrollments?.length || 0} student{(enrollments?.length || 0) !== 1 ? 's' : ''} enrolled in this course</p>
                         </div>
-                        <UsersIcon className="h-6 w-6 text-indigo-500" />
+                        <UsersIcon className="h-6 w-6 text-blue-600" />
                     </div>
 
                     {enrollments && enrollments.length > 0 ? (
@@ -386,7 +386,7 @@ export default function CourseDetailsPage() {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
                                     {enrollments.map((enrollment: any, idx: number) => (
-                                        <tr key={enrollment.id} className="hover:bg-indigo-50 transition-colors">
+                                        <tr key={enrollment.id} className="hover:bg-blue-50 transition-colors">
                                             <td className="px-4 py-3 text-sm text-gray-400">{idx + 1}</td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
@@ -442,7 +442,7 @@ export default function CourseDetailsPage() {
                                     {summaries.map((summary: any) => (
                                         <tr key={summary.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-bold text-indigo-600">Week {summary.weekNumber}</div>
+                                                <div className="text-sm font-bold text-blue-600">Week {summary.weekNumber}</div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm font-medium text-gray-900">{summary.weekTitle}</div>
@@ -458,7 +458,7 @@ export default function CourseDetailsPage() {
                                                             setSelectedSummary(summary);
                                                             setShowSummaryView(true);
                                                         }}
-                                                        className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded-lg"
+                                                        className="text-blue-600 hover:text-blue-600 bg-blue-50 p-2 rounded-lg"
                                                         title="View Teaching Summary"
                                                     >
                                                         <EyeIcon className="h-5 w-5" />
@@ -558,7 +558,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                 <select
                                     value={selectedWeek}
                                     onChange={(e) => setSelectedWeek(parseInt(e.target.value))}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                 >
                                     {Array.from({ length: syllabusInfo.totalWeeks || 12 }, (_, i) => i + 1).map(week => (
                                         <option key={week} value={week}>Week {week}</option>
@@ -574,7 +574,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                 <button
                                     onClick={handleSummarize}
                                     disabled={summarizeWeekMutation.isPending}
-                                    className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                                 >
                                     {summarizeWeekMutation.isPending ? 'Generating...' : 'Generate Summary'}
                                 </button>
@@ -599,7 +599,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                         <div className="space-y-4">
                             <button
                                 onClick={downloadTemplate}
-                                className="w-full text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                className="w-full text-blue-600 hover:text-blue-600 text-sm font-medium"
                             >
                                 ↓ Download Excel Template
                             </button>
@@ -615,7 +615,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                             <button
                                 onClick={() => studentFileInputRef.current?.click()}
                                 disabled={importStudentsMutation.isPending}
-                                className="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                                className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                             >
                                 {importStudentsMutation.isPending ? 'Importing...' : 'Choose Excel File'}
                             </button>
@@ -651,7 +651,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                     required
                                     value={newStudent.fullName}
                                     onChange={(e) => setNewStudent({ ...newStudent, fullName: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -665,7 +665,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                     required
                                     value={newStudent.matricNumber}
                                     onChange={(e) => setNewStudent({ ...newStudent, matricNumber: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                     placeholder="MAT001"
                                 />
                             </div>
@@ -679,7 +679,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                     required
                                     value={newStudent.email}
                                     onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                     placeholder="john@example.com"
                                 />
                             </div>
@@ -688,7 +688,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                 <button
                                     type="submit"
                                     disabled={addStudentMutation.isPending}
-                                    className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                                 >
                                     {addStudentMutation.isPending ? 'Adding...' : 'Add Student'}
                                 </button>
@@ -732,7 +732,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                                 setSelectedStudentIds([]);
                                             }
                                         }}
-                                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-300"
                                     />
                                     <span className="text-xs text-gray-600">Select All</span>
                                 </label>
@@ -752,7 +752,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                                                         setSelectedStudentIds(selectedStudentIds.filter(id => id !== enrollment.studentId));
                                                     }
                                                 }}
-                                                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-300"
                                             />
                                             <div className="text-left">
                                                 <p className="text-sm font-medium text-gray-900">{enrollment.student?.fullName}</p>
@@ -794,10 +794,10 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
             {showSummaryView && selectedSummary && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
-                        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-indigo-50 rounded-t-xl">
+                        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-blue-50 rounded-t-xl">
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900">Weekly Summary</h2>
-                                <p className="text-sm text-indigo-600 font-medium">Week {selectedSummary.weekNumber}: {selectedSummary.weekTitle}</p>
+                                <p className="text-sm text-blue-600 font-medium">Week {selectedSummary.weekNumber}: {selectedSummary.weekTitle}</p>
                             </div>
                             <button
                                 onClick={() => {
@@ -868,7 +868,7 @@ Generated: ${new Date(summary.generatedAt).toLocaleString()}
                             {selectedSummary.preparationNotes && (
                                 <section>
                                     <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Preparation Notes</h3>
-                                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100 text-amber-800 text-sm italic">
+                                    <div className="bg-blue-50 p-4 rounded-lg border border-amber-100 text-blue-600 text-sm italic">
                                         {selectedSummary.preparationNotes}
                                     </div>
                                 </section>

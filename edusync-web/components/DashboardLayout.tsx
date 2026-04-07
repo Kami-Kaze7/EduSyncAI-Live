@@ -33,13 +33,6 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const roleColors = {
-    lecturer: { gradient: 'from-[#FF6B35] to-[#FFA07A]', light: 'bg-[#FFF3E0]', text: 'text-[#FF6B35]', ring: 'ring-[#FF6B35]' },
-    student: { gradient: 'from-emerald-500 to-[#FF6B35]', light: 'bg-emerald-50', text: 'text-emerald-600', ring: 'ring-emerald-500' },
-    admin: { gradient: 'from-amber-500 to-[#FF6B35]', light: 'bg-amber-50', text: 'text-amber-600', ring: 'ring-amber-500' },
-  };
-
-  const colors = roleColors[role];
   const roleLabel = role === 'lecturer' ? 'Lecturer' : role === 'student' ? 'Student' : 'Admin';
   const roleEmoji = role === 'lecturer' ? '👨‍🏫' : role === 'student' ? '👨‍🎓' : '🛡️';
 
@@ -47,7 +40,7 @@ export default function DashboardLayout({
   const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="h-screen bg-[#F5F6FA] flex overflow-hidden">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -61,10 +54,10 @@ export default function DashboardLayout({
         {/* Logo */}
         <div className="px-6 py-5 border-b border-gray-100">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#FF6B35] flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
               E
             </div>
-            <span className="text-base font-bold text-[#1A1A2E]">EduSync AI</span>
+            <span className="text-base font-bold text-gray-900">EduSync AI</span>
           </Link>
         </div>
 
@@ -81,8 +74,8 @@ export default function DashboardLayout({
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? `bg-[#FFF3E0] text-[#FF6B35]`
-                    : 'text-[#6B7280] hover:bg-gray-50 hover:text-[#1A1A2E]'
+                    ? `bg-blue-50 text-blue-600`
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -119,21 +112,21 @@ export default function DashboardLayout({
               </svg>
             </button>
             <div>
-              <h1 className="text-lg font-bold text-[#1A1A2E]">{roleLabel} Dashboard</h1>
-              <p className="text-xs text-[#9CA3AF]">{dateStr}</p>
+              <h1 className="text-lg font-bold text-gray-900">{roleLabel} Dashboard</h1>
+              <p className="text-xs text-gray-500">{dateStr}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {/* User info */}
             <div className="hidden sm:block text-right">
-              <p className="text-sm font-semibold text-[#1A1A2E]">{userName}</p>
-              <p className="text-xs text-[#9CA3AF]">{roleLabel}</p>
+              <p className="text-sm font-semibold text-gray-900">{userName}</p>
+              <p className="text-xs text-gray-500">{roleLabel}</p>
             </div>
             {profileImage ? (
               <img src={profileImage} alt={userName} className="w-9 h-9 rounded-full object-cover border border-gray-200" />
             ) : (
-              <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${colors.gradient} flex items-center justify-center text-white text-sm font-bold`}>
+              <div className={`w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold`}>
                 {userName.charAt(0).toUpperCase()}
               </div>
             )}
@@ -151,27 +144,6 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* Welcome Banner */}
-        <div className="px-4 lg:px-8 pt-6">
-          <div className={`bg-gradient-to-r ${colors.gradient} rounded-2xl p-6 lg:p-8 flex items-center justify-between overflow-hidden relative`}>
-            <div className="relative z-10">
-              <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-1">
-                Hi, {userName.split(' ')[0]}! 👋
-              </h2>
-              <p className="text-white/80 text-sm">
-                Ready to start your day? Here&apos;s your {roleLabel.toLowerCase()} overview.
-              </p>
-            </div>
-            {profileImage ? (
-              <img src={profileImage} alt={userName} className="w-24 h-24 lg:w-28 lg:h-28 rounded-full object-cover hidden sm:block border-4 border-white shadow-xl z-20" />
-            ) : (
-              <div className="text-6xl lg:text-7xl hidden sm:block opacity-80 z-20">{roleEmoji}</div>
-            )}
-            {/* Decorative circles */}
-            <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-white/10 rounded-full" />
-            <div className="absolute bottom-[-30px] right-[60px] w-20 h-20 bg-white/10 rounded-full" />
-          </div>
-        </div>
 
         {/* Page Content */}
         <div className="flex-1 px-4 lg:px-8 py-6 overflow-y-auto">

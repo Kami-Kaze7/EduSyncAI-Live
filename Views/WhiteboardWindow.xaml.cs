@@ -232,6 +232,10 @@ namespace EduSyncAI
             _currentMode = DrawingMode.Pen;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Ink;
             WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter = false;
+            
+            // Sync all sticky note ink canvases
+            SyncStickyNoteInkMode(InkCanvasEditingMode.Ink, false);
+
             // Bring InkCanvas to top for pen input
             Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Ink;
             Pen3DOverlayCanvas.DefaultDrawingAttributes.IsHighlighter = false;
@@ -260,6 +264,10 @@ namespace EduSyncAI
             _currentMode = DrawingMode.Highlighter;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Ink;
             WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter = true;
+            
+            // Sync all sticky note ink canvases
+            SyncStickyNoteInkMode(InkCanvasEditingMode.Ink, true);
+
             // Bring InkCanvas to top for highlighter input
             Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Ink;
             Pen3DOverlayCanvas.DefaultDrawingAttributes.IsHighlighter = true;
@@ -287,6 +295,10 @@ namespace EduSyncAI
 
             _currentMode = DrawingMode.Eraser;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+
+            // Sync all sticky note ink canvases
+            SyncStickyNoteInkMode(InkCanvasEditingMode.EraseByPoint, false);
+
             // Bring InkCanvas to top for eraser input
             Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
             Pen3DOverlayCanvas.Background = Brushes.Transparent;
@@ -313,6 +325,10 @@ namespace EduSyncAI
 
             _currentMode = DrawingMode.Select;
             WhiteboardCanvas.EditingMode = InkCanvasEditingMode.Select;
+
+            // Turn off drawing on sticky notes (allow selection instead)
+            SyncStickyNoteInkMode(InkCanvasEditingMode.None, false);
+
             // Bring ShapesCanvas to top for shape/image selection, InkCanvas below for stroke select
             Pen3DOverlayCanvas.EditingMode = InkCanvasEditingMode.Select;
             Pen3DOverlayCanvas.Background = Brushes.Transparent;
@@ -338,10 +354,24 @@ namespace EduSyncAI
             LineButton.Style = (Style)FindResource("ToolButtonStyle");
             ArrowButton.Style = (Style)FindResource("ToolButtonStyle");
             TriangleButton.Style = (Style)FindResource("ToolButtonStyle");
-            
+            StickyNoteButton.Style = (Style)FindResource("ToolButtonStyle");
+
             if (activeButton != null)
             {
                 activeButton.Style = (Style)FindResource("ActiveToolButtonStyle");
+            }
+        }
+        
+        private void SyncStickyNoteInkMode(InkCanvasEditingMode mode, bool isHighlighter)
+        {
+            if (StickyNotesCanvas == null) return;
+            foreach (UIElement child in StickyNotesCanvas.Children)
+            {
+                if (child is Border b && b.Tag is InkCanvas ink)
+                {
+                    ink.EditingMode = mode;
+                    ink.DefaultDrawingAttributes.IsHighlighter = isHighlighter;
+                }
             }
         }
 
@@ -371,9 +401,17 @@ namespace EduSyncAI
                 {
                     PenButton_Click(PenButton, null);
                 }
-                // Always sync to 3D pen overlay
+                // Always sync to 3D pen overlay and sticky notes
                 Pen3DOverlayCanvas.DefaultDrawingAttributes.Color = WhiteboardCanvas.DefaultDrawingAttributes.Color;
                 Pen3DOverlayCanvas.DefaultDrawingAttributes.IsHighlighter = WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter;
+                
+                foreach (UIElement child in StickyNotesCanvas.Children)
+                {
+                    if (child is Border b && b.Tag is InkCanvas ink)
+                    {
+                        ink.DefaultDrawingAttributes.Color = WhiteboardCanvas.DefaultDrawingAttributes.Color;
+                    }
+                }
             }
         }
 
@@ -385,9 +423,18 @@ namespace EduSyncAI
                 var size = double.Parse(thickness);
                 WhiteboardCanvas.DefaultDrawingAttributes.Width = size;
                 WhiteboardCanvas.DefaultDrawingAttributes.Height = size;
-                // Always sync to 3D pen overlay
+                // Always sync to 3D pen overlay and sticky notes
                 Pen3DOverlayCanvas.DefaultDrawingAttributes.Width = size;
                 Pen3DOverlayCanvas.DefaultDrawingAttributes.Height = size;
+                
+                foreach (UIElement child in StickyNotesCanvas.Children)
+                {
+                    if (child is Border b && b.Tag is InkCanvas ink)
+                    {
+                        ink.DefaultDrawingAttributes.Width = size;
+                        ink.DefaultDrawingAttributes.Height = size;
+                    }
+                }
             }
         }
 
@@ -478,6 +525,9 @@ namespace EduSyncAI
 
             // Clear shapes overlay
             Shapes3DOverlayCanvas.Children.Clear();
+
+            // Clear sticky notes
+            StickyNotesCanvas.Children.Clear();
 
             // Clear undo stack
             _undo3DStack.Clear();
@@ -693,6 +743,395 @@ namespace EduSyncAI
             triangle.Points.Add(new Point(start.X, end.Y));
             triangle.Points.Add(new Point(end.X, end.Y));
         }
+
+        // ==================== STICKY NOTES ====================
+        
+        private void StickyNoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Get lecturer name safely
+            string lecturerName = "Lecturer";
+            try
+            {
+                var authService = new AuthenticationService();
+                var lecturer = authService.GetCurrentLecturer();
+                if (lecturer != null && !string.IsNullOrWhiteSpace(lecturer.FullName))
+                {
+                    lecturerName = lecturer.FullName;
+                }
+            }
+            catch { }
+
+            var stickyBorder = CreateStickyNote(lecturerName);
+
+            // Center it horizontally, position slightly down from top
+            var centerX = (StickyNotesCanvas.ActualWidth / 2) - 100;
+            if (centerX < 0 || double.IsNaN(centerX)) centerX = 300;
+            Canvas.SetLeft(stickyBorder, centerX);
+            Canvas.SetTop(stickyBorder, 100);
+
+            StickyNotesCanvas.Children.Add(stickyBorder);
+
+            // Push to custom undo so we delete from StickyNotesCanvas, not Shapes3DOverlayCanvas
+            _undo3DStack.Push(new UndoStickyNoteElement(this, stickyBorder));
+            
+            Shape3DStatusText.Text = "  |  Sticky note added";
+        }
+
+        private Border CreateStickyNote(string authorName)
+        {
+            // Main container
+            var container = new Border
+            {
+                Width = 200,
+                Height = 150,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF176")), // Yellow
+                CornerRadius = new CornerRadius(2),
+                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#C0B359")),
+                BorderThickness = new Thickness(1),
+                Effect = new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    ShadowDepth = 3,
+                    BlurRadius = 8,
+                    Opacity = 0.3,
+                    Color = Colors.Black
+                }
+            };
+
+            var grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(24) }); // Header
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Body
+
+            // 1. Header (Drag handle + Label)
+            var header = new Border
+            {
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#33000000")), // Dark overlay
+                Cursor = Cursors.SizeAll
+            };
+
+            var headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var headerText = new TextBlock
+            {
+                Text = $" {authorName}",
+                FontSize = 10,
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush(Colors.Black),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(4, 0, 0, 0),
+                Opacity = 0.7
+            };
+            Grid.SetColumn(headerText, 0);
+            headerGrid.Children.Add(headerText);
+
+            // Color Palette ComboBox
+            var colorPalette = new ComboBox
+            {
+                Width = 26,
+                Height = 18,
+                Margin = new Thickness(2, 2, 2, 2),
+                Padding = new Thickness(2, 0, 0, 0),
+                Cursor = Cursors.Hand,
+                ToolTip = "Change Color",
+                BorderThickness = new Thickness(0),
+                Background = Brushes.Transparent,
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                VerticalContentAlignment = VerticalAlignment.Center
+            };
+            
+            var colors = new[]
+            {
+                new { Name = "Yellow", Hex = "#FFF176" },
+                new { Name = "Blue", Hex = "#90CAF9" },
+                new { Name = "Green", Hex = "#A5D6A7" },
+                new { Name = "Orange", Hex = "#FFCC80" },
+                new { Name = "Purple", Hex = "#CE93D8" },
+                new { Name = "Pink", Hex = "#F48FB1" },
+                new { Name = "White", Hex = "#FFFFFF" }
+            };
+
+            foreach (var c in colors)
+            {
+                var rect = new System.Windows.Shapes.Rectangle
+                {
+                    Width = 14,
+                    Height = 14,
+                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(c.Hex)),
+                    Margin = new Thickness(2)
+                };
+                var item = new ComboBoxItem
+                {
+                    Content = rect,
+                    Tag = c.Hex,
+                    ToolTip = c.Name
+                };
+                colorPalette.Items.Add(item);
+            }
+
+            colorPalette.SelectionChanged += (s, ev) =>
+            {
+                if (colorPalette.SelectedItem is ComboBoxItem selected && selected.Tag is string hex)
+                {
+                    container.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+                }
+            };
+
+            Grid.SetColumn(colorPalette, 1);
+            headerGrid.Children.Add(colorPalette);
+
+            // Delete Button
+            var deleteBtn = new Button
+            {
+                Content = "✕",
+                Width = 20,
+                Height = 18,
+                Margin = new Thickness(2, 2, 4, 2),
+                Background = Brushes.Transparent,
+                Foreground = Brushes.Black,
+                BorderThickness = new Thickness(0),
+                FontSize = 10,
+                Cursor = Cursors.Hand,
+                ToolTip = "Delete Note",
+                Opacity = 0.6
+            };
+            deleteBtn.Click += (s, ev) =>
+            {
+                StickyNotesCanvas.Children.Remove(container);
+                _undo3DStack.Push(new UndoStickyNoteDeleteElement(this, container));
+            };
+            deleteBtn.MouseEnter += (s, ev) => deleteBtn.Opacity = 1.0;
+            deleteBtn.MouseLeave += (s, ev) => deleteBtn.Opacity = 0.6;
+
+            Grid.SetColumn(deleteBtn, 2);
+            headerGrid.Children.Add(deleteBtn);
+
+            header.Child = headerGrid;
+            Grid.SetRow(header, 0);
+
+            // 2. Body container (TextBox + InkCanvas)
+            var bodyGrid = new Grid();
+            Grid.SetRow(bodyGrid, 1);
+
+            // 2a. TextBox for typing
+            var textBox = new TextBox
+            {
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                TextWrapping = TextWrapping.Wrap,
+                AcceptsReturn = true,
+                FontSize = 14,
+                FontFamily = new FontFamily("Segoe UI"),
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2C3E50")),
+                Padding = new Thickness(8),
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+
+            // 2b. InkCanvas for drawing on the note
+            var inkCanvas = new InkCanvas
+            {
+                Background = Brushes.Transparent,
+                EditingMode = (_currentMode == DrawingMode.Pen || _currentMode == DrawingMode.Highlighter) ? InkCanvasEditingMode.Ink : InkCanvasEditingMode.None
+            };
+            inkCanvas.DefaultDrawingAttributes.Color = WhiteboardCanvas.DefaultDrawingAttributes.Color;
+            inkCanvas.DefaultDrawingAttributes.Width = WhiteboardCanvas.DefaultDrawingAttributes.Width;
+            inkCanvas.DefaultDrawingAttributes.Height = WhiteboardCanvas.DefaultDrawingAttributes.Height;
+            inkCanvas.DefaultDrawingAttributes.IsHighlighter = WhiteboardCanvas.DefaultDrawingAttributes.IsHighlighter;
+
+            // Optional: Tag the border with its ink canvas so tools can toggle it
+            container.Tag = inkCanvas;
+
+            bodyGrid.Children.Add(textBox);
+            bodyGrid.Children.Add(inkCanvas);
+
+            grid.Children.Add(header);
+            grid.Children.Add(bodyGrid);
+            container.Child = grid;
+
+            // Context Menu
+            BuildStickyNoteContextMenu(container, textBox, headerText);
+
+            // Draggability and Resizing via Header
+            MakeStickyNoteDraggable(container, header);
+
+            return container;
+        }
+
+        private void BuildStickyNoteContextMenu(Border noteBorder, TextBox noteText, TextBlock headerText)
+        {
+            var menu = new ContextMenu();
+
+            // Background Colors
+            var bgHeader = new MenuItem { Header = "Background Color", IsEnabled = false };
+            menu.Items.Add(bgHeader);
+
+            var colors = new[]
+            {
+                new { Name = "Yellow", Hex = "#FFF176" },
+                new { Name = "Blue", Hex = "#90CAF9" },
+                new { Name = "Green", Hex = "#A5D6A7" },
+                new { Name = "Orange", Hex = "#FFCC80" },
+                new { Name = "Purple", Hex = "#CE93D8" },
+                new { Name = "Pink", Hex = "#F48FB1" },
+                new { Name = "White", Hex = "#FFFFFF" }
+            };
+
+            foreach (var c in colors)
+            {
+                var item = new MenuItem { Header = $"  {c.Name}" };
+                item.Click += (s, e) =>
+                {
+                    noteBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(c.Hex));
+                };
+                menu.Items.Add(item);
+            }
+
+            menu.Items.Add(new Separator());
+
+            // Text Colors
+            var textHeader = new MenuItem { Header = "Text Color", IsEnabled = false };
+            menu.Items.Add(textHeader);
+
+            var textColors = new[]
+            {
+                new { Name = "Charcoal", Hex = "#2C3E50" },
+                new { Name = "Black", Hex = "#000000" },
+                new { Name = "Red", Hex = "#E74C3C" },
+            };
+
+            foreach (var tc in textColors)
+            {
+                var item = new MenuItem { Header = $"  {tc.Name}" };
+                item.Click += (s, e) =>
+                {
+                    noteText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(tc.Hex));
+                    headerText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(tc.Hex));
+                };
+                menu.Items.Add(item);
+            }
+
+            menu.Items.Add(new Separator());
+
+            // Delete
+            var delItem = new MenuItem { Header = "🗑️ Delete Note", Foreground = Brushes.Red };
+            delItem.Click += (s, e) =>
+            {
+                StickyNotesCanvas.Children.Remove(noteBorder);
+                // Create custom undo for delete
+                _undo3DStack.Push(new UndoStickyNoteDeleteElement(this, noteBorder));
+            };
+            menu.Items.Add(delItem);
+
+            noteBorder.ContextMenu = menu;
+        }
+
+        private void MakeStickyNoteDraggable(Border _element, Border header)
+        {
+            bool isDragging = false;
+            Point dragOffset = new Point();
+
+            // Dragging only on the header
+            header.MouseLeftButtonDown += (s, ev) =>
+            {
+                if (_currentMode == DrawingMode.Eraser) return; // Let eraser just erase ink if we hit InkCanvas
+
+                // Prevent drag if we clicked the dropdown or delete button
+                if (ev.OriginalSource is DependencyObject src)
+                {
+                    var parent = System.Windows.Media.VisualTreeHelper.GetParent(src);
+                    while (parent != null)
+                    {
+                        if (parent is ComboBox || parent is Button) return;
+                        parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+                    }
+                }
+
+                isDragging = true;
+                dragOffset = ev.GetPosition(_element);
+                header.CaptureMouse();
+                ev.Handled = true;
+
+                // Bring to front
+                int maxZ = 0;
+                foreach (UIElement child in StickyNotesCanvas.Children)
+                {
+                    int z = Panel.GetZIndex(child);
+                    if (z > maxZ) maxZ = z;
+                }
+                Panel.SetZIndex(_element, maxZ + 1);
+            };
+
+            header.MouseMove += (s, ev) =>
+            {
+                if (isDragging)
+                {
+                    var pos = ev.GetPosition(StickyNotesCanvas);
+                    Canvas.SetLeft(_element, pos.X - dragOffset.X);
+                    Canvas.SetTop(_element, pos.Y - dragOffset.Y);
+                    ev.Handled = true;
+                }
+            };
+
+            header.MouseLeftButtonUp += (s, ev) =>
+            {
+                if (isDragging)
+                {
+                    isDragging = false;
+                    header.ReleaseMouseCapture();
+                    ev.Handled = true;
+                }
+            };
+
+            // Resize via MouseWheel (attached to whole element)
+            _element.MouseWheel += (s, ev) =>
+            {
+                if (ev.Delta == 0) return;
+                
+                // Adjust Width/Height directly instead of ScaleTransform to keep text sharp and flow wrapping correct
+                double factor = ev.Delta > 0 ? 1.1 : 0.9;
+                
+                double newWidth = _element.Width * factor;
+                double newHeight = _element.Height * factor;
+
+                if (newWidth > 100 && newWidth < 800)
+                {
+                    _element.Width = newWidth;
+                    _element.Height = newHeight;
+                }
+                ev.Handled = true;
+            };
+        }
+
+        // Undo classes for sticky notes
+        private class UndoStickyNoteElement : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly UIElement _element;
+            public string Description => "Add Sticky Note";
+            public UndoStickyNoteElement(WhiteboardWindow w, UIElement element)
+            { _w = w; _element = element; }
+            public void Undo()
+            {
+                if (_w.StickyNotesCanvas.Children.Contains(_element))
+                    _w.StickyNotesCanvas.Children.Remove(_element);
+            }
+        }
+
+        private class UndoStickyNoteDeleteElement : IUndo3DAction
+        {
+            private readonly WhiteboardWindow _w;
+            private readonly UIElement _element;
+            public string Description => "Delete Sticky Note";
+            public UndoStickyNoteDeleteElement(WhiteboardWindow w, UIElement element)
+            { _w = w; _element = element; }
+            public void Undo()
+            {
+                if (!_w.StickyNotesCanvas.Children.Contains(_element))
+                    _w.StickyNotesCanvas.Children.Add(_element);
+            }
+        }
+
 
         // ==================== DOCUMENT VIEWER ====================
 
@@ -2040,6 +2479,13 @@ namespace EduSyncAI
             try
             {
                 var importer = new ModelImporter();
+
+                // Override HelixToolkit's default blue material with a neutral gray
+                var neutralMat = new MaterialGroup();
+                neutralMat.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(255, 200, 200, 200))));
+                neutralMat.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromArgb(80, 255, 255, 255)), 40));
+                importer.DefaultMaterial = neutralMat;
+
                 var modelGroup = importer.Load(filePath);
 
                 // Auto-scale and center the model
@@ -2060,15 +2506,10 @@ namespace EduSyncAI
                     modelGroup.Transform = localTransform;
                 }
 
-                // Provide a default material if the model lacks one
-                if (modelGroup.Children.Count > 0 && modelGroup.Children[0] is GeometryModel3D gm && gm.Material == null)
-                {
-                    var mat = new MaterialGroup();
-                    mat.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(255, 200, 200, 200))));
-                    mat.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromArgb(50, 255, 255, 255)), 40));
-                    gm.Material = mat;
-                    gm.BackMaterial = mat;
-                }
+                // Fix any remaining HelixToolkit default blue materials on ALL geometry children.
+                // HelixToolkit assigns a non-null blue DiffuseMaterial when .mtl files are missing,
+                // so a simple null check doesn't catch them. We detect the blue default and replace it.
+                FixDefaultBlueMaterials(modelGroup, neutralMat);
 
                 var visual = new ModelVisual3D { Content = modelGroup };
                 
@@ -2855,6 +3296,52 @@ namespace EduSyncAI
             {
                 foreach (var child in mg.Children) RemoveMaterials(child);
             }
+        }
+
+        /// <summary>
+        /// Recursively walks a Model3D tree and replaces HelixToolkit's default blue material
+        /// with a neutral replacement. HelixToolkit uses a solid blue DiffuseMaterial as its
+        /// fallback when .mtl files are missing — this method detects and replaces those.
+        /// </summary>
+        private void FixDefaultBlueMaterials(Model3D model, Material replacement)
+        {
+            if (model is GeometryModel3D gm)
+            {
+                if (gm.Material == null || IsHelixDefaultBlueMaterial(gm.Material))
+                {
+                    gm.Material = replacement;
+                    gm.BackMaterial = replacement;
+                }
+            }
+            else if (model is Model3DGroup mg)
+            {
+                foreach (var child in mg.Children)
+                    FixDefaultBlueMaterials(child, replacement);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether a material is HelixToolkit's default blue DiffuseMaterial.
+        /// The default is a plain DiffuseMaterial with Color = #FF0000FF (pure blue).
+        /// </summary>
+        private bool IsHelixDefaultBlueMaterial(Material material)
+        {
+            // Check plain DiffuseMaterial (most common HelixToolkit default)
+            if (material is DiffuseMaterial dm && dm.Brush is SolidColorBrush scb)
+            {
+                var c = scb.Color;
+                // HelixToolkit default: pure blue (#0000FF) or near-blue variants
+                if (c.R < 30 && c.G < 30 && c.B > 220)
+                    return true;
+            }
+
+            // Check MaterialGroup where only child is the blue DiffuseMaterial
+            if (material is MaterialGroup mg && mg.Children.Count == 1)
+            {
+                return IsHelixDefaultBlueMaterial(mg.Children[0]);
+            }
+
+            return false;
         }
 
         private void Focus3DShape(ModelVisual3D shape)

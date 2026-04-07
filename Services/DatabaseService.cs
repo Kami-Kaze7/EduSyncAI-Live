@@ -61,7 +61,8 @@ namespace EduSyncAI
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 CourseCode TEXT,
                 CourseTitle TEXT,
-                SyllabusPath TEXT
+                SyllabusPath TEXT,
+                LecturerId INTEGER
             );
 
             CREATE TABLE IF NOT EXISTS Lectures (
@@ -205,6 +206,12 @@ namespace EduSyncAI
                 patchCommand.CommandText = "ALTER TABLE ModelAssets ADD COLUMN UploadedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP;";
                 patchCommand.ExecuteNonQuery();
             } catch { /* Ignore if column exists */ }
+
+            try {
+                var patchCommand2 = connection.CreateCommand();
+                patchCommand2.CommandText = "ALTER TABLE Courses ADD COLUMN LecturerId INTEGER DEFAULT 0;";
+                patchCommand2.ExecuteNonQuery();
+            } catch { /* Ignore if column exists */ }
         }
 
         public int CreateCourse(Course course)
@@ -213,13 +220,14 @@ namespace EduSyncAI
             connection.Open();
             var command = connection.CreateCommand();
             command.CommandText = @"
-            INSERT INTO Courses (CourseCode, CourseTitle, SyllabusPath)
-            VALUES (@code, @title, @path);
+            INSERT INTO Courses (CourseCode, CourseTitle, SyllabusPath, LecturerId)
+            VALUES (@code, @title, @path, @lecturerId);
             SELECT last_insert_rowid();
         ";
             command.Parameters.AddWithValue("@code", course.CourseCode);
             command.Parameters.AddWithValue("@title", course.CourseTitle);
             command.Parameters.AddWithValue("@path", course.SyllabusPath ?? "");
+            command.Parameters.AddWithValue("@lecturerId", course.LecturerId);
             return Convert.ToInt32(command.ExecuteScalar());
         }
 
@@ -233,13 +241,14 @@ namespace EduSyncAI
             connection.Open();
             var command = connection.CreateCommand();
             command.CommandText = @"
-            INSERT OR REPLACE INTO Courses (Id, CourseCode, CourseTitle, SyllabusPath)
-            VALUES (@id, @code, @title, @path);
+            INSERT OR REPLACE INTO Courses (Id, CourseCode, CourseTitle, SyllabusPath, LecturerId)
+            VALUES (@id, @code, @title, @path, @lecturerId);
         ";
             command.Parameters.AddWithValue("@id", course.Id);
             command.Parameters.AddWithValue("@code", course.CourseCode ?? "");
             command.Parameters.AddWithValue("@title", course.CourseTitle ?? "");
             command.Parameters.AddWithValue("@path", course.SyllabusPath ?? "");
+            command.Parameters.AddWithValue("@lecturerId", course.LecturerId);
             command.ExecuteNonQuery();
         }
 
@@ -259,7 +268,32 @@ namespace EduSyncAI
                     Id = reader.GetInt32(0),
                     CourseCode = reader.GetString(1),
                     CourseTitle = reader.GetString(2),
-                    SyllabusPath = reader.IsDBNull(3) ? null : reader.GetString(3)
+                    SyllabusPath = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                    LecturerId = reader.IsDBNull(4) ? 0 : reader.GetInt32(4)
+                });
+            }
+            return courses;
+        }
+
+        public List<Course> GetCoursesByLecturer(int lecturerId)
+        {
+            var courses = new List<Course>();
+            using var connection = GetConnection();
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT * FROM Courses WHERE LecturerId = @lecturerId";
+            command.Parameters.AddWithValue("@lecturerId", lecturerId);
+            
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                courses.Add(new Course
+                {
+                    Id = reader.GetInt32(0),
+                    CourseCode = reader.GetString(1),
+                    CourseTitle = reader.GetString(2),
+                    SyllabusPath = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                    LecturerId = reader.IsDBNull(4) ? 0 : reader.GetInt32(4)
                 });
             }
             return courses;
@@ -285,7 +319,8 @@ namespace EduSyncAI
                     Id = reader.GetInt32(0),
                     CourseCode = reader.GetString(1),
                     CourseTitle = reader.GetString(2),
-                    SyllabusPath = reader.IsDBNull(3) ? null : reader.GetString(3)
+                    SyllabusPath = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                    LecturerId = reader.IsDBNull(4) ? 0 : reader.GetInt32(4)
                 });
             }
             return courses;

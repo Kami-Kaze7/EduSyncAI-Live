@@ -1123,3 +1123,1078 @@
 [15:00:23.497] [FACE] Service initialized
 [15:28:39.516] [FACE] Service initialized
 [15:39:56.492] [FACE] Service initialized
+[07:11:43.722] [FACE] Service initialized
+[08:57:18.601] [FACE] Service initialized
+[10:10:30.526] [FACE] Service initialized
+[10:27:37.069] [FACE] Service initialized
+[02:40:28.441] [FACE] Service initialized
+[08:03:49.786] [FACE] Service initialized
+[08:06:21.503] [FACE] RecognizeFacesAsync called, sessionId=141, imageLen=17719
+[08:06:21.505] [FACE] Session found, courseId=4
+[08:06:21.506] [FACE] Using remote server to fetch students
+[08:06:22.899] [FACE] Found 1 students with photos, calling Gemini...
+[08:06:22.902] [FACE] Classroom image size: 13270 bytes
+[08:06:24.711] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:06:36.500] [FACE] RecognizeFacesAsync called, sessionId=141, imageLen=28599
+[08:06:36.503] [FACE] Session found, courseId=4
+[08:06:36.505] [FACE] Using remote server to fetch students
+[08:06:36.691] [FACE] Found 1 students with photos, calling Gemini...
+[08:06:36.693] [FACE] Classroom image size: 21432 bytes
+[08:06:37.149] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:06:51.524] [FACE] RecognizeFacesAsync called, sessionId=141, imageLen=50219
+[08:06:51.526] [FACE] Session found, courseId=4
+[08:06:51.528] [FACE] Using remote server to fetch students
+[08:06:51.694] [FACE] Found 1 students with photos, calling Gemini...
+[08:06:51.696] [FACE] Classroom image size: 37645 bytes
+[08:06:52.207] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:07:06.521] [FACE] RecognizeFacesAsync called, sessionId=141, imageLen=39439
+[08:07:06.524] [FACE] Session found, courseId=4
+[08:07:06.525] [FACE] Using remote server to fetch students
+[08:07:06.701] [FACE] Found 1 students with photos, calling Gemini...
+[08:07:06.703] [FACE] Classroom image size: 29560 bytes
+[08:07:07.184] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:08:06.492] [FACE] Service initialized
+[08:08:25.221] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19171
+[08:08:25.224] [FACE] Session found, courseId=4
+[08:08:25.225] [FACE] Using remote server to fetch students
+[08:08:26.048] [FACE] Found 1 students with photos, calling Gemini...
+[08:08:26.050] [FACE] Classroom image size: 14359 bytes
+[08:08:27.271] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:08:40.219] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19239
+[08:08:40.222] [FACE] Session found, courseId=4
+[08:08:40.224] [FACE] Using remote server to fetch students
+[08:08:40.479] [FACE] Found 1 students with photos, calling Gemini...
+[08:08:40.481] [FACE] Classroom image size: 14412 bytes
+[08:08:41.200] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:08:55.220] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=25987
+[08:08:55.221] [FACE] Session found, courseId=4
+[08:08:55.223] [FACE] Using remote server to fetch students
+[08:08:55.418] [FACE] Found 1 students with photos, calling Gemini...
+[08:08:55.420] [FACE] Classroom image size: 19472 bytes
+[08:08:55.881] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:09:10.240] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=17519
+[08:09:10.242] [FACE] Session found, courseId=4
+[08:09:10.244] [FACE] Using remote server to fetch students
+[08:09:10.444] [FACE] Found 1 students with photos, calling Gemini...
+[08:09:10.447] [FACE] Classroom image size: 13120 bytes
+[08:09:10.900] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:09:25.241] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=17999
+[08:09:25.243] [FACE] Session found, courseId=4
+[08:09:25.245] [FACE] Using remote server to fetch students
+[08:09:25.536] [FACE] Found 1 students with photos, calling Gemini...
+[08:09:25.538] [FACE] Classroom image size: 13480 bytes
+[08:09:26.045] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:09:40.232] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=17583
+[08:09:40.235] [FACE] Session found, courseId=4
+[08:09:40.237] [FACE] Using remote server to fetch students
+[08:09:40.594] [FACE] Found 1 students with photos, calling Gemini...
+[08:09:40.596] [FACE] Classroom image size: 13169 bytes
+[08:09:41.105] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:09:55.275] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=17291
+[08:09:55.276] [FACE] Session found, courseId=4
+[08:09:55.279] [FACE] Using remote server to fetch students
+[08:09:55.492] [FACE] Found 1 students with photos, calling Gemini...
+[08:09:55.502] [FACE] Classroom image size: 12949 bytes
+[08:09:55.950] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:10:10.262] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=17315
+[08:10:10.264] [FACE] Session found, courseId=4
+[08:10:10.267] [FACE] Using remote server to fetch students
+[08:10:11.211] [FACE] Found 1 students with photos, calling Gemini...
+[08:10:11.215] [FACE] Classroom image size: 12968 bytes
+[08:10:11.645] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:10:25.266] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=25643
+[08:10:25.268] [FACE] Session found, courseId=4
+[08:10:25.269] [FACE] Using remote server to fetch students
+[08:10:25.495] [FACE] Found 1 students with photos, calling Gemini...
+[08:10:25.496] [FACE] Classroom image size: 19214 bytes
+[08:10:26.843] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:10:40.231] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=15435
+[08:10:40.234] [FACE] Session found, courseId=4
+[08:10:40.235] [FACE] Using remote server to fetch students
+[08:10:40.442] [FACE] Found 1 students with photos, calling Gemini...
+[08:10:40.444] [FACE] Classroom image size: 11557 bytes
+[08:10:40.894] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:10:55.289] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=30319
+[08:10:55.292] [FACE] Session found, courseId=4
+[08:10:55.294] [FACE] Using remote server to fetch students
+[08:10:55.506] [FACE] Found 1 students with photos, calling Gemini...
+[08:10:55.509] [FACE] Classroom image size: 22722 bytes
+[08:10:55.944] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:11:10.254] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21531
+[08:11:10.256] [FACE] Session found, courseId=4
+[08:11:10.258] [FACE] Using remote server to fetch students
+[08:11:10.461] [FACE] Found 1 students with photos, calling Gemini...
+[08:11:10.463] [FACE] Classroom image size: 16129 bytes
+[08:11:10.894] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:11:25.254] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=30299
+[08:11:25.255] [FACE] Session found, courseId=4
+[08:11:25.257] [FACE] Using remote server to fetch students
+[08:11:25.457] [FACE] Found 1 students with photos, calling Gemini...
+[08:11:25.458] [FACE] Classroom image size: 22707 bytes
+[08:11:25.891] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:11:40.235] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21559
+[08:11:40.237] [FACE] Session found, courseId=4
+[08:11:40.238] [FACE] Using remote server to fetch students
+[08:11:40.440] [FACE] Found 1 students with photos, calling Gemini...
+[08:11:40.442] [FACE] Classroom image size: 16151 bytes
+[08:11:40.880] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:11:55.265] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=22019
+[08:11:55.268] [FACE] Session found, courseId=4
+[08:11:55.269] [FACE] Using remote server to fetch students
+[08:11:55.479] [FACE] Found 1 students with photos, calling Gemini...
+[08:11:55.481] [FACE] Classroom image size: 16496 bytes
+[08:11:55.916] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:12:10.281] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=28979
+[08:12:10.285] [FACE] Session found, courseId=4
+[08:12:10.287] [FACE] Using remote server to fetch students
+[08:12:10.491] [FACE] Found 1 students with photos, calling Gemini...
+[08:12:10.496] [FACE] Classroom image size: 21716 bytes
+[08:12:10.949] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:12:25.314] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20719
+[08:12:25.320] [FACE] Session found, courseId=4
+[08:12:25.322] [FACE] Using remote server to fetch students
+[08:12:25.545] [FACE] Found 1 students with photos, calling Gemini...
+[08:12:25.547] [FACE] Classroom image size: 15521 bytes
+[08:12:25.986] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:12:40.285] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=30135
+[08:12:40.303] [FACE] Session found, courseId=4
+[08:12:40.305] [FACE] Using remote server to fetch students
+[08:12:40.530] [FACE] Found 1 students with photos, calling Gemini...
+[08:12:40.532] [FACE] Classroom image size: 22582 bytes
+[08:12:41.003] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:12:55.288] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=33355
+[08:12:55.293] [FACE] Session found, courseId=4
+[08:12:55.294] [FACE] Using remote server to fetch students
+[08:12:55.489] [FACE] Found 1 students with photos, calling Gemini...
+[08:12:55.491] [FACE] Classroom image size: 24998 bytes
+[08:12:55.935] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:13:10.281] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21031
+[08:13:10.284] [FACE] Session found, courseId=4
+[08:13:10.290] [FACE] Using remote server to fetch students
+[08:13:10.585] [FACE] Found 1 students with photos, calling Gemini...
+[08:13:10.589] [FACE] Classroom image size: 15756 bytes
+[08:13:11.090] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:13:25.283] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=14163
+[08:13:25.286] [FACE] Session found, courseId=4
+[08:13:25.288] [FACE] Using remote server to fetch students
+[08:13:25.491] [FACE] Found 1 students with photos, calling Gemini...
+[08:13:25.493] [FACE] Classroom image size: 10603 bytes
+[08:13:25.920] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:13:40.293] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=14263
+[08:13:40.295] [FACE] Session found, courseId=4
+[08:13:40.301] [FACE] Using remote server to fetch students
+[08:13:40.498] [FACE] Found 1 students with photos, calling Gemini...
+[08:13:40.500] [FACE] Classroom image size: 10680 bytes
+[08:13:40.909] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:13:55.279] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=13775
+[08:13:55.281] [FACE] Session found, courseId=4
+[08:13:55.283] [FACE] Using remote server to fetch students
+[08:13:55.522] [FACE] Found 1 students with photos, calling Gemini...
+[08:13:55.523] [FACE] Classroom image size: 10314 bytes
+[08:13:55.935] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:14:10.307] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20335
+[08:14:10.312] [FACE] Session found, courseId=4
+[08:14:10.316] [FACE] Using remote server to fetch students
+[08:14:10.531] [FACE] Found 1 students with photos, calling Gemini...
+[08:14:10.532] [FACE] Classroom image size: 15233 bytes
+[08:14:10.970] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:14:25.296] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=13999
+[08:14:25.304] [FACE] Session found, courseId=4
+[08:14:25.305] [FACE] Using remote server to fetch students
+[08:14:25.508] [FACE] Found 1 students with photos, calling Gemini...
+[08:14:25.510] [FACE] Classroom image size: 10481 bytes
+[08:14:25.941] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:14:40.291] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=14051
+[08:14:40.297] [FACE] Session found, courseId=4
+[08:14:40.299] [FACE] Using remote server to fetch students
+[08:14:40.498] [FACE] Found 1 students with photos, calling Gemini...
+[08:14:40.500] [FACE] Classroom image size: 10519 bytes
+[08:14:40.928] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:14:55.324] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=14487
+[08:14:55.326] [FACE] Session found, courseId=4
+[08:14:55.328] [FACE] Using remote server to fetch students
+[08:14:55.521] [FACE] Found 1 students with photos, calling Gemini...
+[08:14:55.522] [FACE] Classroom image size: 10848 bytes
+[08:14:55.944] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:15:10.333] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=14795
+[08:15:10.335] [FACE] Session found, courseId=4
+[08:15:10.337] [FACE] Using remote server to fetch students
+[08:15:10.561] [FACE] Found 1 students with photos, calling Gemini...
+[08:15:10.563] [FACE] Classroom image size: 11078 bytes
+[08:15:11.006] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:15:25.388] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20955
+[08:15:25.391] [FACE] Session found, courseId=4
+[08:15:25.393] [FACE] Using remote server to fetch students
+[08:15:25.611] [FACE] Found 1 students with photos, calling Gemini...
+[08:15:25.613] [FACE] Classroom image size: 15698 bytes
+[08:15:26.051] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:15:40.376] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20315
+[08:15:40.379] [FACE] Session found, courseId=4
+[08:15:40.381] [FACE] Using remote server to fetch students
+[08:15:40.585] [FACE] Found 1 students with photos, calling Gemini...
+[08:15:40.590] [FACE] Classroom image size: 15219 bytes
+[08:15:41.032] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:15:55.342] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21495
+[08:15:55.344] [FACE] Session found, courseId=4
+[08:15:55.347] [FACE] Using remote server to fetch students
+[08:15:55.576] [FACE] Found 1 students with photos, calling Gemini...
+[08:15:55.578] [FACE] Classroom image size: 16103 bytes
+[08:15:56.019] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:16:10.381] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20299
+[08:16:10.383] [FACE] Session found, courseId=4
+[08:16:10.385] [FACE] Using remote server to fetch students
+[08:16:10.592] [FACE] Found 1 students with photos, calling Gemini...
+[08:16:10.594] [FACE] Classroom image size: 15206 bytes
+[08:16:11.039] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:16:25.380] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21515
+[08:16:25.385] [FACE] Session found, courseId=4
+[08:16:25.387] [FACE] Using remote server to fetch students
+[08:16:25.628] [FACE] Found 1 students with photos, calling Gemini...
+[08:16:25.641] [FACE] Classroom image size: 16117 bytes
+[08:16:26.082] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:16:40.359] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=22411
+[08:16:40.361] [FACE] Session found, courseId=4
+[08:16:40.362] [FACE] Using remote server to fetch students
+[08:16:40.567] [FACE] Found 1 students with photos, calling Gemini...
+[08:16:40.569] [FACE] Classroom image size: 16790 bytes
+[08:16:41.011] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:16:55.344] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19903
+[08:16:55.347] [FACE] Session found, courseId=4
+[08:16:55.349] [FACE] Using remote server to fetch students
+[08:16:55.552] [FACE] Found 1 students with photos, calling Gemini...
+[08:16:55.554] [FACE] Classroom image size: 14908 bytes
+[08:16:55.987] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:17:10.333] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19447
+[08:17:10.335] [FACE] Session found, courseId=4
+[08:17:10.336] [FACE] Using remote server to fetch students
+[08:17:10.603] [FACE] Found 1 students with photos, calling Gemini...
+[08:17:10.604] [FACE] Classroom image size: 14568 bytes
+[08:17:11.033] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:17:25.340] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18815
+[08:17:25.342] [FACE] Session found, courseId=4
+[08:17:25.343] [FACE] Using remote server to fetch students
+[08:17:25.546] [FACE] Found 1 students with photos, calling Gemini...
+[08:17:25.548] [FACE] Classroom image size: 14094 bytes
+[08:17:25.993] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:17:40.348] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19499
+[08:17:40.350] [FACE] Session found, courseId=4
+[08:17:40.352] [FACE] Using remote server to fetch students
+[08:17:40.576] [FACE] Found 1 students with photos, calling Gemini...
+[08:17:40.580] [FACE] Classroom image size: 14607 bytes
+[08:17:41.050] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:17:55.365] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18559
+[08:17:55.367] [FACE] Session found, courseId=4
+[08:17:55.370] [FACE] Using remote server to fetch students
+[08:17:56.614] [FACE] Found 1 students with photos, calling Gemini...
+[08:17:56.619] [FACE] Classroom image size: 13902 bytes
+[08:17:57.332] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:18:10.341] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18547
+[08:18:10.344] [FACE] Session found, courseId=4
+[08:18:10.346] [FACE] Using remote server to fetch students
+[08:18:10.575] [FACE] Found 1 students with photos, calling Gemini...
+[08:18:10.577] [FACE] Classroom image size: 13891 bytes
+[08:18:11.049] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:18:25.380] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18379
+[08:18:25.388] [FACE] Session found, courseId=4
+[08:18:25.391] [FACE] Using remote server to fetch students
+[08:18:26.314] [FACE] Found 1 students with photos, calling Gemini...
+[08:18:26.315] [FACE] Classroom image size: 13765 bytes
+[08:18:27.006] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:18:40.356] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18467
+[08:18:40.359] [FACE] Session found, courseId=4
+[08:18:40.361] [FACE] Using remote server to fetch students
+[08:18:40.592] [FACE] Found 1 students with photos, calling Gemini...
+[08:18:40.598] [FACE] Classroom image size: 13833 bytes
+[08:18:41.053] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:18:55.347] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=16603
+[08:18:55.349] [FACE] Session found, courseId=4
+[08:18:55.350] [FACE] Using remote server to fetch students
+[08:18:55.538] [FACE] Found 1 students with photos, calling Gemini...
+[08:18:55.539] [FACE] Classroom image size: 12434 bytes
+[08:18:55.971] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:19:10.351] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=15511
+[08:19:10.354] [FACE] Session found, courseId=4
+[08:19:10.355] [FACE] Using remote server to fetch students
+[08:19:10.845] [FACE] Found 1 students with photos, calling Gemini...
+[08:19:10.846] [FACE] Classroom image size: 11615 bytes
+[08:19:11.331] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:19:25.351] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18919
+[08:19:25.352] [FACE] Session found, courseId=4
+[08:19:25.353] [FACE] Using remote server to fetch students
+[08:19:25.554] [FACE] Found 1 students with photos, calling Gemini...
+[08:19:25.556] [FACE] Classroom image size: 14172 bytes
+[08:19:25.993] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:19:40.385] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18727
+[08:19:40.388] [FACE] Session found, courseId=4
+[08:19:40.390] [FACE] Using remote server to fetch students
+[08:19:40.594] [FACE] Found 1 students with photos, calling Gemini...
+[08:19:40.596] [FACE] Classroom image size: 14028 bytes
+[08:19:41.042] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:19:55.407] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18967
+[08:19:55.409] [FACE] Session found, courseId=4
+[08:19:55.413] [FACE] Using remote server to fetch students
+[08:19:55.610] [FACE] Found 1 students with photos, calling Gemini...
+[08:19:55.612] [FACE] Classroom image size: 14207 bytes
+[08:19:56.058] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:20:10.357] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18859
+[08:20:10.359] [FACE] Session found, courseId=4
+[08:20:10.360] [FACE] Using remote server to fetch students
+[08:20:10.564] [FACE] Found 1 students with photos, calling Gemini...
+[08:20:10.565] [FACE] Classroom image size: 14125 bytes
+[08:20:10.995] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:20:25.363] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18695
+[08:20:25.365] [FACE] Session found, courseId=4
+[08:20:25.367] [FACE] Using remote server to fetch students
+[08:20:25.563] [FACE] Found 1 students with photos, calling Gemini...
+[08:20:25.564] [FACE] Classroom image size: 14002 bytes
+[08:20:26.013] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:20:40.377] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19255
+[08:20:40.379] [FACE] Session found, courseId=4
+[08:20:40.381] [FACE] Using remote server to fetch students
+[08:20:40.643] [FACE] Found 1 students with photos, calling Gemini...
+[08:20:40.646] [FACE] Classroom image size: 14424 bytes
+[08:20:41.087] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:20:55.398] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19975
+[08:20:55.401] [FACE] Session found, courseId=4
+[08:20:55.403] [FACE] Using remote server to fetch students
+[08:20:55.627] [FACE] Found 1 students with photos, calling Gemini...
+[08:20:55.631] [FACE] Classroom image size: 14963 bytes
+[08:20:56.063] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:21:10.410] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20207
+[08:21:10.413] [FACE] Session found, courseId=4
+[08:21:10.414] [FACE] Using remote server to fetch students
+[08:21:10.612] [FACE] Found 1 students with photos, calling Gemini...
+[08:21:10.614] [FACE] Classroom image size: 15136 bytes
+[08:21:11.036] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:21:25.416] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21255
+[08:21:25.418] [FACE] Session found, courseId=4
+[08:21:25.419] [FACE] Using remote server to fetch students
+[08:21:25.617] [FACE] Found 1 students with photos, calling Gemini...
+[08:21:25.618] [FACE] Classroom image size: 15924 bytes
+[08:21:26.051] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:21:40.454] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=22791
+[08:21:40.458] [FACE] Session found, courseId=4
+[08:21:40.460] [FACE] Using remote server to fetch students
+[08:21:40.701] [FACE] Found 1 students with photos, calling Gemini...
+[08:21:40.703] [FACE] Classroom image size: 17076 bytes
+[08:21:41.124] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:21:55.434] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=23123
+[08:21:55.436] [FACE] Session found, courseId=4
+[08:21:55.438] [FACE] Using remote server to fetch students
+[08:21:55.640] [FACE] Found 1 students with photos, calling Gemini...
+[08:21:55.642] [FACE] Classroom image size: 17323 bytes
+[08:21:56.075] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:22:10.424] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21975
+[08:22:10.427] [FACE] Session found, courseId=4
+[08:22:10.428] [FACE] Using remote server to fetch students
+[08:22:10.632] [FACE] Found 1 students with photos, calling Gemini...
+[08:22:10.634] [FACE] Classroom image size: 16463 bytes
+[08:22:11.070] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:22:25.430] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=25179
+[08:22:25.433] [FACE] Session found, courseId=4
+[08:22:25.435] [FACE] Using remote server to fetch students
+[08:22:25.651] [FACE] Found 1 students with photos, calling Gemini...
+[08:22:25.653] [FACE] Classroom image size: 18866 bytes
+[08:22:26.124] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:22:40.435] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18995
+[08:22:40.437] [FACE] Session found, courseId=4
+[08:22:40.439] [FACE] Using remote server to fetch students
+[08:22:40.649] [FACE] Found 1 students with photos, calling Gemini...
+[08:22:40.651] [FACE] Classroom image size: 14229 bytes
+[08:22:41.079] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:22:55.452] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18467
+[08:22:55.455] [FACE] Session found, courseId=4
+[08:22:55.458] [FACE] Using remote server to fetch students
+[08:22:55.676] [FACE] Found 1 students with photos, calling Gemini...
+[08:22:55.677] [FACE] Classroom image size: 13833 bytes
+[08:22:56.121] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:23:10.451] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18751
+[08:23:10.454] [FACE] Session found, courseId=4
+[08:23:10.456] [FACE] Using remote server to fetch students
+[08:23:10.671] [FACE] Found 1 students with photos, calling Gemini...
+[08:23:10.674] [FACE] Classroom image size: 14044 bytes
+[08:23:11.112] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:23:25.475] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20463
+[08:23:25.478] [FACE] Session found, courseId=4
+[08:23:25.480] [FACE] Using remote server to fetch students
+[08:23:25.701] [FACE] Found 1 students with photos, calling Gemini...
+[08:23:25.703] [FACE] Classroom image size: 15330 bytes
+[08:23:26.461] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:23:40.457] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=22807
+[08:23:40.459] [FACE] Session found, courseId=4
+[08:23:40.461] [FACE] Using remote server to fetch students
+[08:23:40.663] [FACE] Found 1 students with photos, calling Gemini...
+[08:23:40.664] [FACE] Classroom image size: 17087 bytes
+[08:23:41.093] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:23:55.483] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=21243
+[08:23:55.489] [FACE] Session found, courseId=4
+[08:23:55.490] [FACE] Using remote server to fetch students
+[08:23:55.711] [FACE] Found 1 students with photos, calling Gemini...
+[08:23:55.719] [FACE] Classroom image size: 15915 bytes
+[08:23:56.150] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:24:10.466] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19027
+[08:24:10.471] [FACE] Session found, courseId=4
+[08:24:10.473] [FACE] Using remote server to fetch students
+[08:24:10.673] [FACE] Found 1 students with photos, calling Gemini...
+[08:24:10.675] [FACE] Classroom image size: 14252 bytes
+[08:24:11.129] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:24:25.462] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19175
+[08:24:25.464] [FACE] Session found, courseId=4
+[08:24:25.465] [FACE] Using remote server to fetch students
+[08:24:25.675] [FACE] Found 1 students with photos, calling Gemini...
+[08:24:25.677] [FACE] Classroom image size: 14364 bytes
+[08:24:26.110] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:24:40.464] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18743
+[08:24:40.466] [FACE] Session found, courseId=4
+[08:24:40.468] [FACE] Using remote server to fetch students
+[08:24:40.663] [FACE] Found 1 students with photos, calling Gemini...
+[08:24:40.665] [FACE] Classroom image size: 14039 bytes
+[08:24:41.090] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:24:55.478] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18607
+[08:24:55.480] [FACE] Session found, courseId=4
+[08:24:55.482] [FACE] Using remote server to fetch students
+[08:24:55.697] [FACE] Found 1 students with photos, calling Gemini...
+[08:24:55.701] [FACE] Classroom image size: 13937 bytes
+[08:24:56.149] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:25:10.460] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19755
+[08:25:10.462] [FACE] Session found, courseId=4
+[08:25:10.464] [FACE] Using remote server to fetch students
+[08:25:10.685] [FACE] Found 1 students with photos, calling Gemini...
+[08:25:10.701] [FACE] Classroom image size: 14797 bytes
+[08:25:11.140] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:25:25.509] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20631
+[08:25:25.518] [FACE] Session found, courseId=4
+[08:25:25.520] [FACE] Using remote server to fetch students
+[08:25:26.225] [FACE] Found 1 students with photos, calling Gemini...
+[08:25:26.226] [FACE] Classroom image size: 15455 bytes
+[08:25:26.668] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:25:40.550] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20703
+[08:25:40.552] [FACE] Session found, courseId=4
+[08:25:40.553] [FACE] Using remote server to fetch students
+[08:25:40.768] [FACE] Found 1 students with photos, calling Gemini...
+[08:25:40.770] [FACE] Classroom image size: 15510 bytes
+[08:25:41.192] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:25:55.615] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19915
+[08:25:55.617] [FACE] Session found, courseId=4
+[08:25:55.621] [FACE] Using remote server to fetch students
+[08:25:55.832] [FACE] Found 1 students with photos, calling Gemini...
+[08:25:55.833] [FACE] Classroom image size: 14917 bytes
+[08:25:56.284] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:26:10.799] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20167
+[08:26:10.802] [FACE] Session found, courseId=4
+[08:26:10.803] [FACE] Using remote server to fetch students
+[08:26:11.323] [FACE] Found 1 students with photos, calling Gemini...
+[08:26:11.324] [FACE] Classroom image size: 15108 bytes
+[08:26:11.993] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:26:25.792] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=19703
+[08:26:25.794] [FACE] Session found, courseId=4
+[08:26:25.796] [FACE] Using remote server to fetch students
+[08:26:26.004] [FACE] Found 1 students with photos, calling Gemini...
+[08:26:26.005] [FACE] Classroom image size: 14758 bytes
+[08:26:26.433] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:26:40.799] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18891
+[08:26:40.801] [FACE] Session found, courseId=4
+[08:26:40.802] [FACE] Using remote server to fetch students
+[08:26:41.028] [FACE] Found 1 students with photos, calling Gemini...
+[08:26:41.030] [FACE] Classroom image size: 14151 bytes
+[08:26:43.088] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:26:55.804] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=20331
+[08:26:55.806] [FACE] Session found, courseId=4
+[08:26:55.807] [FACE] Using remote server to fetch students
+[08:26:56.183] [FACE] Found 1 students with photos, calling Gemini...
+[08:26:56.184] [FACE] Classroom image size: 15229 bytes
+[08:26:58.471] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:27:10.814] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18787
+[08:27:10.816] [FACE] Session found, courseId=4
+[08:27:10.818] [FACE] Using remote server to fetch students
+[08:27:11.033] [FACE] Found 1 students with photos, calling Gemini...
+[08:27:11.034] [FACE] Classroom image size: 14071 bytes
+[08:27:11.475] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:27:25.833] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18847
+[08:27:25.835] [FACE] Session found, courseId=4
+[08:27:25.837] [FACE] Using remote server to fetch students
+[08:27:26.050] [FACE] Found 1 students with photos, calling Gemini...
+[08:27:26.051] [FACE] Classroom image size: 14116 bytes
+[08:27:26.486] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[08:27:40.825] [FACE] RecognizeFacesAsync called, sessionId=142, imageLen=18679
+[08:27:40.827] [FACE] Session found, courseId=4
+[08:27:40.828] [FACE] Using remote server to fetch students
+[08:27:41.025] [FACE] Found 1 students with photos, calling Gemini...
+[08:27:41.027] [FACE] Classroom image size: 13991 bytes
+[08:27:41.475] [FACE] Gemini result: Success=False, Matches=0, Error=API Error (TooManyRequests): {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[15:52:56.100] [FACE] Service initialized
+[11:18:52.583] [FACE] Service initialized

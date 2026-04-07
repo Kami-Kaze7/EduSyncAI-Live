@@ -1,0 +1,124 @@
+=== OLD DB SCHEMA ===
+CREATE TABLE IF NOT EXISTS "Students" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Students" PRIMARY KEY AUTOINCREMENT,
+    "MatricNumber" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "Email" TEXT NOT NULL,
+    "PhotoPath" TEXT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "Age" INTEGER NULL,
+    "Hobbies" TEXT NULL,
+    "Bio" TEXT NULL
+);
+---
+CREATE TABLE IF NOT EXISTS "Courses" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Courses" PRIMARY KEY AUTOINCREMENT,
+    "CourseCode" TEXT NOT NULL,
+    "CourseTitle" TEXT NOT NULL,
+    "SyllabusPath" TEXT NULL
+, LecturerId INTEGER NOT NULL DEFAULT 1, CreatedAt TEXT, CreditHours INTEGER NOT NULL DEFAULT 3, CourseName TEXT);
+---
+CREATE TABLE IF NOT EXISTS "ClassSessions" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_ClassSessions" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "LectureId" INTEGER NOT NULL,
+    "LecturerId" INTEGER NULL,
+    "SessionCode" TEXT NULL,
+    "SessionState" TEXT NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "AudioFilePath" TEXT NULL,
+    "VideoFilePath" TEXT NULL,
+    "BoardExportPath" TEXT NULL,
+    "BoardSnapshotFolder" TEXT NULL,
+    "AttendanceCount" INTEGER NOT NULL,
+    "Duration" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+, Topic TEXT);
+---
+CREATE TABLE Attendance (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                SessionId INTEGER NOT NULL,
+                StudentId INTEGER NOT NULL,
+                CheckInTime TEXT NOT NULL,
+                CheckInMethod TEXT NOT NULL,
+                VerifiedBy INTEGER,
+                FOREIGN KEY (SessionId) REFERENCES ClassSessions(Id),
+                FOREIGN KEY (StudentId) REFERENCES Students(Id),
+                FOREIGN KEY (VerifiedBy) REFERENCES Lecturers(Id),
+                UNIQUE(SessionId, StudentId)
+            );
+---
+CREATE TABLE IF NOT EXISTS "CourseEnrollments" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_CourseEnrollments" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "StudentId" INTEGER NOT NULL,
+    CONSTRAINT "FK_CourseEnrollments_Courses_CourseId" FOREIGN KEY ("CourseId") REFERENCES "Courses" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_CourseEnrollments_Students_StudentId" FOREIGN KEY ("StudentId") REFERENCES "Students" ("Id") ON DELETE CASCADE
+);
+CREATE INDEX "IX_CourseEnrollments_CourseId" ON "CourseEnrollments" ("CourseId");
+CREATE INDEX "IX_CourseEnrollments_StudentId" ON "CourseEnrollments" ("StudentId");
+
+=== NEW DB SCHEMA ===
+CREATE TABLE IF NOT EXISTS "Students" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Students" PRIMARY KEY AUTOINCREMENT,
+    "MatricNumber" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "Email" TEXT NOT NULL,
+    "PhotoPath" TEXT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "Age" INTEGER NULL,
+    "Hobbies" TEXT NULL,
+    "Bio" TEXT NULL
+);
+---
+CREATE TABLE IF NOT EXISTS "Courses" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Courses" PRIMARY KEY AUTOINCREMENT,
+    "CourseCode" TEXT NOT NULL,
+    "CourseTitle" TEXT NOT NULL,
+    "SyllabusPath" TEXT NULL
+, LecturerId INTEGER NOT NULL DEFAULT 1, CreatedAt TEXT, CreditHours INTEGER NOT NULL DEFAULT 3, CourseName TEXT);
+---
+CREATE TABLE IF NOT EXISTS "ClassSessions" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_ClassSessions" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "LectureId" INTEGER NOT NULL,
+    "LecturerId" INTEGER NULL,
+    "SessionCode" TEXT NULL,
+    "SessionState" TEXT NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "AudioFilePath" TEXT NULL,
+    "VideoFilePath" TEXT NULL,
+    "BoardExportPath" TEXT NULL,
+    "BoardSnapshotFolder" TEXT NULL,
+    "AttendanceCount" INTEGER NOT NULL,
+    "Duration" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+, Topic TEXT);
+---
+CREATE TABLE Attendance (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                SessionId INTEGER NOT NULL,
+                StudentId INTEGER NOT NULL,
+                CheckInTime TEXT NOT NULL,
+                CheckInMethod TEXT NOT NULL,
+                VerifiedBy INTEGER,
+                FOREIGN KEY (SessionId) REFERENCES ClassSessions(Id),
+                FOREIGN KEY (StudentId) REFERENCES Students(Id),
+                FOREIGN KEY (VerifiedBy) REFERENCES Lecturers(Id),
+                UNIQUE(SessionId, StudentId)
+            );
+---
+CREATE TABLE IF NOT EXISTS "CourseEnrollments" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_CourseEnrollments" PRIMARY KEY AUTOINCREMENT,
+    "CourseId" INTEGER NOT NULL,
+    "StudentId" INTEGER NOT NULL,
+    CONSTRAINT "FK_CourseEnrollments_Courses_CourseId" FOREIGN KEY ("CourseId") REFERENCES "Courses" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_CourseEnrollments_Students_StudentId" FOREIGN KEY ("StudentId") REFERENCES "Students" ("Id") ON DELETE CASCADE
+);
+CREATE INDEX "IX_CourseEnrollments_CourseId" ON "CourseEnrollments" ("CourseId");
+CREATE INDEX "IX_CourseEnrollments_StudentId" ON "CourseEnrollments" ("StudentId");
+DONE

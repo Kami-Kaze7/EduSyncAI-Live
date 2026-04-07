@@ -1,0 +1,105 @@
+[TAILING] Tailing last 50 lines for [edusync-web] process (change the value with --lines option)
+/root/.pm2/logs/edusync-web-error.log last 50 lines:
+5|edusync- | ⨯ Failed to start server
+5|edusync- | Error: listen EADDRINUSE: address already in use :::3000
+5|edusync- |     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+5|edusync- |     at new Promise (<anonymous>) {
+5|edusync- |   code: 'EADDRINUSE',
+5|edusync- |   errno: -98,
+5|edusync- |   syscall: 'listen',
+5|edusync- |   address: '::',
+5|edusync- |   port: 3000
+5|edusync- | }
+5|edusync- | ⨯ Failed to start server
+5|edusync- | Error: listen EADDRINUSE: address already in use :::3000
+5|edusync- |     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+5|edusync- |     at new Promise (<anonymous>) {
+5|edusync- |   code: 'EADDRINUSE',
+5|edusync- |   errno: -98,
+5|edusync- |   syscall: 'listen',
+5|edusync- |   address: '::',
+5|edusync- |   port: 3000
+5|edusync- | }
+5|edusync- | ⨯ Failed to start server
+5|edusync- | Error: listen EADDRINUSE: address already in use :::3000
+5|edusync- |     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+5|edusync- |     at new Promise (<anonymous>) {
+5|edusync- |   code: 'EADDRINUSE',
+5|edusync- |   errno: -98,
+5|edusync- |   syscall: 'listen',
+5|edusync- |   address: '::',
+5|edusync- |   port: 3000
+5|edusync- | }
+5|edusync- | ⨯ Failed to start server
+5|edusync- | Error: listen EADDRINUSE: address already in use :::3000
+5|edusync- |     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+5|edusync- |     at new Promise (<anonymous>) {
+5|edusync- |   code: 'EADDRINUSE',
+5|edusync- |   errno: -98,
+5|edusync- |   syscall: 'listen',
+5|edusync- |   address: '::',
+5|edusync- |   port: 3000
+5|edusync- | }
+5|edusync- | ⨯ Failed to start server
+5|edusync- | Error: listen EADDRINUSE: address already in use :::3000
+5|edusync- |     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+5|edusync- |     at new Promise (<anonymous>) {
+5|edusync- |   code: 'EADDRINUSE',
+5|edusync- |   errno: -98,
+5|edusync- |   syscall: 'listen',
+5|edusync- |   address: '::',
+5|edusync- |   port: 3000
+5|edusync- | }
+
+/root/.pm2/logs/edusync-web-out.log last 50 lines:
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+5|edusync- | 
+5|edusync- | > edusync-web@0.1.0 start
+5|edusync- | > next start -p 3000
+5|edusync- | 
+

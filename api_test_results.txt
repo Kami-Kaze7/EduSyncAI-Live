@@ -1,0 +1,19 @@
+TEST1_DIRECT:
+[]
+TEST2_HTTPS:
+[]
+TEST3_POST_CHECK:
+400
+TEST4_CONTROLLER_DLL:
+<GetModelAssets>d__2
+<GetModelAssetsByDiscipline>d__3
+<GetModelAsset>d__4
+<PostModelAsset>d__5
+<ModelAssets>k__BackingField
+
+TEST5_UPLOADS_DIR:
+total 12
+drwxr-xr-x  3 root root 4096 Mar 15 22:32 .
+drwxr-xr-x 11 root root 4096 Mar 25 17:02 ..
+drwxr-xr-x  2 root root 4096 Mar 23 15:59 students
+DONE

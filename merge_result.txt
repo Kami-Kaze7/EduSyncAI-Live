@@ -1,0 +1,53 @@
+=== STEP 1: BACKUP CURRENT NEW DB ===
+Backup created
+
+=== STEP 2: CHECK OLD DB DATA ===
+Old Lecturers:
+5|newlecturer|lecturer
+6|testlecturer|Test Lecturer
+7|Bamidele|Bamidele
+8|kami|kami kaze
+
+Old Students:
+1|2017/123456|Cyril Jeremiah
+2|2022/123456|Namikaze
+
+Old Courses:
+1|course 101|computer basics 
+2|contp 101|contuner science 
+4|CSC301|Data Structures
+
+=== STEP 3: CHECK NEW DB DATA ===
+New Lecturers:
+9|testlecturer|Test Lecturer
+
+New ModelAssets:
+1|Test Model|Biology
+2|NGINX Test|Physics
+3|Human Skeleton|Biology
+
+=== STEP 4: MERGE OLD DATA INTO NEW DB ===
+
+=== STEP 5: VERIFY MERGED DATA ===
+Lecturers after merge:
+5
+Students after merge:
+1
+Courses after merge:
+0
+ModelAssets after merge:
+3
+
+=== STEP 6: RESTART API ===
+API restarted
+
+=== STEP 7: VERIFY API SERVES DATA ===
+[{"id":5,"username":"newlecturer","fullName":"lecturer","email":"lecturer@gmail.com","isActive":true},{"id":6,"username":"testlecturer","fullName":"Test Lecturer","email":"test@edusync.ai","isActive":true},{"id":7,"username":"Bamidele","fullName":"Bamidele","email":"Bamidele@gmail.com","isActive":true},{"id":8,"username":"kami","fullName":"kami kaze","email":"kamikaze@gmail.com","isActive":true},{"id":9,"username":"testlecturer","fullName":"Test Lecturer","email":"test@edusync.ai","isActive":true}]
+MERGE COMPLETE
+
+
+STDERR:
+Parse error near line 8: table Students has no column named WindowsUsername
+Parse error near line 12: table Courses has no column named Description
+Parse error near line 20: table ClassSessions has no column named ScheduledDate
+Parse error near line 24: table Attendance has no column named IsVerified

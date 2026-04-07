@@ -7,10 +7,11 @@ import { studentApi } from '@/lib/studentApi';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import DashboardLayout from '@/components/DashboardLayout';
+import CourseVideosTab from '@/components/student/CourseVideosTab';
 
 export default function StudentDashboard() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'courses' | 'profile' | 'whiteboards' | 'attendance'>('courses');
+    const [activeTab, setActiveTab] = useState<'courses' | 'videos' | 'profile' | 'whiteboards' | 'attendance'>('courses');
     const [allWhiteboards, setAllWhiteboards] = useState<any[]>([]);
     const [isFetchingAllWhiteboards, setIsFetchingAllWhiteboards] = useState(false);
     const [attendanceRecords, setAttendanceRecords] = useState<any[]>([]);
@@ -142,6 +143,7 @@ export default function StudentDashboard() {
 
     const studentNav = [
         { id: 'courses', label: 'Courses', icon: '📚' },
+        { id: 'videos', label: 'Course Videos', icon: '▶️' },
         { id: 'whiteboards', label: 'Recorded Lectures', icon: '🎥' },
         { id: 'attendance', label: 'Attendance', icon: '📋' },
         { id: 'profile', label: 'Profile', icon: '👤' },
@@ -184,6 +186,7 @@ export default function StudentDashboard() {
                 </div>
             )}
                     {activeTab === 'courses' && <CoursesTab />}
+                    {activeTab === 'videos' && <CourseVideosTab />}
                     {activeTab === 'profile' && <ProfileTab />}
                     {activeTab === 'whiteboards' && (
                         <div className="space-y-6 pb-20">
@@ -322,7 +325,7 @@ export default function StudentDashboard() {
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${record.checkInMethod === 'Fingerprint'
                                                                 ? 'bg-[#FFF3E0] text-[#FF6B35]'
-                                                                : 'bg-indigo-100 text-indigo-800'
+                                                                : 'bg-blue-600 text-blue-600'
                                                             }`}>
                                                             {record.checkInMethod}
                                                         </span>
@@ -361,7 +364,7 @@ export default function StudentDashboard() {
                 {showSummaryView && selectedSummary && (
                     <div className="fixed inset-0 bg-white z-[100] flex flex-col overflow-hidden">
                         {/* Top Bar */}
-                        <div className="bg-indigo-600 px-6 py-4 flex items-center justify-between text-white shadow-md">
+                        <div className="bg-blue-600 px-6 py-4 flex items-center justify-between text-white shadow-md">
                             <div className="flex items-center space-x-4">
                                 <button
                                     onClick={() => {
@@ -369,7 +372,7 @@ export default function StudentDashboard() {
                                         setSelectedSummary(null);
                                         setChatMessages([]);
                                     }}
-                                    className="p-2 hover:bg-indigo-700 rounded-full transition-colors"
+                                    className="p-2 hover:bg-blue-600 rounded-full transition-colors"
                                     title="Close View"
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -384,7 +387,7 @@ export default function StudentDashboard() {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3">
-                                <span className="text-xs bg-indigo-500 px-3 py-1 rounded-full border border-indigo-400">
+                                <span className="text-xs bg-blue-600 px-3 py-1 rounded-full border border-blue-300">
                                     {selectedSummary.type === 'Weekly' ? `Week ${selectedSummary.weekNumber}` : 'Daily Summary'}
                                 </span>
                                 <button
@@ -393,7 +396,7 @@ export default function StudentDashboard() {
                                         setSelectedSummary(null);
                                         setChatMessages([]);
                                     }}
-                                    className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-bold hover:bg-gray-100 transition-colors shadow-sm"
+                                    className="bg-white text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-gray-100 transition-colors shadow-sm"
                                 >
                                     Close Teaching
                                 </button>
@@ -413,8 +416,8 @@ export default function StudentDashboard() {
                                     </section>
 
                                     {selectedSummary.keyTopics && (
-                                        <section className="bg-indigo-50 p-8 rounded-2xl border border-indigo-100">
-                                            <h3 className="text-lg font-bold text-indigo-900 mb-4 flex items-center">
+                                        <section className="bg-blue-50 p-8 rounded-2xl border border-indigo-100">
+                                            <h3 className="text-lg font-bold text-blue-600 mb-4 flex items-center">
                                                 <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 11h.01M7 15h.01M13 7h.01M13 11h.01M13 15h.01M17 7h.01M17 11h.01M17 15h.01" />
                                                 </svg>
@@ -428,7 +431,7 @@ export default function StudentDashboard() {
                                                             : selectedSummary.keyTopics;
                                                         return Array.isArray(topics)
                                                             ? topics.map((topic: string, i: number) => (
-                                                                <span key={i} className="px-3 py-1.5 bg-white text-indigo-700 text-sm font-semibold rounded-lg border border-indigo-200 shadow-sm">
+                                                                <span key={i} className="px-3 py-1.5 bg-white text-blue-600 text-sm font-semibold rounded-lg border border-indigo-200 shadow-sm">
                                                                     #{topic}
                                                                 </span>
                                                             ))
@@ -442,14 +445,14 @@ export default function StudentDashboard() {
                                     )}
 
                                     {selectedSummary.preparationNotes && (
-                                        <section className="bg-amber-50 p-8 rounded-2xl border border-amber-100">
-                                            <h3 className="text-lg font-bold text-amber-900 mb-4 flex items-center">
+                                        <section className="bg-blue-50 p-8 rounded-2xl border border-amber-100">
+                                            <h3 className="text-lg font-bold text-blue-600 mb-4 flex items-center">
                                                 <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                                 </svg>
                                                 Suggested Preparation
                                             </h3>
-                                            <p className="text-amber-800 leading-relaxed italic">{selectedSummary.preparationNotes}</p>
+                                            <p className="text-blue-600 leading-relaxed italic">{selectedSummary.preparationNotes}</p>
                                         </section>
                                     )}
 
@@ -459,7 +462,7 @@ export default function StudentDashboard() {
                                             <h3 className="text-2xl font-bold text-gray-900 border-b pb-4 mb-6">Session Recordings & Materials</h3>
                                             {isFetchingMaterials ? (
                                                 <div className="flex justify-center py-8">
-                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -517,7 +520,7 @@ export default function StudentDashboard() {
                                                                     download={material.fileName}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors flex-shrink-0"
+                                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
                                                                     title="Download"
                                                                 >
                                                                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -547,8 +550,8 @@ export default function StudentDashboard() {
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                     {chatMessages.length === 0 ? (
                                         <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                                            <div className="bg-indigo-100 p-4 rounded-full">
-                                                <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <div className="bg-blue-600 p-4 rounded-full">
+                                                <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                                 </svg>
                                             </div>
@@ -561,7 +564,7 @@ export default function StudentDashboard() {
                                         chatMessages.map((msg, i) => (
                                             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user'
-                                                    ? 'bg-indigo-600 text-white rounded-tr-none shadow-md'
+                                                    ? 'bg-blue-600 text-white rounded-tr-none shadow-md'
                                                     : 'bg-gray-100 text-gray-800 rounded-tl-none border border-gray-200'
                                                     }`}>
                                                     <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -588,12 +591,12 @@ export default function StudentDashboard() {
                                             onChange={(e) => setUserQuestion(e.target.value)}
                                             placeholder="Ask a question..."
                                             disabled={isAskingAI}
-                                            className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none text-sm disabled:opacity-50"
+                                            className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition-all outline-none text-sm disabled:opacity-50"
                                         />
                                         <button
                                             type="submit"
                                             disabled={!userQuestion.trim() || isAskingAI}
-                                            className="absolute right-2 top-1.5 p-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:bg-gray-400"
+                                            className="absolute right-2 top-1.5 p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:bg-gray-400"
                                         >
                                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -610,7 +613,7 @@ export default function StudentDashboard() {
     );
 }
 
-// ─── Dummy Course Timetable Data ─────────────────────────────────────────────
+// ─── Dynamic Course Data (fetched from API) ─────────────────────────────────
 const SEMESTER_START = new Date(2025, 0, 6); // Monday 6 Jan 2025
 const SEMESTER_WEEKS = 12;
 
@@ -626,25 +629,40 @@ interface CourseEvent {
     dotColor: string; // dot/accent color (hex)
 }
 
-const DUMMY_COURSES: CourseEvent[] = [
-    { code: 'CSC301', title: 'Data Structures', lecturer: 'Dr. Adeyemi', days: [1, 3, 5], startTime: '08:00', endTime: '09:00', color: '#7c3aed', bgColor: '#f3e8ff', dotColor: '#7c3aed' },
-    { code: 'CSC303', title: 'Operating Systems', lecturer: 'Prof. Okafor', days: [1, 3], startTime: '09:00', endTime: '10:00', color: '#2563eb', bgColor: '#dbeafe', dotColor: '#2563eb' },
-    { code: 'CSC305', title: 'Computer Networks', lecturer: 'Dr. Bello', days: [2, 4, 5], startTime: '08:00', endTime: '09:30', color: '#0d9488', bgColor: '#ccfbf1', dotColor: '#0d9488' },
-    { code: 'CSC307', title: 'Software Eng.', lecturer: 'Dr. Nwankwo', days: [1, 3, 5], startTime: '10:00', endTime: '11:00', color: '#ea580c', bgColor: '#ffedd5', dotColor: '#ea580c' },
-    { code: 'CSC309', title: 'Database Systems', lecturer: 'Prof. Ibrahim', days: [2, 4], startTime: '10:00', endTime: '11:00', color: '#dc2626', bgColor: '#fee2e2', dotColor: '#dc2626' },
-    { code: 'MTH301', title: 'Numerical Methods', lecturer: 'Dr. Chukwu', days: [2, 4], startTime: '11:30', endTime: '12:30', color: '#4f46e5', bgColor: '#e0e7ff', dotColor: '#4f46e5' },
-    { code: 'CSC311', title: 'Artificial Intelligence', lecturer: 'Prof. Eze', days: [1, 3], startTime: '11:30', endTime: '12:30', color: '#059669', bgColor: '#d1fae5', dotColor: '#059669' },
-    { code: 'CSC313', title: 'Computer Arch.', lecturer: 'Dr. Abubakar', days: [2, 4, 5], startTime: '14:00', endTime: '15:00', color: '#d97706', bgColor: '#fef3c7', dotColor: '#d97706' },
-    { code: 'EEE301', title: 'Signal Processing', lecturer: 'Prof. Uche', days: [1, 3, 5], startTime: '14:00', endTime: '15:00', color: '#db2777', bgColor: '#fce7f3', dotColor: '#db2777' },
-    { code: 'GST301', title: 'Entrepreneurship', lecturer: 'Dr. Fashola', days: [2, 4], startTime: '15:30', endTime: '17:00', color: '#475569', bgColor: '#f1f5f9', dotColor: '#475569' },
+// Color palette for dynamically assigned courses
+const COURSE_COLORS = [
+    { color: '#2563EB', bgColor: '#DBEAFE', dotColor: '#2563EB' },
+    { color: '#0d9488', bgColor: '#ccfbf1', dotColor: '#0d9488' },
+    { color: '#ea580c', bgColor: '#ffedd5', dotColor: '#ea580c' },
+    { color: '#dc2626', bgColor: '#fee2e2', dotColor: '#dc2626' },
+    { color: '#4f46e5', bgColor: '#e0e7ff', dotColor: '#4f46e5' },
+    { color: '#059669', bgColor: '#d1fae5', dotColor: '#059669' },
+    { color: '#d97706', bgColor: '#fef3c7', dotColor: '#d97706' },
+    { color: '#db2777', bgColor: '#fce7f3', dotColor: '#db2777' },
+    { color: '#475569', bgColor: '#f1f5f9', dotColor: '#475569' },
+    { color: '#7c3aed', bgColor: '#ede9fe', dotColor: '#7c3aed' },
 ];
 
-function getCoursesForDate(date: Date): CourseEvent[] {
+// Default schedule slots for enrolled courses (distributed across the week)
+const DEFAULT_SLOTS = [
+    { days: [1, 3, 5], startTime: '08:00', endTime: '09:00' },
+    { days: [1, 3],    startTime: '09:00', endTime: '10:00' },
+    { days: [2, 4, 5], startTime: '08:00', endTime: '09:30' },
+    { days: [1, 3, 5], startTime: '10:00', endTime: '11:00' },
+    { days: [2, 4],    startTime: '10:00', endTime: '11:00' },
+    { days: [2, 4],    startTime: '11:30', endTime: '12:30' },
+    { days: [1, 3],    startTime: '11:30', endTime: '12:30' },
+    { days: [2, 4, 5], startTime: '14:00', endTime: '15:00' },
+    { days: [1, 3, 5], startTime: '14:00', endTime: '15:00' },
+    { days: [2, 4],    startTime: '15:30', endTime: '17:00' },
+];
+
+function getCoursesForDate(date: Date, courseList: CourseEvent[]): CourseEvent[] {
     const dayOfWeek = date.getDay();
     const semesterEnd = new Date(SEMESTER_START);
     semesterEnd.setDate(semesterEnd.getDate() + SEMESTER_WEEKS * 7);
     if (date < SEMESTER_START || date >= semesterEnd) return [];
-    return DUMMY_COURSES.filter(c => c.days.includes(dayOfWeek));
+    return courseList.filter(c => c.days.includes(dayOfWeek));
 }
 
 function getDaysInMonth(year: number, month: number) {
@@ -665,35 +683,39 @@ function CoursesTab() {
     const [selectedCourse, setSelectedCourse] = useState<CourseEvent | null>(null);
     const [selectedCourseDate, setSelectedCourseDate] = useState<Date | null>(null);
     const [summaryTab, setSummaryTab] = useState<'general' | 'personalized'>('general');
-    const [courses, setCourses] = useState<CourseEvent[]>(DUMMY_COURSES);
+    const [courses, setCourses] = useState<CourseEvent[]>([]);
+    const [isLoadingCourses, setIsLoadingCourses] = useState(true);
 
-    // Fetch real lecturer names from API and merge into course data
+    // Fetch enrolled courses from API and build CourseEvent objects
     useEffect(() => {
-        const fetchRealLecturers = async () => {
+        const fetchEnrolledCourses = async () => {
             try {
                 const token = localStorage.getItem('studentToken');
-                if (!token) return;
+                if (!token) { setIsLoadingCourses(false); return; }
                 const res = await fetch(`${API_BASE_URL}/students/my-courses`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!res.ok) return;
+                if (!res.ok) { setIsLoadingCourses(false); return; }
                 const enrolled: { courseCode: string; courseTitle: string; lecturerName: string }[] = await res.json();
-                if (!enrolled.length) return;
-                // Build lookup: courseCode -> real lecturer name
-                const lecturerMap: Record<string, string> = {};
-                enrolled.forEach(c => {
-                    if (c.lecturerName && c.lecturerName !== 'TBA') {
-                        lecturerMap[c.courseCode] = c.lecturerName;
-                    }
+                // Convert API courses into CourseEvent objects with rotating colors and schedule slots
+                const courseEvents: CourseEvent[] = enrolled.map((c, i) => {
+                    const colorSet = COURSE_COLORS[i % COURSE_COLORS.length];
+                    const slot = DEFAULT_SLOTS[i % DEFAULT_SLOTS.length];
+                    return {
+                        code: c.courseCode,
+                        title: c.courseTitle,
+                        lecturer: c.lecturerName || 'TBA',
+                        days: slot.days,
+                        startTime: slot.startTime,
+                        endTime: slot.endTime,
+                        ...colorSet,
+                    };
                 });
-                // Merge into DUMMY_COURSES
-                setCourses(DUMMY_COURSES.map(dc => ({
-                    ...dc,
-                    lecturer: lecturerMap[dc.code] || dc.lecturer
-                })));
-            } catch { /* keep dummy data on error */ }
+                setCourses(courseEvents);
+            } catch { /* keep empty on error */ }
+            finally { setIsLoadingCourses(false); }
         };
-        fetchRealLecturers();
+        fetchEnrolledCourses();
     }, []);
 
     const getCoursesForDateLocal = (date: Date): CourseEvent[] => {
@@ -766,7 +788,7 @@ function CoursesTab() {
                         <div className="text-right">
                             <p className="text-xs font-bold text-gray-700">{dayNames}</p>
                             <p className="text-xs text-gray-400">{selectedCourse.startTime} – {selectedCourse.endTime}</p>
-                            <p className="text-[10px] text-purple-500 font-bold mt-1">12-week semester</p>
+                            <p className="text-[10px] text-blue-600 font-bold mt-1">12-week semester</p>
                         </div>
                     </div>
                 </div>
@@ -776,7 +798,7 @@ function CoursesTab() {
                     <button
                         onClick={() => setSummaryTab('general')}
                         className={`px-5 py-2 text-sm font-bold rounded-full transition-all ${
-                            summaryTab === 'general' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                            summaryTab === 'general' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
                         }`}
                     >
                         📄 General Summaries
@@ -784,7 +806,7 @@ function CoursesTab() {
                     <button
                         onClick={() => setSummaryTab('personalized')}
                         className={`px-5 py-2 text-sm font-bold rounded-full transition-all ${
-                            summaryTab === 'personalized' ? 'bg-[#7c3aed] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                            summaryTab === 'personalized' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
                         }`}
                     >
                         🎯 Personalized Summaries
@@ -819,7 +841,7 @@ function CoursesTab() {
                 </div>
                 {/* View toggle pills */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
-                    <button className="px-4 py-1.5 text-xs font-bold rounded-full bg-[#7c3aed] text-white shadow-sm">Month</button>
+                    <button className="px-4 py-1.5 text-xs font-bold rounded-full bg-[#2563EB] text-white shadow-sm">Month</button>
                     <button className="px-4 py-1.5 text-xs font-medium rounded-full text-gray-500 hover:text-gray-700 transition-colors">Week</button>
                     <button className="px-4 py-1.5 text-xs font-medium rounded-full text-gray-500 hover:text-gray-700 transition-colors">Day</button>
                 </div>
@@ -832,7 +854,7 @@ function CoursesTab() {
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                         <div className="flex items-center gap-3">
                             <h3 className="text-lg font-bold text-gray-900">{MONTH_NAMES[month]} {year}</h3>
-                            <span className="text-xs bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">{DUMMY_COURSES.length} courses</span>
+                            <span className="text-xs bg-blue-600 text-blue-600 font-bold px-2 py-0.5 rounded-full">{courses.length} courses</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <button onClick={prevMonth} disabled={viewMonth === 0} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors">
@@ -858,7 +880,7 @@ function CoursesTab() {
                                 return <div key={`empty-${idx}`} className="min-h-[100px] bg-gray-50/50 border-b border-r border-gray-50" />;
                             }
                             const date = new Date(year, month, day);
-                            const courses = getCoursesForDate(date);
+                            const dayCourses = getCoursesForDate(date, courses);
                             const dayIsToday = isToday(day);
                             const isSelected = selectedDate?.getDate() === day && selectedDate?.getMonth() === month;
 
@@ -866,17 +888,17 @@ function CoursesTab() {
                                 <div
                                     key={day}
                                     onClick={() => setSelectedDate(date)}
-                                    className={`min-h-[100px] p-1.5 border-b border-r border-gray-100 cursor-pointer transition-all hover:bg-purple-50/50 ${
-                                        isSelected ? 'bg-purple-50 ring-2 ring-[#7c3aed] ring-inset' : ''
+                                    className={`min-h-[100px] p-1.5 border-b border-r border-gray-100 cursor-pointer transition-all hover:bg-blue-50/50 ${
+                                        isSelected ? 'bg-blue-50 ring-2 ring-[#2563EB] ring-inset' : ''
                                     }`}
                                 >
                                     <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                                        dayIsToday ? 'bg-[#7c3aed] text-white' : 'text-gray-700'
+                                        dayIsToday ? 'bg-[#2563EB] text-white' : 'text-gray-700'
                                     }`}>
                                         {day}
                                     </div>
                                     <div className="space-y-0.5">
-                                        {courses.slice(0, 3).map(c => (
+                                        {dayCourses.slice(0, 3).map(c => (
                                             <div
                                                 key={c.code}
                                                 className="rounded-md px-1.5 py-0.5 text-[10px] font-bold truncate leading-tight"
@@ -886,8 +908,8 @@ function CoursesTab() {
                                                 {c.code} <span className="font-normal opacity-70">{c.startTime}</span>
                                             </div>
                                         ))}
-                                        {courses.length > 3 && (
-                                            <div className="text-[9px] font-bold text-purple-500 pl-1">+{courses.length - 3} more</div>
+                                        {dayCourses.length > 3 && (
+                                            <div className="text-[9px] font-bold text-blue-600 pl-1">+{dayCourses.length - 3} more</div>
                                         )}
                                     </div>
                                 </div>
@@ -918,9 +940,9 @@ function CoursesTab() {
                                     disabled={!day}
                                     className={`text-[11px] py-1 rounded-full font-medium transition-all ${
                                         !day ? 'invisible' :
-                                        isToday(day!) ? 'bg-[#7c3aed] text-white font-bold' :
-                                        selectedDate?.getDate() === day && selectedDate?.getMonth() === month ? 'bg-purple-100 text-purple-700 font-bold' :
-                                        'text-gray-600 hover:bg-purple-50'
+                                        isToday(day!) ? 'bg-[#2563EB] text-white font-bold' :
+                                        selectedDate?.getDate() === day && selectedDate?.getMonth() === month ? 'bg-blue-600 text-blue-600 font-bold' :
+                                        'text-gray-600 hover:bg-blue-50'
                                     }`}
                                 >
                                     {day || ''}
@@ -935,12 +957,12 @@ function CoursesTab() {
                             <h4 className="text-sm font-bold text-gray-900">
                                 {selectedDate ? `${DAY_HEADERS[selectedDate.getDay()]}, ${MONTH_NAMES[selectedDate.getMonth()]} ${selectedDate.getDate()}` : 'Today\'s Classes'}
                             </h4>
-                            <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
-                                {selectedCourses.length || getCoursesForDate(today).length} classes
+                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                {selectedCourses.length || getCoursesForDate(today, courses).length} classes
                             </span>
                         </div>
                         <div className="space-y-2">
-                            {(selectedCourses.length > 0 ? selectedCourses : getCoursesForDate(today)).map(c => (
+                            {(selectedCourses.length > 0 ? selectedCourses : getCoursesForDate(today, courses)).map(c => (
                                 <div key={c.code} onClick={() => handleCourseClick(c, selectedDate ?? today)} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
                                     <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
                                     <div className="flex-1 min-w-0">
@@ -952,7 +974,7 @@ function CoursesTab() {
                                     </span>
                                 </div>
                             ))}
-                            {selectedCourses.length === 0 && getCoursesForDate(today).length === 0 && (
+                            {selectedCourses.length === 0 && getCoursesForDate(today, courses).length === 0 && (
                                 <p className="text-xs text-gray-400 text-center py-4">No classes scheduled</p>
                             )}
                         </div>
@@ -962,7 +984,7 @@ function CoursesTab() {
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
                         <h4 className="text-sm font-bold text-gray-900 mb-3">My Courses</h4>
                         <div className="space-y-2">
-                            {DUMMY_COURSES.map(c => (
+                            {courses.map((c: CourseEvent) => (
                                 <div key={c.code} onClick={() => handleCourseClick(c)} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg px-1 py-0.5 -mx-1 transition-colors">
                                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.dotColor }} />
                                     <span className="text-[11px] font-bold text-gray-700">{c.code}</span>
@@ -1009,7 +1031,7 @@ function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent 
     if (isLoading) {
         return (
             <div className="flex justify-center py-16">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600" />
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
             </div>
         );
     }
@@ -1027,7 +1049,7 @@ function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent 
                 <p className="text-sm text-gray-400 max-w-sm mx-auto">
                     The lecturer has not uploaded and analyzed the syllabus for {course.code} yet.
                 </p>
-                <div className="mt-5 inline-flex items-center gap-2 text-xs text-purple-500 bg-purple-50 px-4 py-2 rounded-full font-semibold">
+                <div className="mt-5 inline-flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-4 py-2 rounded-full font-semibold">
                     Week {weekNumber} &bull; Day {dayOrdinal} of {totalDays} &bull; {dayName}
                 </div>
             </div>
@@ -1068,7 +1090,7 @@ function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent 
             {daySummary.summary && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-black">{dayOrdinal}</span>
+                        <span className="w-6 h-6 bg-blue-600 text-blue-600 rounded-full flex items-center justify-center text-xs font-black">{dayOrdinal}</span>
                         Today&apos;s Lecture Summary
                     </h4>
                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{daySummary.summary}</p>
@@ -1077,11 +1099,11 @@ function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent 
 
             {/* Key topics */}
             {keyTopics.length > 0 && (
-                <div className="bg-indigo-50 rounded-2xl p-5 border border-indigo-100">
-                    <h4 className="text-sm font-bold text-indigo-800 mb-3">Key Topics &mdash; {dayName}</h4>
+                <div className="bg-blue-50 rounded-2xl p-5 border border-indigo-100">
+                    <h4 className="text-sm font-bold text-blue-600 mb-3">Key Topics &mdash; {dayName}</h4>
                     <div className="flex flex-wrap gap-2">
                         {keyTopics.map((topic: string, i: number) => (
-                            <span key={i} className="px-3 py-1.5 bg-white text-indigo-700 text-xs font-semibold rounded-lg border border-indigo-200 shadow-sm">
+                            <span key={i} className="px-3 py-1.5 bg-white text-blue-600 text-xs font-semibold rounded-lg border border-indigo-200 shadow-sm">
                                 #{topic}
                             </span>
                         ))}
@@ -1091,9 +1113,9 @@ function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent 
 
             {/* Preparation notes on last day */}
             {isLastDay && daySummary.preparationNotes && (
-                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
-                    <h4 className="text-sm font-bold text-amber-800 mb-2">Preparation for Next Week</h4>
-                    <p className="text-amber-800 text-sm italic leading-relaxed">{daySummary.preparationNotes}</p>
+                <div className="bg-blue-50 rounded-2xl p-5 border border-amber-100">
+                    <h4 className="text-sm font-bold text-blue-600 mb-2">Preparation for Next Week</h4>
+                    <p className="text-blue-600 text-sm italic leading-relaxed">{daySummary.preparationNotes}</p>
                 </div>
             )}
 
@@ -1107,7 +1129,7 @@ function GeneralSummariesSection({ course, clickedDate }: { course: CourseEvent 
                                 key={s.id}
                                 className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                                     s.weekNumber === weekNumber && s.dayNumber === dayOrdinal
-                                        ? 'bg-purple-600 text-white'
+                                        ? 'bg-blue-600 text-white'
                                         : 'bg-gray-100 text-gray-600'
                                 }`}
                             >
@@ -1206,21 +1228,21 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
                 {msgs.map((m, i) => (
                     <div key={i}>
                         {m.role === 'user' ? (
-                            <div className="flex justify-end"><div className="bg-purple-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 max-w-[80%] text-sm">{m.content}</div></div>
+                            <div className="flex justify-end"><div className="bg-blue-600 text-white rounded-2xl rounded-br-md px-4 py-2.5 max-w-[80%] text-sm">{m.content}</div></div>
                         ) : m.role === 'quiz' && m.quizData ? (
                             <div className="space-y-3">
                                 <div className="flex items-start gap-2">
-                                    <span className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</span>
+                                    <span className="w-7 h-7 bg-blue-600 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</span>
                                     <div className="bg-white rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[90%] text-sm text-gray-800 border border-gray-100">{m.content}</div>
                                 </div>
                                 {m.quizData.map((q, qi) => {
                                     const k = i * 100 + qi; const done = qDone[k]; const sel = qAnswers[k]; const ok = sel === q.correctIndex;
                                     return (
                                         <div key={qi} className="bg-white rounded-xl border border-gray-200 p-4 ml-9">
-                                            <p className="text-sm font-semibold text-gray-800 mb-2"><span className="text-purple-600 mr-1">Q{qi + 1}.</span>{q.question}</p>
+                                            <p className="text-sm font-semibold text-gray-800 mb-2"><span className="text-blue-600 mr-1">Q{qi + 1}.</span>{q.question}</p>
                                             <div className="space-y-1.5">
                                                 {q.options.map((o, oi) => {
-                                                    let cls = 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-purple-50 hover:border-purple-300 cursor-pointer';
+                                                    let cls = 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-300 cursor-pointer';
                                                     if (done) {
                                                         if (oi === q.correctIndex) cls = 'bg-green-50 border-green-400 text-green-800';
                                                         else if (oi === sel && !ok) cls = 'bg-red-50 border-red-400 text-red-800';
@@ -1234,7 +1256,7 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
                                                     );
                                                 })}
                                             </div>
-                                            {done && <p className={`text-xs mt-2 p-2 rounded-lg ${ok ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{ok ? '🎉 Correct! ' : '💡 '}{q.explanation}</p>}
+                                            {done && <p className={`text-xs mt-2 p-2 rounded-lg ${ok ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-600'}`}>{ok ? '🎉 Correct! ' : '💡 '}{q.explanation}</p>}
                                         </div>
                                     );
                                 })}
@@ -1245,7 +1267,7 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
                                         const correct = m.quizData!.filter((q, qi) => qAnswers[i * 100 + qi] === q.correctIndex).length;
                                         const pct = Math.round((correct / tot) * 100);
                                         return (
-                                            <div className={`ml-9 p-3 rounded-xl border text-center text-sm font-bold ${pct >= 80 ? 'bg-green-50 border-green-200 text-green-700' : pct >= 50 ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                                            <div className={`ml-9 p-3 rounded-xl border text-center text-sm font-bold ${pct >= 80 ? 'bg-green-50 border-green-200 text-green-700' : pct >= 50 ? 'bg-blue-50 border-amber-200 text-blue-600' : 'bg-red-50 border-red-200 text-red-700'}`}>
                                                 {pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '📚'} Score: {correct}/{tot} ({pct}%)
                                                 {pct >= 80 ? ' — Excellent!' : pct >= 50 ? ' — Good job!' : ' — Review and try again!'}
                                             </div>
@@ -1256,7 +1278,7 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
                             </div>
                         ) : (
                             <div className="flex items-start gap-2">
-                                <span className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</span>
+                                <span className="w-7 h-7 bg-blue-600 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</span>
                                 <div className="bg-white rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[80%] text-sm text-gray-800 border border-gray-100 whitespace-pre-wrap">{m.content}</div>
                             </div>
                         )}
@@ -1264,9 +1286,9 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
                 ))}
                 {loading && (
                     <div className="flex items-start gap-2">
-                        <span className="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">AI</span>
+                        <span className="w-7 h-7 bg-blue-600 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">AI</span>
                         <div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 border border-gray-100">
-                            <div className="flex gap-1"><span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0s'}} /><span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0.15s'}} /><span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0.3s'}} /></div>
+                            <div className="flex gap-1"><span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay:'0s'}} /><span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay:'0.15s'}} /><span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay:'0.3s'}} /></div>
                         </div>
                     </div>
                 )}
@@ -1276,14 +1298,14 @@ function SummaryChatbot({ summaryId, courseCode, summaryTitle }: { summaryId: nu
             {/* Input area */}
             <div className="border-t border-gray-200 p-3 flex gap-2 bg-white">
                 <button onClick={genQuiz} disabled={loading}
-                    className="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold hover:bg-indigo-200 transition-colors disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
+                    className="px-3 py-2 bg-blue-600 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center gap-1 flex-shrink-0"
                     title="Generate a quiz">📝 Quiz</button>
                 <input value={input} onChange={e => setInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
                     placeholder="Ask about this topic..."
-                    className="flex-1 px-3 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all" disabled={loading} />
+                    className="flex-1 px-3 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all" disabled={loading} />
                 <button onClick={send} disabled={loading || !input.trim()}
-                    className="w-9 h-9 bg-purple-600 text-white rounded-xl flex items-center justify-center hover:bg-purple-700 transition-colors disabled:opacity-50 flex-shrink-0">
+                    className="w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors disabled:opacity-50 flex-shrink-0">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </button>
             </div>
@@ -1397,7 +1419,7 @@ function SummariesTab({ setSelectedSummary, setShowSummaryView }: { setSelectedS
                                             <div className="text-[10px] text-gray-500 uppercase tracking-tight">{summary.courseName}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-full ${summary.type === 'Weekly' ? 'bg-purple-100 text-purple-700' : 'bg-[#FFF3E0] text-[#FF6B35]'}`}>
+                                            <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-full ${summary.type === 'Weekly' ? 'bg-blue-600 text-blue-600' : 'bg-[#FFF3E0] text-[#FF6B35]'}`}>
                                                 {summary.type === 'Weekly' ? `Week ${summary.weekNumber}` : 'Day Summary'}
                                             </span>
                                         </td>

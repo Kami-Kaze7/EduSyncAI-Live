@@ -54,7 +54,7 @@ export default function LecturerWhiteboardsPage() {
                     </div>
                     <button
                         onClick={fetchWhiteboards}
-                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all flex items-center font-medium"
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all flex items-center font-medium"
                     >
                         <ArrowPathIcon className={`h-5 w-5 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                         Sync Drawings
@@ -65,7 +65,7 @@ export default function LecturerWhiteboardsPage() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-24">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
                         <p className="text-gray-500 font-medium">Loading your drawings...</p>
                     </div>
                 ) : whiteboards.length > 0 ? (
@@ -104,14 +104,14 @@ export default function LecturerWhiteboardsPage() {
                                                 )}
 
                                             </div>
-                                            <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider mt-1">{wb.courseCode} • {wb.courseName}</p>
+                                            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mt-1">{wb.courseCode} • {wb.courseName}</p>
                                         </div>
                                         <a
                                             href={`${API_BASE_URL}/materials/${wb.id}/download`}
                                             download={wb.fileName}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                                            className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                             title="Download"
                                         >
                                             <ArrowDownTrayIcon className="h-5 w-5" />
@@ -131,7 +131,7 @@ export default function LecturerWhiteboardsPage() {
                     </div>
                 ) : (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 text-center max-w-2xl mx-auto">
-                        <div className="bg-indigo-50 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="bg-blue-50 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-6">
                             <PhotoIcon className="h-12 w-12 text-indigo-400" />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">No Whiteboards Saved</h3>
@@ -141,7 +141,7 @@ export default function LecturerWhiteboardsPage() {
                         <div className="mt-8">
                             <Link
                                 href="/schedule"
-                                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all active:scale-95"
+                                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-600 shadow-md transition-all active:scale-95"
                             >
                                 View My Schedule
                             </Link>

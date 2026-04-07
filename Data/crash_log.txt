@@ -132,3 +132,37 @@ System.NullReferenceException: Object reference not set to an instance of an obj
    at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
    at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
 ===STARTUP ENTERED [4/2/2026 3:37:54 PM]===
+
+===STARTUP ENTERED [4/3/2026 7:11:19 AM]===
+
+===STARTUP ENTERED [4/3/2026 7:12:24 AM]===
+
+===STARTUP ENTERED [4/3/2026 7:12:52 AM]===
+
+===STARTUP ENTERED [4/3/2026 8:49:00 AM]===
+
+===STARTUP ENTERED [4/3/2026 8:57:00 AM]===
+
+===STARTUP ENTERED [4/3/2026 10:10:07 AM]===
+
+===STARTUP ENTERED [4/3/2026 10:27:15 AM]===
+
+===STARTUP ENTERED [4/4/2026 1:33:54 AM]===
+
+===STARTUP ENTERED [4/4/2026 2:40:02 AM]===
+
+===STARTUP ENTERED [4/4/2026 8:02:19 AM]===
+
+===STARTUP ENTERED [4/4/2026 8:03:29 AM]===
+
+===STARTUP ENTERED [4/6/2026 3:39:31 PM]===
+
+===STARTUP ENTERED [4/6/2026 3:50:42 PM]===
+
+===STARTUP ENTERED [4/7/2026 10:59:05 AM]===
+
+===STARTUP ENTERED [4/7/2026 11:17:17 AM]===
+
+===STARTUP ENTERED [4/7/2026 3:05:04 PM]===
+
+===STARTUP ENTERED [4/7/2026 4:00:17 PM]===

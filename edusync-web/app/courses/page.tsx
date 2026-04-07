@@ -71,13 +71,13 @@ export default function CoursesPage() {
                                 <ArrowLeftIcon className="h-6 w-6" />
                             </Link>
                             <div className="flex items-center space-x-3">
-                                <AcademicCapIcon className="h-8 w-8 text-indigo-600" />
+                                <AcademicCapIcon className="h-8 w-8 text-blue-600" />
                                 <h1 className="text-2xl font-bold text-gray-900">Course Management</h1>
                             </div>
                         </div>
                         <button
                             onClick={() => setIsCreating(true)}
-                            className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                         >
                             <PlusIcon className="h-5 w-5" />
                             <span>New Course</span>
@@ -102,7 +102,7 @@ export default function CoursesPage() {
                                         required
                                         value={newCourse.courseCode}
                                         onChange={(e) => setNewCourse({ ...newCourse, courseCode: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                         placeholder="e.g., CS101"
                                     />
                                 </div>
@@ -115,7 +115,7 @@ export default function CoursesPage() {
                                         required
                                         value={newCourse.courseName}
                                         onChange={(e) => setNewCourse({ ...newCourse, courseName: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                         placeholder="e.g., Introduction to Programming"
                                     />
                                 </div>
@@ -127,7 +127,7 @@ export default function CoursesPage() {
                                         value={newCourse.description}
                                         onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
                                         rows={3}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                         placeholder="Course description..."
                                     />
                                 </div>
@@ -142,14 +142,14 @@ export default function CoursesPage() {
                                         max="6"
                                         value={newCourse.creditHours}
                                         onChange={(e) => setNewCourse({ ...newCourse, creditHours: parseInt(e.target.value) })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                                     />
                                 </div>
                                 <div className="flex space-x-4 pt-4">
                                     <button
                                         type="submit"
                                         disabled={createMutation.isPending}
-                                        className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                                        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                                     >
                                         {createMutation.isPending ? 'Creating...' : 'Create Course'}
                                     </button>
@@ -169,7 +169,7 @@ export default function CoursesPage() {
                 {/* Courses Grid */}
                 {isLoading ? (
                     <div className="text-center py-12">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                         <p className="mt-4 text-gray-600">Loading courses...</p>
                     </div>
                 ) : courses && courses.length > 0 ? (
@@ -202,7 +202,7 @@ export default function CoursesPage() {
                                     </span>
                                     <Link
                                         href={`/courses/${course.id}`}
-                                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                        className="text-blue-600 hover:text-blue-600 text-sm font-medium"
                                     >
                                         View Details →
                                     </Link>
@@ -217,7 +217,7 @@ export default function CoursesPage() {
                         <p className="text-gray-600 mb-6">Get started by creating your first course</p>
                         <button
                             onClick={() => setIsCreating(true)}
-                            className="inline-flex items-center space-x-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+                            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
                         >
                             <PlusIcon className="h-5 w-5" />
                             <span>Create Course</span>

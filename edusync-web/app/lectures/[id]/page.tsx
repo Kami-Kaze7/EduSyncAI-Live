@@ -85,7 +85,7 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
         return (
             <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     <p className="mt-4 text-gray-600">Loading lecture details...</p>
                 </div>
             </div>
@@ -102,7 +102,7 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
                             <ArrowLeftIcon className="h-6 w-6" />
                         </Link>
                         <div className="flex items-center space-x-3">
-                            <DocumentTextIcon className="h-8 w-8 text-purple-600" />
+                            <DocumentTextIcon className="h-8 w-8 text-blue-600" />
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900">Lecture Preparation</h1>
                                 {session && (
@@ -125,13 +125,13 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
                             value={notes || session?.notes?.content || ''}
                             onChange={(e) => setNotes(e.target.value)}
                             rows={15}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent resize-none"
                             placeholder="Write your lecture notes here..."
                         />
                         <button
                             onClick={handleSaveNotes}
                             disabled={updateNotesMutation.isPending}
-                            className="mt-4 w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                            className="mt-4 w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                         >
                             {updateNotesMutation.isPending ? 'Saving...' : 'Save Notes'}
                         </button>
@@ -158,7 +158,7 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
                             <button
                                 onClick={handleFileUpload}
                                 disabled={!selectedFile || uploadMutation.isPending}
-                                className="w-full flex items-center justify-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                             >
                                 <CloudArrowUpIcon className="h-5 w-5" />
                                 <span>{uploadMutation.isPending ? 'Uploading...' : 'Upload Material'}</span>
@@ -186,7 +186,7 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
                                                     href={`${API_BASE_URL}/materials/${material.id}/download`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-purple-600 hover:text-purple-800"
+                                                    className="text-blue-600 hover:text-blue-600"
                                                     title="Download"
                                                 >
                                                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,14 +229,14 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-gray-900">Attendance List</h2>
-                            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">
+                            <span className="bg-blue-600 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
                                 {attendanceLoading ? 'Checking...' : attendance ? `${attendance.length} Student${attendance.length !== 1 ? 's' : ''} Present` : '0 Students Present'}
                             </span>
                         </div>
 
                         {attendanceLoading ? (
                             <div className="flex justify-center py-10">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                             </div>
                         ) : attendance && attendance.length > 0 ? (
                             <div className="overflow-x-auto">
@@ -264,7 +264,7 @@ export default function LecturePreparationPage({ params }: { params: Promise<{ i
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${record.checkInMethod === 'Fingerprint'
                                                             ? 'bg-blue-100 text-blue-800'
-                                                            : 'bg-indigo-100 text-indigo-800'
+                                                            : 'bg-blue-600 text-blue-600'
                                                         }`}>
                                                         {record.checkInMethod}
                                                     </span>
