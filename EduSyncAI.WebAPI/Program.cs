@@ -26,6 +26,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EduSyncAI.WebAPI.Services.GeminiSummarizationService>();
 builder.Services.AddSingleton<EduSyncAI.WebAPI.Services.LiveStreamService>();
+builder.Services.AddSingleton<EduSyncAI.WebAPI.Services.WasabiService>();
 builder.Services.AddSignalR();
 
 // Configure database
@@ -125,6 +126,12 @@ using (var scope = app.Services.CreateScope())
             );
         ");
     } catch { /* Ignore if it exists */ }
+
+    // Wasabi CourseVideo columns migration
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN WasabiKey TEXT"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN FileSizeBytes INTEGER"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN OriginalFileName TEXT"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN IsWasabiVideo INTEGER NOT NULL DEFAULT 0"); } catch { }
     
     // Seed test user
     DatabaseSeeder.SeedTestUser(context);

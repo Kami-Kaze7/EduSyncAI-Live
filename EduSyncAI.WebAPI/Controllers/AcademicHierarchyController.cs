@@ -286,7 +286,11 @@ namespace EduSyncAI.WebAPI.Controllers
                                 Title = v.Title,
                                 Description = v.Description,
                                 VideoUrl = v.VideoUrl,
-                                AddedAt = v.AddedAt
+                                AddedAt = v.AddedAt,
+                                IsWasabiVideo = v.IsWasabiVideo,
+                                FileSizeBytes = v.FileSizeBytes,
+                                OriginalFileName = v.OriginalFileName,
+                                WasabiKey = v.WasabiKey
                             }).ToList()
                         }).ToList()
                     }).ToList()

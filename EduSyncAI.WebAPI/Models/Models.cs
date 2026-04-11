@@ -279,6 +279,12 @@ namespace EduSyncAI.WebAPI.Models
         public int OrderIndex { get; set; } = 0;
         public DateTime AddedAt { get; set; } = DateTime.UtcNow;
         
+        // Wasabi cloud storage fields
+        public string? WasabiKey { get; set; }          // S3 object key (e.g., "courses/15/abc123.mp4")
+        public long? FileSizeBytes { get; set; }         // File size for display
+        public string? OriginalFileName { get; set; }    // Original uploaded file name
+        public bool IsWasabiVideo { get; set; } = false; // true = uploaded file, false = YouTube embed
+        
         public virtual Course? Course { get; set; }
     }
 }

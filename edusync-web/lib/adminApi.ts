@@ -254,5 +254,33 @@ export const adminApi = {
     deleteCourseVideo: async (videoId: number) => {
         const response = await axios.delete(`${API_BASE_URL}/CourseVideos/${videoId}`);
         return response.data;
+    },
+
+    // Wasabi Video Upload
+    getUploadUrl: async (fileName: string, contentType: string, courseId: number) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/upload-url`, {
+            fileName,
+            contentType,
+            courseId
+        });
+        return response.data;
+    },
+    confirmVideoUpload: async (courseId: number, data: {
+        title: string;
+        description?: string;
+        objectKey: string;
+        originalFileName: string;
+        fileSizeBytes: number;
+    }) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/course/${courseId}/confirm`, data);
+        return response.data;
+    },
+    getVideoStreamUrl: async (videoId: number) => {
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/${videoId}/stream-url`);
+        return response.data;
+    },
+    getVideoDownloadUrl: async (videoId: number) => {
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/${videoId}/download-url`);
+        return response.data;
     }
 };

@@ -274,18 +274,21 @@ namespace EduSyncAI
 
             try
             {
-                _sessionService.EndSession(ActiveSession.Id);
+                // Capture ID before LoadData() nullifies ActiveSession
+                var sessionId = ActiveSession.Id;
+
+                _sessionService.EndSession(sessionId);
                 StopLiveTimer();
 
-                LoadData();
+                // Upload attendance records to cloud (before LoadData nullifies ActiveSession)
+                _ = UploadAttendanceRecordsAsync(sessionId);
 
-                    // Upload attendance records to cloud
-                    _ = UploadAttendanceRecordsAsync(ActiveSession.Id);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error ending session: {ex.Message}");
-                }
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error ending session: {ex.Message}");
+            }
         }
 
         private void StartLiveTimer()

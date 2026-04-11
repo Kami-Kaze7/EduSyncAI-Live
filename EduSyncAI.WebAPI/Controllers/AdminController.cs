@@ -782,12 +782,8 @@ namespace EduSyncAI.WebAPI.Controllers
                 if (student == null)
                     return NotFound(new { error = "Student not found" });
 
-                // The 10 standard course codes
-                var standardCodes = new[] { "CSC301","CSC303","CSC305","CSC307","CSC309","MTH301","CSC311","CSC313","EEE301","GST301" };
-
-                var courses = await _context.Courses
-                    .Where(c => standardCodes.Contains(c.CourseCode))
-                    .ToListAsync();
+                // Enroll in ALL courses in the database
+                var courses = await _context.Courses.ToListAsync();
 
                 int enrolled = 0, skipped = 0;
                 foreach (var course in courses)

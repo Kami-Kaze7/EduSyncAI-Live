@@ -73,7 +73,7 @@ namespace EduSyncAI
             }
         }
 
-        private async void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(SessionManagementViewModel.HasActiveSession))
             {
@@ -86,14 +86,8 @@ namespace EduSyncAI
                         StartScreenRecording(viewModel.ActiveSession.Id);
                         AutoOpenWhiteboard(viewModel);
                     }
-                    else
-                    {
-                        // Session ended → stop recording
-                        if (_isScreenRecording)
-                        {
-                            await StopScreenRecordingAsync();
-                        }
-                    }
+                    // Recording stop is handled by OnWhiteboardSessionEndedAsync callback
+                    // (not here — doing it here caused a race condition with Close())
                 }
             }
         }
@@ -107,7 +101,7 @@ namespace EduSyncAI
                 _activeWhiteboard = new WhiteboardWindow(
                     viewModel.ActiveSession.Id,
                     viewModel,
-                    OnWhiteboardSessionEnded);
+                    OnWhiteboardSessionEndedAsync);
                 _activeWhiteboard.Closed += (s, e) => RestoreMainWindow();
                 _activeWhiteboard.Show();
 
@@ -120,10 +114,15 @@ namespace EduSyncAI
             }
         }
 
-        private async void OnWhiteboardSessionEnded()
+        /// <summary>
+        /// Primary handler for stopping the screen recording when the session ends.
+        /// Returns Task so the whiteboard can await it before closing.
+        /// </summary>
+        private async Task OnWhiteboardSessionEndedAsync()
         {
-            // When session is ended from the whiteboard, stop recording here
-            if (_isScreenRecording)
+            // Always attempt to stop recording — don't rely on the flag
+            // (it may have been cleared by a previous partial attempt)
+            if (_screenRecordProcess != null || _isScreenRecording)
             {
                 await StopScreenRecordingAsync();
             }
@@ -171,7 +170,7 @@ namespace EduSyncAI
                     _activeWhiteboard = new WhiteboardWindow(
                         viewModel.ActiveSession.Id,
                         viewModel,
-                        OnWhiteboardSessionEnded);
+                        OnWhiteboardSessionEndedAsync);
                     _activeWhiteboard.Closed += (s, args) => RestoreMainWindow();
                     _activeWhiteboard.Show();
                     MinimizeMainWindow();
@@ -206,35 +205,10 @@ namespace EduSyncAI
                 _screenRecordingPath = System.IO.Path.Combine(recordingsDir, $"Session_{sessionId}_{timestamp}.mp4");
                 _recordingSessionId = sessionId;
 
-                // Try to find an audio device for recording system audio
-                string audioArgs = "";
-                try
-                {
-                    var audioDevice = FindAudioDevice(ffmpegPath);
-                    if (!string.IsNullOrEmpty(audioDevice))
-                    {
-                        audioArgs = $"-f dshow -i audio=\"{audioDevice}\" ";
-                        System.Diagnostics.Debug.WriteLine($"Audio capture device found: {audioDevice}");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("No audio capture device found, recording video only");
-                    }
-                }
-                catch { /* Fall back to video-only */ }
-
-                // Build ffmpeg arguments: video + optional audio
-                string ffmpegArgs;
-                if (!string.IsNullOrEmpty(audioArgs))
-                {
-                    // Record screen + system audio
-                    ffmpegArgs = $"-y -f gdigrab -framerate 10 -i desktop {audioArgs}-c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"";
-                }
-                else
-                {
-                    // Video only (no audio device available)
-                    ffmpegArgs = $"-y -f gdigrab -framerate 10 -i desktop -c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"";
-                }
+                // Start recording IMMEDIATELY with video-only to avoid any startup delay.
+                // Audio device detection was previously blocking 5-10 seconds before recording began,
+                // causing the first ~10 seconds of sessions to be lost.
+                string ffmpegArgs = $"-y -f gdigrab -framerate 15 -i desktop -c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"";
 
                 _screenRecordProcess = new Process
                 {
@@ -251,7 +225,60 @@ namespace EduSyncAI
                 _screenRecordProcess.Start();
                 _isScreenRecording = true;
                 StartRecBlink();
-                System.Diagnostics.Debug.WriteLine($"Screen recording started: {_screenRecordingPath}");
+                System.Diagnostics.Debug.WriteLine($"Screen recording started (video-only, instant): {_screenRecordingPath}");
+
+                // Try to detect audio device in the background and restart with audio if found.
+                // This does NOT block the recording start.
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        var audioDevice = FindAudioDevice(ffmpegPath);
+                        if (!string.IsNullOrEmpty(audioDevice) && _isScreenRecording && _screenRecordProcess != null && !_screenRecordProcess.HasExited)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Audio device found: {audioDevice}. Restarting recording with audio...");
+
+                            // Stop the current video-only recording
+                            try
+                            {
+                                _screenRecordProcess.StandardInput.Write("q");
+                                _screenRecordProcess.StandardInput.Flush();
+                                _screenRecordProcess.StandardInput.Close();
+                            }
+                            catch { }
+                            _screenRecordProcess.WaitForExit(3000);
+                            if (!_screenRecordProcess.HasExited) _screenRecordProcess.Kill();
+                            _screenRecordProcess.Dispose();
+
+                            // Delete the short video-only file
+                            try { if (System.IO.File.Exists(_screenRecordingPath)) System.IO.File.Delete(_screenRecordingPath); } catch { }
+
+                            // Restart with audio
+                            var newTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                            _screenRecordingPath = System.IO.Path.Combine(recordingsDir, $"Session_{sessionId}_{newTimestamp}.mp4");
+                            string audioFfmpegArgs = $"-y -f gdigrab -framerate 15 -i desktop -f dshow -i audio=\"{audioDevice}\" -c:v libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags frag_keyframe+empty_moov \"{_screenRecordingPath}\"";
+
+                            _screenRecordProcess = new Process
+                            {
+                                StartInfo = new ProcessStartInfo
+                                {
+                                    FileName = ffmpegPath,
+                                    Arguments = audioFfmpegArgs,
+                                    UseShellExecute = false,
+                                    RedirectStandardInput = true,
+                                    RedirectStandardError = true,
+                                    CreateNoWindow = true
+                                }
+                            };
+                            _screenRecordProcess.Start();
+                            System.Diagnostics.Debug.WriteLine($"Screen recording restarted with audio: {_screenRecordingPath}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Audio detection/restart failed (video-only continues): {ex.Message}");
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -282,7 +309,7 @@ namespace EduSyncAI
                 };
                 process.Start();
                 var output = process.StandardError.ReadToEnd();
-                process.WaitForExit(5000);
+                process.WaitForExit(2000);
                 if (!process.HasExited) process.Kill();
 
                 // Parse output for audio devices
@@ -349,13 +376,13 @@ namespace EduSyncAI
                     }
                     catch { }
 
-                    // Wait max 5 seconds (was 30s) — file is already playable
-                    // thanks to -movflags frag_keyframe+empty_moov
-                    await Task.Run(() => _screenRecordProcess.WaitForExit(5000));
+                    // Wait up to 15 seconds for ffmpeg to flush buffers and finalize.
+                    // Too short a timeout causes the last few seconds of video to be lost.
+                    await Task.Run(() => _screenRecordProcess.WaitForExit(15000));
                     if (!_screenRecordProcess.HasExited)
                     {
                         _screenRecordProcess.Kill();
-                        await Task.Delay(300);
+                        await Task.Delay(500);
                     }
                     _screenRecordProcess.Dispose();
                     _screenRecordProcess = null;
@@ -381,6 +408,17 @@ namespace EduSyncAI
                             // Fallback: fire-and-forget full upload in background
                             _ = Task.Run(() => UploadRecordingInBackgroundAsync(_screenRecordingPath, fileName, _recordingSessionId));
                         }
+
+                        // Show user-visible confirmation
+                        var sizeKB = fileInfo.Length / 1024;
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show(
+                                $"Recording saved successfully!\n\nFile: {fileName}\nSize: {sizeKB} KB",
+                                "Recording Saved",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+                        });
                     }
                     else
                     {

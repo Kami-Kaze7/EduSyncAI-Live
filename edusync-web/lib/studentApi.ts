@@ -131,4 +131,20 @@ export const studentApi = {
         });
         return response.data;
     },
+
+    getVideoStreamUrl: async (videoId: number) => {
+        const token = localStorage.getItem('studentToken');
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/${videoId}/stream-url`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    getVideoDownloadUrl: async (videoId: number) => {
+        const token = localStorage.getItem('studentToken');
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/${videoId}/download-url`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
 };

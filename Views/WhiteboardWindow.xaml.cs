@@ -65,7 +65,7 @@ namespace EduSyncAI
 
         // ==================== SESSION CONTEXT ====================
         private SessionManagementViewModel? _viewModel;
-        private Action? _onSessionEnded;
+        private Func<Task>? _onSessionEnded;
 
         // Facial Recognition state
         private readonly GeminiFaceRecognitionService _faceService;
@@ -112,7 +112,7 @@ namespace EduSyncAI
         // Active overlay tracking
         private string _activeOverlay = ""; // "attendance", "live", or ""
 
-        public WhiteboardWindow(int sessionId, SessionManagementViewModel? viewModel = null, Action? onSessionEnded = null)
+        public WhiteboardWindow(int sessionId, SessionManagementViewModel? viewModel = null, Func<Task>? onSessionEnded = null)
         {
             InitializeComponent();
             _sessionId = sessionId;
@@ -2185,14 +2185,19 @@ namespace EduSyncAI
             // Stop live broadcast
             if (_isLiveBroadcasting) await StopLiveBroadcastAsync();
 
-            // End session via ViewModel
+            // Stop recording FIRST — await so recording is fully saved
+            // and user sees the "Recording saved!" confirmation MessageBox
+            // before the whiteboard closes.
+            if (_onSessionEnded != null)
+            {
+                await _onSessionEnded.Invoke();
+            }
+
+            // End session via ViewModel (after recording is saved)
             if (_viewModel?.EndSessionCommand?.CanExecute(null) == true)
             {
                 _viewModel.EndSessionCommand.Execute(null);
             }
-
-            // Invoke callback
-            _onSessionEnded?.Invoke();
 
             // Close the whiteboard
             _sessionTimer?.Stop();
