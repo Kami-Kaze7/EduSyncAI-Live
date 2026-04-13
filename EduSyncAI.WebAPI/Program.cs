@@ -32,7 +32,7 @@ builder.Services.AddSignalR();
 // Configure database
 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "..", "Data", "edusync.db");
 builder.Services.AddDbContext<EduSyncDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+    options.UseSqlite($"Data Source={dbPath};Foreign Keys=False"));
 
 // Configure CORS for web app
 builder.Services.AddCors(options =>
@@ -103,6 +103,10 @@ app.MapHub<EduSyncAI.WebAPI.Hubs.ClassroomHub>("/hubs/classroom");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<EduSyncDbContext>();
+    
+    // Disable FK enforcement so CourseVideo can have null CourseId (V2 flat flow)
+    try { context.Database.ExecuteSqlRaw("PRAGMA foreign_keys = OFF;"); } catch { }
+    
     try {
         context.Database.EnsureCreated();
     } catch { /* Ignore if it fails due to existing tables not tracked by EF */ }
@@ -132,6 +136,15 @@ using (var scope = app.Services.CreateScope())
     try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN FileSizeBytes INTEGER"); } catch { }
     try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN OriginalFileName TEXT"); } catch { }
     try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN IsWasabiVideo INTEGER NOT NULL DEFAULT 0"); } catch { }
+    
+    // Flat metadata columns for CourseVideos (video management redesign)
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN FacultyName TEXT NOT NULL DEFAULT ''"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN DepartmentName TEXT NOT NULL DEFAULT ''"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN CourseName TEXT NOT NULL DEFAULT ''"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN Duration TEXT"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN Price REAL NOT NULL DEFAULT 0"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN ThumbnailUrl TEXT"); } catch { }
+    try { context.Database.ExecuteSqlRaw("ALTER TABLE CourseVideos ADD COLUMN IsFeatured INTEGER NOT NULL DEFAULT 0"); } catch { }
     
     // Seed test user
     DatabaseSeeder.SeedTestUser(context);

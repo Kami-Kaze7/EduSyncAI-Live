@@ -1,291 +1,352 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { studentApi } from '@/lib/studentApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
-function formatFileSize(bytes: number): string {
-    if (!bytes) return '';
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-    return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-}
-
-function WasabiVideoPlayer({ videoId }: { videoId: number }) {
-    const [streamUrl, setStreamUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-
-    useEffect(() => {
-        setLoading(true);
-        setError(false);
-        studentApi.getVideoStreamUrl(videoId)
-            .then(data => {
-                setStreamUrl(data.url);
-                setLoading(false);
-            })
-            .catch(() => {
-                setError(true);
-                setLoading(false);
-            });
-    }, [videoId]);
-
-    if (loading) {
-        return (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-950 text-white">
-                <div className="w-10 h-10 border-3 border-blue-400 border-t-transparent rounded-full animate-spin mb-3" />
-                <span className="text-sm text-gray-400">Loading video stream...</span>
-            </div>
-        );
-    }
-
-    if (error || !streamUrl) {
-        return (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-950 text-red-400">
-                <span className="text-3xl mb-2">⚠️</span>
-                <span className="text-sm font-medium">Failed to load video stream</span>
-                <button 
-                    onClick={() => { setLoading(true); setError(false); studentApi.getVideoStreamUrl(videoId).then(d => { setStreamUrl(d.url); setLoading(false); }).catch(() => { setError(true); setLoading(false); }); }}
-                    className="mt-3 text-xs text-blue-400 hover:text-blue-300 underline"
-                >
-                    Retry
-                </button>
-            </div>
-        );
-    }
-
-    return (
-        <video 
-            src={streamUrl} 
-            controls 
-            autoPlay
-            className="w-full h-full"
-            style={{ backgroundColor: '#000' }}
-            onError={() => setError(true)}
-        >
-            Your browser does not support video playback.
-        </video>
-    );
-}
-
 export default function CourseVideosTab() {
+    const [activeFaculty, setActiveFaculty] = useState<string>('all');
     const [selectedCourse, setSelectedCourse] = useState<any>(null);
-    const [activeVideo, setActiveVideo] = useState<any>(null);
-    const [downloading, setDownloading] = useState(false);
+    const [playingVideoId, setPlayingVideoId] = useState<number | null>(null);
 
-    // Fetch enrolled courses
-    const { data: myCourses, isLoading: loadingCourses } = useQuery({
-        queryKey: ['my-courses'],
-        queryFn: studentApi.getMyCourses,
+    const { data: faculties, isLoading } = useQuery({
+        queryKey: ['student-all-videos'],
+        queryFn: studentApi.getAllCourseVideos
     });
 
-    // Fetch videos for the selected course
-    const { data: videos, isLoading: loadingVideos } = useQuery({
-        queryKey: ['course-videos', selectedCourse?.id || selectedCourse?.Id],
-        queryFn: () => studentApi.getCourseVideos(selectedCourse.id || selectedCourse.Id),
-        enabled: !!selectedCourse
-    });
+    const facultyNames: string[] = faculties?.map((f: any) => f.facultyName).filter((n: string) => n) || [];
 
-    useEffect(() => {
-        if (myCourses?.length > 0 && !selectedCourse) {
-            setSelectedCourse(myCourses[0]);
-        }
-    }, [myCourses]);
+    const displayedFaculties = activeFaculty === 'all'
+        ? faculties || []
+        : (faculties || []).filter((f: any) => f.facultyName === activeFaculty);
 
-    useEffect(() => {
-        if (videos?.length > 0) {
-            setActiveVideo(videos[0]);
-        } else {
-            setActiveVideo(null);
-        }
-    }, [videos, selectedCourse]);
-
-    const handleDownload = async (video: any) => {
-        const videoId = video.id || video.Id;
-        setDownloading(true);
+    const handleDownload = async (videoId: number) => {
         try {
             const data = await studentApi.getVideoDownloadUrl(videoId);
-            // Open download URL in a new tab
             window.open(data.url, '_blank');
-            toast.success('Download started!');
         } catch {
-            toast.error('Download not available for this video');
-        } finally {
-            setDownloading(false);
+            toast.error('Failed to get download link');
         }
     };
 
-    if (loadingCourses) return <div className="p-10 text-center text-gray-500 animate-pulse">Loading Your Courses...</div>;
-
-    if (!myCourses || myCourses.length === 0) {
+    if (isLoading) {
         return (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-16 text-center">
-                <div className="text-5xl mb-4">🎓</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No Enrolled Courses</h3>
-                <p className="text-gray-500">You must be enrolled in courses to watch their videos.</p>
+            <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-gray-500 text-sm">Loading course videos...</p>
+                </div>
             </div>
         );
     }
 
-    const isWasabi = activeVideo?.isWasabiVideo || activeVideo?.IsWasabiVideo;
-    const activeVideoId = activeVideo?.id || activeVideo?.Id;
+    // If a course is selected, show full video player view
+    if (selectedCourse) {
+        return (
+            <CoursePlayerView
+                course={selectedCourse}
+                onBack={() => { setSelectedCourse(null); setPlayingVideoId(null); }}
+                playingVideoId={playingVideoId}
+                setPlayingVideoId={setPlayingVideoId}
+                onDownload={handleDownload}
+            />
+        );
+    }
+
+    // Helper: get thumbnail for a course from first video that has one
+    const getCourseThumbnail = (course: any) => {
+        const thumb = course.videos?.find((v: any) => v.thumbnailUrl)?.thumbnailUrl;
+        return thumb || null;
+    };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-6 min-h-[700px]">
-            {/* Sidebar / Playlist */}
-            <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col gap-4">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Course</label>
-                    <select
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-blue-300"
-                        value={selectedCourse?.id || selectedCourse?.Id || ''}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            const c = myCourses.find((c:any) => (c.id || c.Id).toString() === val);
-                            if(c) setSelectedCourse(c);
-                        }}
-                    >
-                        {myCourses.map((c: any) => (
-                            <option key={c.id || c.Id} value={c.id || c.Id}>{c.courseCode || c.CourseCode} - {c.courseName || c.courseTitle || c.CourseTitle || c.CourseName}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col overflow-hidden">
-                    <div className="p-4 border-b border-gray-200 bg-gray-50">
-                        <h3 className="font-bold text-gray-800">Course Content</h3>
-                        <p className="text-xs text-gray-500 mt-1">{videos?.length || 0} Lessons</p>
-                    </div>
-                    
-                    <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[500px]">
-                        {loadingVideos ? (
-                            <p className="text-center text-sm text-gray-400 py-4">Loading videos...</p>
-                        ) : videos?.length === 0 ? (
-                            <p className="text-center text-sm text-gray-400 py-4 italic">No videos scheduled for this course yet.</p>
-                        ) : (
-                            videos?.map((v: any, idx: number) => {
-                                const vId = v.id || v.Id;
-                                const vTitle = v.title || v.Title;
-                                const vDesc = v.description || v.Description;
-                                const vIsWasabi = v.isWasabiVideo || v.IsWasabiVideo;
-                                const vSize = v.fileSizeBytes || v.FileSizeBytes;
-                                const isActive = activeVideoId === vId;
-                                return (
-                                    <button
-                                        key={vId}
-                                        onClick={() => setActiveVideo(v)}
-                                        className={`w-full text-left px-4 py-3 rounded-lg transition-all ${isActive ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50 border border-transparent'}`}
-                                    >
-                                        <div className="flex gap-3">
-                                            <div className={`mt-0.5 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                                                {idx + 1}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className={`text-sm font-bold ${isActive ? 'text-blue-600' : 'text-gray-700'}`}>{vTitle}</p>
-                                                {vDesc && <p className="text-xs text-gray-500 mt-1 line-clamp-1">{vDesc}</p>}
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${vIsWasabi ? 'bg-sky-50 text-sky-600' : 'bg-purple-50 text-purple-600'}`}>
-                                                        {vIsWasabi ? '☁️ Cloud' : '🔗 Embed'}
-                                                    </span>
-                                                    {vIsWasabi && vSize && (
-                                                        <span className="text-xs text-gray-400">{formatFileSize(vSize)}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </button>
-                                );
-                            })
-                        )}
-                    </div>
-                </div>
+        <div className="space-y-6">
+            {/* Header */}
+            <div>
+                <h2 className="text-xl font-semibold text-gray-900">Course Videos</h2>
+                <p className="text-sm text-gray-400 mt-0.5">Browse available course recordings and lectures.</p>
             </div>
 
-            {/* Video Player Main Area */}
-            <div className="w-full lg:w-2/3 xl:w-3/4 flex flex-col">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
-                    {activeVideo ? (
-                        <>
-                            {/* Player Wrapper */}
-                            <div className="w-full aspect-video bg-black relative">
-                                {isWasabi ? (
-                                    <WasabiVideoPlayer videoId={activeVideoId} key={activeVideoId} />
-                                ) : (
-                                    <iframe 
-                                        src={activeVideo.videoUrl || activeVideo.VideoUrl} 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                        allowFullScreen
-                                        className="w-full h-full absolute top-0 left-0 border-0"
-                                        title={activeVideo.title || activeVideo.Title}
-                                    />
+            {/* Faculty Tabs */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 overflow-x-auto">
+                <button
+                    onClick={() => setActiveFaculty('all')}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all ${
+                        activeFaculty === 'all' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                    All Faculties
+                </button>
+                {facultyNames.map((name: string) => (
+                    <button
+                        key={name}
+                        onClick={() => setActiveFaculty(name)}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all ${
+                            activeFaculty === name ? 'bg-white shadow-sm text-amber-700' : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                        {name}
+                    </button>
+                ))}
+            </div>
+
+            {/* Course Grid */}
+            {displayedFaculties.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
+                    <div className="text-5xl mb-4">🎬</div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">No Videos Available</h3>
+                    <p className="text-sm text-gray-400">Course videos will appear here once uploaded by the admin.</p>
+                </div>
+            ) : (
+                displayedFaculties.map((faculty: any) => (
+                    <div key={faculty.facultyName} className="space-y-4">
+                        {activeFaculty === 'all' && (
+                            <div className="flex items-center gap-3 px-1">
+                                <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center text-sm">🏛️</span>
+                                <h3 className="text-base font-bold text-gray-900">{faculty.facultyName}</h3>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {faculty.courses.map((course: any) => {
+                                const thumbnail = getCourseThumbnail(course);
+                                return (
+                                    <div
+                                        key={`${faculty.facultyName}-${course.courseName}`}
+                                        onClick={() => setSelectedCourse({ ...course, facultyName: faculty.facultyName })}
+                                        className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:border-amber-200 transition-all cursor-pointer group"
+                                    >
+                                        {/* Course Card Thumbnail Area */}
+                                        <div
+                                            className="h-40 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center relative overflow-hidden"
+                                            style={thumbnail ? { backgroundImage: `url(${thumbnail})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                                        >
+                                            {!thumbnail && (
+                                                <div className="text-5xl opacity-30 group-hover:opacity-50 transition-opacity">📚</div>
+                                            )}
+                                            {/* Hover overlay */}
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                                                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                                    <svg className="w-5 h-5 text-amber-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                </div>
+                                            </div>
+                                            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs font-bold px-2 py-1 rounded-lg backdrop-blur-sm">
+                                                {course.videos.length} video{course.videos.length !== 1 ? 's' : ''}
+                                            </div>
+                                            {course.price > 0 && (
+                                                <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">
+                                                    ₦{course.price.toLocaleString()}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Course Card Info */}
+                                        <div className="p-4">
+                                            <h4 className="font-bold text-gray-900 truncate">{course.courseName}</h4>
+                                            <p className="text-xs text-gray-500 mt-0.5">{course.departmentName}</p>
+                                            {course.description && (
+                                                <p className="text-xs text-gray-400 mt-2 line-clamp-2">{course.description}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
+    );
+}
+
+// ═══════════════════════════════════════════
+// Course Player View (when a course is clicked)
+// ═══════════════════════════════════════════
+function CoursePlayerView({ course, onBack, playingVideoId, setPlayingVideoId, onDownload }: any) {
+    const activeVideo = course.videos.find((v: any) => v.id === playingVideoId) || course.videos[0];
+
+    return (
+        <div className="space-y-5">
+            {/* Back Button & Course Title */}
+            <div className="flex items-center gap-3">
+                <button onClick={onBack} className="text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <h2 className="text-lg font-bold text-gray-900">{course.courseName}</h2>
+            </div>
+
+            {/* ── Main Layout Grid ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                {/* Left Column — Video + Playlist/Details (2/3 width) */}
+                <div className="lg:col-span-2 space-y-5">
+                    {/* Video Player */}
+                    <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-lg">
+                        {activeVideo ? (
+                            activeVideo.isWasabiVideo ? (
+                                <WasabiVideoPlayer videoId={activeVideo.id} key={activeVideo.id} />
+                            ) : (
+                                <iframe src={activeVideo.videoUrl} title={activeVideo.title} className="w-full h-full border-0" allowFullScreen />
+                            )
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                <p>Select a video to play</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Playlist + Course Details — side by side under video */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Playlist */}
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                                <h4 className="font-bold text-gray-800 text-sm">Playlist</h4>
+                                <p className="text-xs text-gray-400">{course.videos.length} video{course.videos.length !== 1 ? 's' : ''}</p>
+                            </div>
+                            <div className="divide-y divide-gray-50 max-h-[300px] overflow-y-auto">
+                                {course.videos.map((video: any, idx: number) => (
+                                    <button
+                                        key={video.id}
+                                        onClick={() => setPlayingVideoId(video.id)}
+                                        className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-amber-50/60 transition-colors ${
+                                            activeVideo?.id === video.id ? 'bg-amber-50 border-l-4 border-amber-500' : 'border-l-4 border-transparent'
+                                        }`}
+                                    >
+                                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                                            activeVideo?.id === video.id
+                                                ? 'bg-amber-500 text-white shadow-md shadow-amber-200'
+                                                : 'bg-gray-100 text-gray-500'
+                                        }`}>
+                                            {activeVideo?.id === video.id ? '▶' : idx + 1}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className={`text-sm font-medium truncate ${activeVideo?.id === video.id ? 'text-amber-700' : 'text-gray-800'}`}>
+                                                {video.title}
+                                            </p>
+                                            {video.duration && (
+                                                <span className="text-xs text-gray-400 mt-0.5 block">{video.duration}</span>
+                                            )}
+                                        </div>
+                                        {activeVideo?.id === video.id && (
+                                            <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">▶</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Course Details */}
+                        <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Course Details</h4>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-sm">🏛️</div>
+                                    <div>
+                                        <p className="text-[11px] text-gray-400 font-medium">Faculty</p>
+                                        <p className="text-sm font-semibold text-gray-800">{course.facultyName}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-sm">📘</div>
+                                    <div>
+                                        <p className="text-[11px] text-gray-400 font-medium">Department</p>
+                                        <p className="text-sm font-semibold text-gray-800">{course.departmentName}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-sm">📚</div>
+                                    <div>
+                                        <p className="text-[11px] text-gray-400 font-medium">Course</p>
+                                        <p className="text-sm font-semibold text-gray-800">{course.courseName}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-sm">🎬</div>
+                                    <div>
+                                        <p className="text-[11px] text-gray-400 font-medium">Videos</p>
+                                        <p className="text-sm font-semibold text-gray-800">{course.videos.length} video{course.videos.length !== 1 ? 's' : ''}</p>
+                                    </div>
+                                </div>
+                                {course.price > 0 && (
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-sm">💰</div>
+                                        <div>
+                                            <p className="text-[11px] text-gray-400 font-medium">Price</p>
+                                            <p className="text-sm font-bold text-emerald-700">₦{course.price.toLocaleString()}</p>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
-                            
-                            {/* Meta */}
-                            <div className="p-6 md:p-8">
-                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{activeVideo.title || activeVideo.Title}</h1>
-                                
-                                <div className="flex items-center gap-4 py-4 border-b border-gray-200 mb-6 flex-wrap">
-                                    <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-                                        {selectedCourse?.courseCode || selectedCourse?.CourseCode}
-                                    </span>
-                                    <span className="text-sm font-medium text-gray-500">
-                                        {selectedCourse?.lecturerName || selectedCourse?.LecturerName || 'Assigned Lecturer'}
-                                    </span>
-                                    
-                                    {/* Source badge */}
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${isWasabi ? 'bg-sky-50 text-sky-700' : 'bg-purple-50 text-purple-700'}`}>
-                                        {isWasabi ? '☁️ Cloud Video' : '🔗 Embedded'}
-                                    </span>
+                        </div>
+                    </div>
 
-                                    {/* File size */}
-                                    {isWasabi && (activeVideo.fileSizeBytes || activeVideo.FileSizeBytes) && (
-                                        <span className="text-xs text-gray-400 font-medium">
-                                            {formatFileSize(activeVideo.fileSizeBytes || activeVideo.FileSizeBytes)}
-                                        </span>
-                                    )}
+                    {/* What You'll Learn Card */}
+                    {course.whatYoullLearn && (
+                        <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl border border-emerald-100 shadow-sm p-5">
+                            <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px]">✓</span>
+                                What You'll Learn
+                            </h4>
+                            <ul className="space-y-2">
+                                {course.whatYoullLearn.split('\n').filter((line: string) => line.trim()).map((point: string, idx: number) => (
+                                    <li key={idx} className="flex items-start gap-2.5">
+                                        <span className="mt-0.5 w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] shrink-0">✓</span>
+                                        <span className="text-sm text-gray-700">{point.trim()}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
 
-                                    {/* Download button for Wasabi videos */}
-                                    {isWasabi && (
-                                        <button
-                                            onClick={() => handleDownload(activeVideo)}
-                                            disabled={downloading}
-                                            className="ml-auto bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 disabled:opacity-50"
-                                        >
-                                            {downloading ? (
-                                                <>
-                                                    <span className="w-3 h-3 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-                                                    Preparing...
-                                                </>
-                                            ) : (
-                                                <>⬇️ Download</>
-                                            )}
-                                        </button>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <h4 className="text-sm font-bold text-gray-900 mb-2">Lesson Description</h4>
-                                    <p className="text-gray-600 leading-relaxed max-w-4xl text-sm md:text-base">
-                                        {activeVideo.description || activeVideo.Description || "No specific description provided by the instructor."}
-                                    </p>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center p-12 text-center h-full min-h-[400px]">
-                            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                                <span className="text-4xl text-gray-300">🎬</span>
-                            </div>
-                            <h2 className="text-xl font-bold text-gray-800 mb-2">Select a video to start learning</h2>
-                            <p className="text-gray-400 max-w-sm">Choose a lesson from the playlist on the left to begin watching.</p>
+                {/* Right Column — Description Panel (1/3 width) */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 h-fit">
+                    <h3 className="text-lg font-bold text-gray-900 leading-snug">{activeVideo?.title || 'No video selected'}</h3>
+                    {activeVideo?.duration && (
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
+                                ⏱️ {activeVideo.duration}
+                            </span>
+                            {activeVideo?.isWasabiVideo && (
+                                <button onClick={() => onDownload(activeVideo.id)} className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                                    ⬇️ Download
+                                </button>
+                            )}
+                        </div>
+                    )}
+                    {activeVideo?.description && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Description</h4>
+                            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{activeVideo.description}</p>
                         </div>
                     )}
                 </div>
             </div>
         </div>
+    );
+}
+
+// ═══════════════════════════════════════════
+// Wasabi Video Player
+// ═══════════════════════════════════════════
+function WasabiVideoPlayer({ videoId }: { videoId: number }) {
+    const [streamUrl, setStreamUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useState(() => {
+        studentApi.getVideoStreamUrl(videoId).then(data => {
+            setStreamUrl(data.url);
+            setLoading(false);
+        }).catch(() => setLoading(false));
+    });
+
+    if (loading) return <div className="w-full h-full flex items-center justify-center text-white text-sm animate-pulse">Loading video...</div>;
+    if (!streamUrl) return <div className="w-full h-full flex items-center justify-center text-red-400 text-sm">Failed to load video</div>;
+
+    return (
+        <video src={streamUrl} controls autoPlay className="w-full h-full" controlsList="nodownload">
+            Your browser does not support video playback.
+        </video>
     );
 }

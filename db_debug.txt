@@ -1,0 +1,140 @@
+=== appsettings.json ===
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=../Data/edusync.db"
+  },
+  "Jwt": {
+    "Secret": "EduSyncAI-Super-Secret-Key-For-JWT-Authentication-Min-32-Chars",
+    "Issuer": "EduSyncAI",
+    "Audience": "EduSyncAI-Web",
+    "ExpirationHours": 24
+  },
+  "Gemini": {
+    "ApiKey": "AIzaSyCPDfN0mq2lEMebdtNBOPP5Hoq4sFrp1kE"
+  }
+}
+
+=== appsettings.Production.json ===
+cat: /opt/edusyncai/publish/api/appsettings.Production.json: No such file or directory
+
+=== API process working dir ===
+ls: cannot access '1663947/cwd': No such file or directory
+/proc/1663243:
+total 0
+dr-xr-xr-x   9 root root 0 Apr  8 05:08 .
+dr-xr-xr-x 220 root root 0 Mar 19 12:46 ..
+-r--r--r--   1 root root 0 Apr  8 05:10 arch_status
+dr-xr-xr-x   2 root root 0 Apr  8 05:08 attr
+-rw-r--r--   1 root root 0 Apr  8 05:10 autogroup
+-r--------   1 root root 0 Apr  8 05:10 auxv
+-r--r--r--   1 root root 0 Apr  8 05:08 cgroup
+--w-------   1 root root 0 Apr  8 05:10 clear_refs
+-r--r--r--   1 root root 0 Apr  8 05:08 cmdline
+-rw-r--r--   1 root root 0 Apr  8 05:08 comm
+-rw-r--r--   1 root root 0 Apr  8 05:10 coredump_filter
+-r--r--r--   1 root root 0 Apr  8 05:10 cpu_resctrl_groups
+-r--r--r--   1 root root 0 Apr  8 05:10 cpuset
+lrwxrwxrwx   1 root root 0 Apr  8 05:10 cwd -> /opt/edusyncai/publish/api
+-r--------   1 root root 0 Apr  8 05:08 environ
+lrwxrwxrwx   1 root root 0 Apr  8 05:08 exe -> /root/.dotnet/dotnet
+dr-x------   2 root root 0 Apr  8 05:08 fd
+dr-xr-xr-x   2 root root 0 Apr  8 05:10 fdinfo
+-rw-r--r--   1 root root 0 Apr  8 05:10 gid_map
+-r--------   1 root root 0 Apr  8 05:10 io
+-r--r--r--   1 root root 0 Apr  8 05:10 limits
+-rw-r--r--   1 root root 0 Apr  8 05:08 loginuid
+dr-x------   2 root root 0 Apr  8 05:10 map_files
+-r--r--r--   1 root root 0 Apr  8 05:08 maps
+-rw-------   1 root root 0 Apr  8 05:10 mem
+-r--r--r--   1 root root 0 Apr  8 05:08 mountinfo
+-r--r--r--   1 root root 0 Apr  8 05:10 mounts
+-r--------   1 root root 0 Apr  8 05:10 mountstats
+dr-xr-xr-x  60 root root 0 Apr  8 05:10 net
+dr-x--x--x   2 root root 0 Apr  8 05:10 ns
+-r--r--r--   1 root root 0 Apr  8 05:10 numa_maps
+-rw-r--r--   1 root root 0 Apr  8 05:10 oom_adj
+-r--r--r--   1 root root 0 Apr  8 05:10 oom_score
+-rw-r--r--   1 root root 0 Apr  8 05:10 oom_score_adj
+-r--------   1 root root 0 Apr  8 05:10 pagemap
+-r--------   1 root root 0 Apr  8 05:10 patch_state
+-r--------   1 root root 0 Apr  8 05:10 personality
+-rw-r--r--   1 root root 0 Apr  8 05:10 projid_map
+lrwxrwxrwx   1 root root 0 Apr  8 05:10 root -> /
+-rw-r--r--   1 root root 0 Apr  8 05:10 sched
+-r--r--r--   1 root root 0 Apr  8 05:10 schedstat
+-r--r--r--   1 root root 0 Apr  8 05:08 sessionid
+-rw-r--r--   1 root root 0 Apr  8 05:10 setgroups
+-r--r--r--   1 root root 0 Apr  8 05:10 smaps
+-r--r--r--   1 root root 0 Apr  8 05:10 smaps_rollup
+-r--------   1 root root 0 Apr  8 05:10 stack
+-r--r--r--   1 root root 0 Apr  8 05:08 stat
+-r--r--r--   1 root root 0 Apr  8 05:10 statm
+-r--r--r--   1 root root 0 Apr  8 05:08 status
+-r--------   1 root root 0 Apr  8 05:10 syscall
+dr-xr-xr-x  23 root root 0 Apr  8 05:08 task
+-rw-r--r--   1 root root 0 Apr  8 05:10 timens_offsets
+-r--r--r--   1 root root 0 Apr  8 05:10 timers
+-rw-rw-rw-   1 root root 0 Apr  8 05:10 timerslack_ns
+-rw-r--r--   1 root root 0 Apr  8 05:10 uid_map
+-r--r--r--   1 root root 0 Apr  8 05:10 wchan
+
+=== All DB files ===
+-rw-r--r-- 1 root root 140K Apr  7 19:02 /opt/edusyncai/publish/Data/edusync.db
+-rw-rw-rw- 1 root root 596K Apr  8 05:08 /opt/edusyncai/publish/api/Data/edusync.db
+
+=== DbContext connection ===
+
+
+=== Program.cs DB config ===
+// Configure database
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, "..", "Data", "edusync.db");
+builder.Services.AddDbContext<EduSyncDbContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
+
+// Configure CORS for web app
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebApp", policy =>
+--
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<EduSyncDbContext>();
+    try {
+        context.Database.EnsureCreated();
+    } catch { /* Ignore if it fails due to existing tables not tracked by EF */ }
+    
+    // Add DayNumber column if it doesn't exist (schema migration)
+
+=== Service file ===
+[Unit]
+Description=EduSyncAI .NET WebAPI
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/edusyncai/publish/api
+ExecStart=/root/.dotnet/dotnet /opt/edusyncai/publish/api/EduSyncAI.WebAPI.dll --urls http://localhost:5152
+Restart=always
+RestartSec=10
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:5152
+Environment=JWT_SECRET=EduSyncAI-Super-Secret-Key-For-JWT-Authentication-Min-32-Chars
+
+[Install]
+WantedBy=multi-user.target
+
+=== API /api/courses verbose ===
+[]
+
+=== Courses in DB ===
+
+
+=== Courses in source DB ===
+Error: in prepare, no such column: CourseId (1)

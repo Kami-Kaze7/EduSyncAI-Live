@@ -166,3 +166,13 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 ===STARTUP ENTERED [4/7/2026 3:05:04 PM]===
 
 ===STARTUP ENTERED [4/7/2026 4:00:17 PM]===
+
+===STARTUP ENTERED [4/8/2026 9:21:11 AM]===
+
+===STARTUP ENTERED [4/8/2026 10:44:56 AM]===
+
+===STARTUP ENTERED [4/8/2026 10:55:07 AM]===
+
+===STARTUP ENTERED [4/10/2026 6:56:54 PM]===
+
+===STARTUP ENTERED [4/10/2026 7:25:12 PM]===

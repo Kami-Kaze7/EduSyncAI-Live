@@ -279,12 +279,20 @@ namespace EduSyncAI.WebAPI.Models
         public int OrderIndex { get; set; } = 0;
         public DateTime AddedAt { get; set; } = DateTime.UtcNow;
         
+        // Flat metadata fields (no hierarchy needed)
+        public string FacultyName { get; set; } = string.Empty;
+        public string DepartmentName { get; set; } = string.Empty;
+        public string CourseName { get; set; } = string.Empty;
+        public string? Duration { get; set; }              // e.g. "1h 30m"
+        public decimal Price { get; set; } = 0;            // Per-course price
+        
         // Wasabi cloud storage fields
         public string? WasabiKey { get; set; }          // S3 object key (e.g., "courses/15/abc123.mp4")
         public long? FileSizeBytes { get; set; }         // File size for display
         public string? OriginalFileName { get; set; }    // Original uploaded file name
+        public string? ThumbnailUrl { get; set; }         // Thumbnail image URL or base64 data URI
         public bool IsWasabiVideo { get; set; } = false; // true = uploaded file, false = YouTube embed
-        
-        public virtual Course? Course { get; set; }
+        public bool IsFeatured { get; set; } = false;    // true = shown on landing page featured section
+        public string? WhatYoullLearn { get; set; }       // "What you'll learn" text (course-level, stored on each video)
     }
 }

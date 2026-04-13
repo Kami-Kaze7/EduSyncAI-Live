@@ -1,0 +1,28 @@
+API: active
+WEB: active
+
+SSL cert: Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Found the following certs:
+  Certificate Name: 62-171-138-230.nip.io
+    Serial Number: 6d4394b2a8c4e9498efcca2aefa90c7a17a
+    Key Type: RSA
+    Domains: 62-171-138-230.nip.io
+    Expiry Date: 2026-07-07 02:38:20+00:00 (VALID: 89 days)
+    Certificate Path: /etc/letsencrypt/live/62-171-138-230.nip.io/fullchain.pem
+    Private Key Path: /etc/letsencrypt/live/6
+
+Nginx SSL paths:
+ssl_certificate /etc/letsencrypt/live/62-171-138-230.nip.io/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/62-171-138-230.nip.io/privkey.pem;
+
+Admin login test:
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzc1NjE5NDcwLCJleHAiOjE3NzU3MDU4NzAsImlhdCI6MTc3NTYxOTQ3MH0.rfGz2HuNffOiLj_QWddFGP_wHQf9hmorZhRVynU8Shs","user":{"id":1,"username":"admin","fullName":"System Administrator","role":"Admin"}}
+
+HTTPS (no -k flag):
+200
+
+.env.production:
+NEXT_PUBLIC_API_URL=https://62-171-138-230.nip.io/api
+NEXT_PUBLIC_SIGNALR_URL=https://62-171-138-230.nip.io

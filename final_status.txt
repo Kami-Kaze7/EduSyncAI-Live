@@ -1,0 +1,50 @@
+=== NODE VERSION ===
+v12.22.9
+
+=== SERVICE STATUS ===
+API:  active
+Web:  activating
+Face: active
+
+=== HTTP STATUS ===
+API:  200
+Web:  000
+
+=== PORTS LISTENING ===
+LISTEN 0      128                   127.0.0.1:5280      0.0.0.0:*    users:(("lua",pid=85639,fd=18))                                                                                                                                                                    
+LISTEN 0      512                   127.0.0.1:5152      0.0.0.0:*    users:(("dotnet",pid=1388528,fd=303))                                                                                                                                                              
+LISTEN 0      511                     0.0.0.0:80        0.0.0.0:*    users:(("nginx",pid=1388617,fd=6),("nginx",pid=1388616,fd=6),("nginx",pid=1388615,fd=6),("nginx",pid=1388614,fd=6),("nginx",pid=1388613,fd=6),("nginx",pid=1388612,fd=6),("nginx",pid=194603,fd=6))
+LISTEN 0      511                     0.0.0.0:443       0.0.0.0:*    users:(("nginx",pid=1388617,fd=8),("nginx",pid=1388616,fd=8),("nginx",pid=1388615,fd=8),("nginx",pid=1388614,fd=8),("nginx",pid=1388613,fd=8),("nginx",pid=1388612,fd=8),("nginx",pid=194603,fd=8))
+LISTEN 0      50           [::ffff:127.0.0.1]:8080            *:*    users:(("java",pid=1339271,fd=153))                                                                                                                                                                
+LISTEN 0      511                        [::]:80           [::]:*    users:(("nginx",pid=1388617,fd=7),("nginx",pid=1388616,fd=7),("nginx",pid=1388615,fd=7),("nginx",pid=1388614,fd=7),("nginx",pid=1388613,fd=7),("nginx",pid=1388612,fd=7),("nginx",pid=194603,fd=7))
+LISTEN 0      511                        [::]:443          [::]:*    users:(("nginx",pid=1388617,fd=9),("nginx",pid=1388616,fd=9),("nginx",pid=1388615,fd=9),("nginx",pid=1388614,fd=9),("nginx",pid=1388613,fd=9),("nginx",pid=1388612,fd=9),("nginx",pid=194603,fd=9))
+LISTEN 0      128                       [::1]:5280         [::]:*    users:(("lua",pid=85639,fd=17))                                                                                                                                                                    
+LISTEN 0      512                       [::1]:5152         [::]:*    users:(("dotnet",pid=1388528,fd=304))
+
+=== API RESPONSE (courses) ===
+[]
+
+=== .NEXT DIRECTORY ===
+ls: cannot access '/opt/edusyncai/edusync-web/.next/': No such file or directory
+
+=== WEB SERVICE LOGS ===
+Error: Cannot find module '/opt/edusyncai/edusync-web/node_modules/.bin/next'
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:815:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:667:27)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:12)
+    at internal/main/run_main_module.js:17:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+edusyncai-web.service: Main process exited, code=exited, status=1/FAILURE
+edusyncai-web.service: Failed with result 'exit-code'.
+
+=== SSL CERTIFICATES ===
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+No certificates found.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+=== DB CHECK ===
+-rw-r--r-- 1 root root 596K Apr  7 19:08 /opt/edusyncai/publish/api/Data/edusync.db

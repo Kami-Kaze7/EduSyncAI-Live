@@ -1,0 +1,75 @@
+=== ADMIN API MODULE ===
+import axios from 'axios';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api';
+
+// Admin API
+export const adminApi = {
+    login: async (username: string, password: string) => {
+        const response = await axios.post(`${API_BASE_URL}/admin/login`, {
+            username,
+            password,
+        });
+        return response.data;
+    },
+
+    // Lecturer management
+    getLecturers: async () => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.get(`${API_BASE_URL}/admin/lecturers`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    createLecturer: async (data: {
+        username: string;
+        fullName: string;
+        email: string;
+        password?: string;
+    }) => {
+        const token = localStorage.getItem('adminToken');
+        const response = await axios.post(`${API_BASE_URL}/admin/lecturers`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    importLecturers: async (file: File) => {
+        const token = localStorage.getItem('adminToken');
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await axios.post(
+            `${API_BASE_URL}/admin/lecturers/import`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    },
+
+    deleteLecturer: async (id: number) => {
+        const token = localStorage.getItem('adminToken');
+        await axios.delete(`${API_BASE_URL}/admin/lecturers/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    },
+
+    // Student management
+    getStudents: async () => {
+        const token = localStorage.getItem('adminToken');
+        co
+
+=== ENV PRODUCTION ===
+NEXT_PUBLIC_API_URL=https://62-171-138-230.nip.io
+NEXT_PUBLIC_SIGNALR_URL=https://62-171-138-230.nip.io
+
+=== BUILT API URL ===
+/opt/edusyncai/edusync-web/.next/server/chunks/ssr/[root-of-the-server]__3b31f767._.js:module.exports=[56704,(a,b,c)=>{b.exports=a.x("next/dist/server/app-render/work-async-storage.external.js",()=>require("next/dist/server/app-render/work-async-storage.external.js"))},32319,(a,b,c)=>{b.exports=a.x(
+
+=== SWAGGER CHECK ===
+Swagger status: 404

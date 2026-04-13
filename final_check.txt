@@ -1,0 +1,14 @@
+API: active
+WEB: active
+FACE: active
+
+HTTPS frontend (nip.io): }
+HTTPS API (nip.io): }
+
+API courses: [{"id":28,"courseCode":"GEO101","courseTitle":"Geology Course 101","yearOfStudyId":8,"courseName":"Geology Course 101","lecturerId":12,"creditHours":3,"createdAt":"2026-04-08T03:15:27.2649302Z","enrollments":[],"sessions":[]},{"id":39,"courseCode":"GEO102","courseTitle":"Geology Course GEO102","yearOfStudyId":8,"courseName":"Geology Course GEO102","lecturerId":10,"creditHours":3,"createdAt":"2026-04-08T03:15:27.2650879Z","enrollments":[],"sessions":[]},{"id":40,"courseCode":"GEO103","courseTitle
+
+API lecturers: 
+
+API faculties: 
+
+DB file: -rw-rw-rw- 1 root root 596K Apr  8 05:14 /opt/edusyncai/publish/Data/edusync.db

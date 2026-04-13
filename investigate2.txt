@@ -1,0 +1,100 @@
+=== ALL API ENDPOINTS ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.10/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/usr/lib/python3.10/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/usr/lib/python3.10/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/usr/lib/python3.10/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+=== ADMIN LOGIN - VERBOSE ===
+*   Trying 127.0.0.1:5152...
+* Connected to localhost (127.0.0.1) port 5152 (#0)
+> POST /api/auth/admin/login HTTP/1.1
+> Host: localhost:5152
+> User-Agent: curl/7.81.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 51
+> 
+} [51 bytes data]
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< Content-Length: 0
+< Date: Wed, 08 Apr 2026 03:28:23 GMT
+< Server: Kestrel
+< 
+* Connection #0 to host localhost left intact
+
+=== ADMIN LOGIN - USERNAME ===
+*   Trying 127.0.0.1:5152...
+* Connected to localhost (127.0.0.1) port 5152 (#0)
+> POST /api/auth/admin/login HTTP/1.1
+> Host: localhost:5152
+> User-Agent: curl/7.81.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 42
+> 
+} [42 bytes data]
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< Content-Length: 0
+< Date: Wed, 08 Apr 2026 03:28:24 GMT
+< Server: Kestrel
+< 
+* Connection #0 to host localhost left intact
+
+=== TRY /api/admin/login ===
+*   Trying 127.0.0.1:5152...
+* Connected to localhost (127.0.0.1) port 5152 (#0)
+> POST /api/admin/login HTTP/1.1
+> Host: localhost:5152
+> User-Agent: curl/7.81.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 42
+> 
+} [42 bytes data]
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Content-Type: application/json; charset=utf-8
+< Date: Wed, 08 Apr 2026 03:28:25 GMT
+< Server: Kestrel
+< Transfer-Encoding: chunked
+< 
+{ [311 bytes data]
+* Connection #0 to ho
+
+=== AUTH CONTROLLER ===
+/opt/edusyncai/EduSyncAI.WebAPI/Controllers/AuthController.cs
+
+=== AUTH CONTROLLER SOURCE ===
+10:    public class LoginRequest
+16:    [Route("api/[controller]")]
+28:        [HttpPost("login")]
+29:        public async Task<ActionResult> Login([FromBody] LoginRequest request)
+44:                    return Unauthorized(new { error = "Account is not active. Please contact administrator." });
+71:                _logger.LogError(ex, "Error during login");
+72:                return StatusCode(500, new { error = "Login failed" });
+76:        [HttpPost("register")]
+
+=== FRONTEND LOGIN API ===
+/opt/edusyncai/edusync-web/app/admin/login/page.tsx:9:export default function AdminLogin() {
+/opt/edusyncai/edusync-web/app/admin/login/page.tsx:20:            const response = await adminApi.login(username, password);
+/opt/edusyncai/edusync-web/app/admin/login/page.tsx:23:            toast.success('Login successful!');
+/opt/edusyncai/edusync-web/app/admin/login/page.tsx:26:            toast.error(error.response?.data?.error || 'Login failed');
+/opt/edusyncai/edusync-web/app/admin/login/page.tsx:112:                        <Link href="/login" className="text-[#FF6B35] font-semibold hover:underline">Lecturer Login</Link>
+/opt/edusyncai/edusync-web/app/admin/login/page.tsx:114:                        <Link href="/student/login" className="text-[#FF6B35] font-semibold hover:underline">Student Login</Link>
+
+=== FRONTEND API FILE ===
+13:// Add request interceptor to include auth token
+17:            const token = localStorage.getItem('auth_token');
+
+=== CERTBOT DEBUG ===
+--dry-run currently only works with the 'certonly' or 'renew' subcommands ('run')
+Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /tmp/tmpxpss8e5o/log or re-run Certbot with -v for more details.

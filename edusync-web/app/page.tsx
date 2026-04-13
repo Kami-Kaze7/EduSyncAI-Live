@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -30,6 +31,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-[#6B7280] hover:text-[#1A1A2E] transition-colors font-medium">Features</a>
             <a href="#services" className="text-sm text-[#6B7280] hover:text-[#1A1A2E] transition-colors font-medium">Services</a>
+            <a href="#courses" className="text-sm text-[#6B7280] hover:text-[#1A1A2E] transition-colors font-medium">Courses</a>
             <a href="#portals" className="text-sm text-[#6B7280] hover:text-[#1A1A2E] transition-colors font-medium">Portals</a>
             <a href="#about" className="text-sm text-[#6B7280] hover:text-[#1A1A2E] transition-colors font-medium">About</a>
           </div>
@@ -345,6 +347,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Featured Courses Section */}
+      <FeaturedCoursesSection />
+
       {/* About Section */}
       <section id="about" className="relative z-10 py-24 px-6 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
@@ -425,4 +430,87 @@ export default function LandingPage() {
       </footer>
     </div>
   );
+}
+
+// ═══════════════════════════════════════════
+// Featured Courses Section
+// ═══════════════════════════════════════════
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api';
+
+function FeaturedCoursesSection() {
+    const [courses, setCourses] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        axios.get(`${API_BASE_URL}/CourseVideos/featured`)
+            .then(res => setCourses(res.data || []))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return null;
+    if (courses.length === 0) return null;
+
+    return (
+        <section id="courses" className="relative z-10 py-24 px-6 bg-white">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-16">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFF3ED] rounded-full mb-6">
+                        <span className="text-sm">🎓</span>
+                        <span className="text-sm font-semibold text-[#FF6B35]">Featured Courses</span>
+                    </div>
+                    <h2 className="text-4xl font-extrabold text-[#1A1A2E] mb-4">Explore Our Top Courses</h2>
+                    <p className="text-[#6B7280] max-w-2xl mx-auto">Handpicked courses from our best instructors, ready for you to start learning today.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {courses.map((course: any) => (
+                        <Link
+                            key={`${course.facultyName}-${course.courseName}`}
+                            href={`/course-info/${encodeURIComponent(course.courseName)}`}
+                            className="group block"
+                        >
+                            <div className="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-[#FF6B35]/30 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+                                {/* Thumbnail / Gradient */}
+                                <div className="h-44 relative overflow-hidden">
+                                    {course.thumbnailUrl ? (
+                                        <img src={course.thumbnailUrl} alt={course.courseName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-[#FF6B35] via-[#FF8F5E] to-[#FFA07A] flex items-center justify-center">
+                                            <span className="text-6xl opacity-30 group-hover:opacity-50 transition-opacity">📚</span>
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+                                        <span className="bg-black/50 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-lg">
+                                            📹 {course.videoCount} video{course.videoCount !== 1 ? 's' : ''}
+                                        </span>
+                                        {course.price > 0 && (
+                                            <span className="bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg shadow">
+                                                ₦{course.price.toLocaleString()}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Info */}
+                                <div className="p-5">
+                                    <h3 className="text-lg font-bold text-[#1A1A2E] group-hover:text-[#FF6B35] transition-colors mb-1">{course.courseName}</h3>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xs text-[#6B7280] bg-gray-100 px-2 py-0.5 rounded-full">{course.facultyName}</span>
+                                        <span className="text-xs text-[#6B7280]">{course.departmentName}</span>
+                                    </div>
+                                    {course.description && (
+                                        <p className="text-sm text-[#6B7280] line-clamp-2 leading-relaxed">{course.description}</p>
+                                    )}
+                                    <div className="mt-4 inline-flex items-center gap-1 text-[#FF6B35] font-semibold text-sm group-hover:gap-2 transition-all">
+                                        View Course <span className="text-base">→</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
 }

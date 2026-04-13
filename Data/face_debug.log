@@ -2198,3 +2198,20 @@
 
 [15:52:56.100] [FACE] Service initialized
 [11:18:52.583] [FACE] Service initialized
+[09:22:19.879] [FACE] Service initialized
+[10:46:24.226] [FACE] Service initialized
+[10:56:16.226] [FACE] Service initialized
+[18:58:09.988] [FACE] Service initialized
+[19:26:25.056] [FACE] Service initialized
+[19:27:19.052] [FACE] RecognizeFacesAsync called, sessionId=149, imageLen=35775
+[19:27:19.054] [FACE] Session found, courseId=28
+[19:27:19.055] [FACE] Using local DB to fetch students
+[19:27:19.065] [FACE] ERROR: No students with profile pictures found
+[19:27:34.011] [FACE] RecognizeFacesAsync called, sessionId=149, imageLen=21703
+[19:27:34.012] [FACE] Session found, courseId=28
+[19:27:34.013] [FACE] Using local DB to fetch students
+[19:27:34.015] [FACE] ERROR: No students with profile pictures found
+[19:27:49.032] [FACE] RecognizeFacesAsync called, sessionId=149, imageLen=22611
+[19:27:49.033] [FACE] Session found, courseId=28
+[19:27:49.034] [FACE] Using local DB to fetch students
+[19:27:49.035] [FACE] ERROR: No students with profile pictures found

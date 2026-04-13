@@ -1,0 +1,18 @@
+﻿Creating bucket: edusyncai-videos in eu-west-1...
+Bucket 'edusyncai-videos' created successfully!
+
+Configuring CORS...
+CORS configured successfully!
+
+Bucket URL: https://s3.eu-west-1.wasabisys.com/edusyncai-videos
+Direct object URL pattern: https://s3.eu-west-1.wasabisys.com/edusyncai-videos/{key}
+
+Uploading test file...
+Test file uploaded successfully!
+Pre-signed URL (valid 1hr): https://s3.eu-west-1.wasabisys.com/edusyncai-videos/test/hello.txt?AWSAccessKeyId=XMU6S90EPC23KXQPHN...
+Test file cleaned up.
+
+=== SETUP COMPLETE ===
+Bucket: edusyncai-videos
+Region: eu-west-1
+Endpoint: https://s3.eu-west-1.wasabisys.com

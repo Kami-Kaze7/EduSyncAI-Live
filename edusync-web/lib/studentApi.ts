@@ -147,4 +147,9 @@ export const studentApi = {
         });
         return response.data;
     },
+
+    getAllCourseVideos: async () => {
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/all`);
+        return response.data;
+    },
 };

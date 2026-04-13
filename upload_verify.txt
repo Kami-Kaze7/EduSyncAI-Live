@@ -1,0 +1,17 @@
+=== FILES ON SERVER ===
+-rwxr-xr-x 1 root root 43K Apr  8 09:44 /opt/edusyncai/Data/uploads/students/2017_123456_6a5fd118-3947-43b5-89f5-008b4e0a894e.jpeg
+-rwxr-xr-x 1 root root 5.6M Apr  8 09:47 /opt/edusyncai/Data/uploads/models/biology/35431b47-1376-40fd-9dee-cf3e648b3980.obj
+-rwxr-xr-x 1 root root 5.6M Apr  8 09:49 /opt/edusyncai/Data/uploads/models/biology/775951b8-272c-4a86-9255-d14e2e292a8f.obj
+-rwxr-xr-x 1 root root 43K Apr  8 09:44 /opt/edusyncai/publish/Data/uploads/students/2017_123456_6a5fd118-3947-43b5-89f5-008b4e0a894e.jpeg
+-rwxr-xr-x 1 root root 5.6M Apr  8 09:48 /opt/edusyncai/publish/Data/uploads/models/biology/35431b47-1376-40fd-9dee-cf3e648b3980.obj
+-rwxr-xr-x 1 root root 5.6M Apr  8 09:54 /opt/edusyncai/publish/Data/uploads/models/biology/775951b8-272c-4a86-9255-d14e2e292a8f.obj
+
+=== STUDENTS WITH PHOTOS ===
+1|Cyril Jeremiah|/uploads/students/2017_123456_6a5fd118-3947-43b5-89f5-008b4e0a894e.jpeg
+3|Jeffry Jacker|
+4|Sammy|
+5|Jonathan Fabian|
+
+=== IMAGE ACCESS TEST ===
+Via HTTPS: %{http_code}
+Via API: %{http_code}

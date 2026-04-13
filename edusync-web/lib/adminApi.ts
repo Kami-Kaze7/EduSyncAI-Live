@@ -282,5 +282,72 @@ export const adminApi = {
     getVideoDownloadUrl: async (videoId: number) => {
         const response = await axios.get(`${API_BASE_URL}/CourseVideos/${videoId}/download-url`);
         return response.data;
+    },
+
+    // === V2 Flat Video Management ===
+    getAllVideos: async () => {
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/all`);
+        return response.data;
+    },
+    createVideoV2: async (data: {
+        title: string;
+        description?: string;
+        videoUrl?: string;
+        facultyName: string;
+        departmentName: string;
+        courseName: string;
+        duration?: string;
+        price: number;
+        thumbnailUrl?: string;
+        whatYoullLearn?: string;
+    }) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/create-v2`, data);
+        return response.data;
+    },
+    updateVideo: async (videoId: number, data: any) => {
+        const response = await axios.put(`${API_BASE_URL}/CourseVideos/${videoId}`, data);
+        return response.data;
+    },
+    updateCourseMetadata: async (data: any) => {
+        const response = await axios.put(`${API_BASE_URL}/CourseVideos/course-update`, data);
+        return response.data;
+    },
+    getUploadUrlV2: async (fileName: string, contentType: string) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/upload-url-v2`, {
+            fileName,
+            contentType,
+            courseId: 0
+        });
+        return response.data;
+    },
+    confirmVideoUploadV2: async (data: {
+        title: string;
+        description?: string;
+        objectKey: string;
+        originalFileName: string;
+        fileSizeBytes: number;
+        facultyName: string;
+        departmentName: string;
+        courseName: string;
+        duration?: string;
+        price: number;
+        thumbnailUrl?: string;
+        whatYoullLearn?: string;
+    }) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/confirm-v2`, data);
+        return response.data;
+    },
+
+    // Featured courses
+    toggleFeatured: async (courseName: string, facultyName: string) => {
+        const response = await axios.post(`${API_BASE_URL}/CourseVideos/toggle-featured`, {
+            courseName,
+            facultyName
+        });
+        return response.data;
+    },
+    getFeaturedCourses: async () => {
+        const response = await axios.get(`${API_BASE_URL}/CourseVideos/featured`);
+        return response.data;
     }
 };

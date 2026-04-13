@@ -1,0 +1,113 @@
+NODE: v20.20.2
+API svc: active
+WEB svc: active
+FACE svc: active
+API HTTP: }
+WEB HTTP: }
+API data: []
+NEXT dir: BUILD_ID
+app-path-routes-manifest.json
+build
+build-manifest.json
+cache
+diagnostics
+export-marker.json
+fallback-build-manifest.json
+images-manifest.json
+next-minimal-server.js.nft.json
+next-server.js.nft.json
+package.json
+prerender-manifest.json
+required-server-files.js
+required-server-files.json
+routes-manifest.json
+server
+static
+trace
+trace-build
+turbopack
+types
+DB files: 
+SSL: Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+No certificates found.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+---NGINX CONFIG---
+server {
+    listen 80;
+    server_name 62-171-138-230.nip.io;
+    client_max_body_size 250M;
+
+    location /api/ {
+        proxy_pass http://localhost:5152;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+
+    location /hubs/ {
+        proxy_pass http://localhost:5152;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+    }
+
+    location /uploads/ {
+        proxy_pass http://localhost:5152;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /swagger {
+        proxy_pass http://localhost:5152;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+---WEB LOGS---
+(root) REPLACE (root)
+(root) LIST (root)
+(root) LIST (root)
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+(root) LIST (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) REPLACE (root)
+---API LOGS---
+(root) REPLACE (root)
+(root) LIST (root)
+(root) LIST (root)
+(root) REPLACE (root)
+? GeminiSummarizationService initialized with key length: 39
+? GeminiSummarizationService initialized with key length: 39
+(root) LIST (root)
+(root) REPLACE (root)
+? GeminiSummarizationService initialized with key length: 39
+? GeminiSummarizationService initialized with key length: 39

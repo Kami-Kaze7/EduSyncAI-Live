@@ -11,11 +11,19 @@ namespace EduSyncAI.WebAPI.Services
         public WasabiService(IConfiguration configuration)
         {
             var wasabiConfig = configuration.GetSection("Wasabi");
-            var accessKey = wasabiConfig["AccessKey"] ?? throw new Exception("Wasabi AccessKey not configured");
-            var secretKey = wasabiConfig["SecretKey"] ?? throw new Exception("Wasabi SecretKey not configured");
-            _bucketName = wasabiConfig["BucketName"] ?? "edusyncai-videos";
-            var serviceUrl = wasabiConfig["ServiceUrl"] ?? "https://s3.eu-west-1.wasabisys.com";
-            var region = wasabiConfig["Region"] ?? "eu-west-1";
+            // Environment variables take priority over appsettings.json (keeps secrets out of git)
+            var accessKey = Environment.GetEnvironmentVariable("WASABI_ACCESS_KEY")
+                ?? wasabiConfig["AccessKey"]
+                ?? throw new Exception("Wasabi AccessKey not configured");
+            var secretKey = Environment.GetEnvironmentVariable("WASABI_SECRET_KEY")
+                ?? wasabiConfig["SecretKey"]
+                ?? throw new Exception("Wasabi SecretKey not configured");
+            _bucketName = Environment.GetEnvironmentVariable("WASABI_BUCKET")
+                ?? wasabiConfig["BucketName"] ?? "edusyncai-videos";
+            var serviceUrl = Environment.GetEnvironmentVariable("WASABI_SERVICE_URL")
+                ?? wasabiConfig["ServiceUrl"] ?? "https://s3.eu-west-1.wasabisys.com";
+            var region = Environment.GetEnvironmentVariable("WASABI_REGION")
+                ?? wasabiConfig["Region"] ?? "eu-west-1";
 
             var config = new AmazonS3Config
             {

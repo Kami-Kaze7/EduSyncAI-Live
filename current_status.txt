@@ -1,0 +1,9 @@
+NODE: v20.20.2
+API svc: active
+WEB svc: active
+FACE svc: active
+API courses: [{"id":28,"courseCode":"GEO101","courseTitle":"Geology Course 101","yearOfStudyId":8,"courseName":"Geology Course 101","lecturerId":12,"creditHours":3,"createdAt":"2026-04-08T03:19:12.4111759Z","enrollments":[],"sessions":[]},{"id":39,"courseCode":"GEO102","courseTitle":"Geology Course GEO102","year
+HTTPS web: }
+HTTPS api: }
+DB: -rw-rw-rw- 1 root root 596K Apr  8 05:14 /opt/edusyncai/publish/Data/edusync.db
+Uptime: 05:19:16 up 19 days, 15:32,  0 users,  load average: 5.60, 5.02, 4.49

@@ -1,0 +1,107 @@
+=== ADMINS TABLE (deployed DB) ===
+OUT: 1|admin|JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=|System Administrator|2026-01-27 10:36:34.5569947
+ERR: 
+
+=== ADMINS SCHEMA ===
+OUT: CREATE TABLE IF NOT EXISTS "Admins" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Admins" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+);
+ERR: 
+
+=== ADMIN COUNT ===
+Count: 1
+
+=== ADMINS in SOURCE DB ===
+OUT: 1|admin|JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=|System Administrator|2026-01-27 10:36:34.5569947
+
+=== SOURCE DB SCHEMA ===
+OUT: CREATE TABLE IF NOT EXISTS "Admins" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Admins" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "FullName" TEXT NOT NULL,
+    "CreatedAt" TEXT NOT NULL
+);
+
+=== ROW COUNTS (deployed) ===
+  Admins: 1
+  Lecturers: 4
+  Students: 4
+  Courses: 4
+  Faculties: 1
+  Departments: 1
+  YearsOfStudy: 3
+  ClassSessions: 0
+  Attendance: 0
+  CourseEnrollments: 1
+  LectureMaterials: 0
+  LectureNotes: 0
+  Lectures: 2
+  CourseSyllabi: 0
+  CourseVideos: 1
+  ClassSummaries: 0
+  WeeklySummaries: 0
+  StudentWeeklySummaries: 0
+  ModelAssets: 1
+  LecturePreps: 0
+
+=== ROW COUNTS (source) ===
+  Admins: 1
+  Lecturers: 4
+  Students: 4
+  Courses: 4
+  Faculties: 1
+  Departments: 1
+  YearsOfStudy: 3
+  ClassSessions: 0
+  Attendance: 0
+  CourseEnrollments: 1
+  LectureMaterials: 0
+  LectureNotes: 0
+  Lectures: 2
+  CourseSyllabi: 0
+  CourseVideos: 1
+  ClassSummaries: 0
+  WeeklySummaries: 0
+  StudentWeeklySummaries: 0
+  ModelAssets: 1
+  LecturePreps: 0
+
+=== SSL CERT ===
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+No certificates found.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+=== NGINX SSL CONFIG ===
+ssl_certificate /etc/nginx/ssl/selfsigned.crt;
+    ssl_certificate_key /etc/nginx/ssl/selfsigned.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+=== ADMIN LOGIN TEST ===
+Response: 
+
+=== ADMIN LOGIN TEST 2 ===
+Response: 
+
+=== API ROUTES ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.10/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/usr/lib/python3.10/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/usr/lib/python3.10/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/usr/lib/python3.10/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting va
+
+=== LOCAL GIT DB ===
+-rwxr-xr-x 1 root root 596K Apr  7 18:45 /opt/edusyncai/Data/edusync.db
+-rw-rw-rw- 1 root root 596K Apr  8 05:14 /opt/edusyncai/publish/Data/edusync.db

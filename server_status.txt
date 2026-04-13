@@ -1,0 +1,140 @@
+=== NODE VERSION ===
+v20.20.2
+
+=== SERVICE STATUS ===
+API:  active
+Web:  active
+Face: active
+
+=== HTTP STATUS (localhost) ===
+API:  200
+Web:  200
+
+=== API RESPONSE ===
+[]
+
+=== .NEXT BUILD ===
+total 168
+drwxr-xr-x 8 root root  4096 Apr  7 19:24 .
+drwxr-xr-x 9 root root  4096 Apr  7 19:24 ..
+-rw-r--r-- 1 root root    21 Apr  7 19:24 BUILD_ID
+-rw-r--r-- 1 root root   686 Apr  7 19:24 app-path-routes-manifest.json
+
+=== NGINX CONFIG ===
+server {
+    listen 80;
+    server_name 62-171-138-230.nip.io;
+    client_max_body_size 250M;
+
+    location /api/ {
+        proxy_pass http://localhost:5152;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+
+    location /hubs/ {
+        proxy_pass http://localhost:5152;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+    }
+
+    location /uploads/ {
+        proxy_pass http://localhost:5152;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /swagger {
+        proxy_pass http://localhost:5152;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+=== SSL CERTS ===
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+No certificates found.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+=== WEB SERVICE LOGS (last 15) ===
+(root) REPLACE (root)
+(root) LIST (root)
+(root) REPLACE (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) LIST (root)
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+(root) LIST (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) REPLACE (root)
+
+=== API SERVICE LOGS (last 15) ===
+(root) REPLACE (root)
+(root) REPLACE (root)
+(root) REPLACE (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) REPLACE (root)
+(root) REPLACE (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) REPLACE (root)
+(root) LIST (root)
+(root) LIST (root)
+(root) REPLACE (root)
+✅ GeminiSummarizationService initialized with key length: 39
+✅ GeminiSummarizationService initialized with key length: 39
+
+=== DB FILES ===
+-rwxr-xr-x 1 root root 596K Apr  7 18:45 /opt/edusyncai/Data/edusync.db
+-rw-r--r-- 1 root root 140K Apr  7 19:02 /opt/edusyncai/publish/Data/edusync.db
+-rw-rw-rw- 1 root root 596K Apr  7 19:16 /opt/edusyncai/publish/api/Data/edusync.db
+
+=== PORTS ===
+LISTEN 0      128                   127.0.0.1:5280       0.0.0.0:*    users:(("lua",pid=85639,fd=18))                                                                                                                                                                    
+LISTEN 0      512                   127.0.0.1:5152       0.0.0.0:*    users:(("dotnet",pid=1409539,fd=303))                                                                                                                                                              
+LISTEN 0      511                     0.0.0.0:80         0.0.0.0:*    users:(("nginx",pid=1409584,fd=6),("nginx",pid=1409583,fd=6),("nginx",pid=1409582,fd=6),("nginx",pid=1409581,fd=6),("nginx",pid=1409580,fd=6),("nginx",pid=1409579,fd=6),("nginx",pid=194603,fd=6))
+LISTEN 0      511                     0.0.0.0:443        0.0.0.0:*    users:(("nginx",pid=1409584,fd=8),("nginx",pid=1409583,fd=8),("nginx",pid=1409582,fd=8),("nginx",pid=1409581,fd=8),("nginx",pid=1409580,fd=8),("nginx",pid=1409579,fd=8),("nginx",pid=194603,fd=8))
+LISTEN 0      128                   127.0.0.1:5280       0.0.0.0:*    users:(("lua",pid=85639,fd=18))                                                                                                                                                                    
+LISTEN 0      512                   127.0.0.1:5152       0.0.0.0:*    users:(("dotnet",pid=1409539,fd=303))                                                                                                                                                              
+LISTEN 0      511                     0.0.0.0:80         0.0.0.0:*    users:(("nginx",pid=1409584,fd=6),("nginx",pid=1409583,fd=6),("nginx",pid=1409582,fd=6),("nginx",pid=1409581,fd=6),("nginx",pid=1409580,fd=6),("nginx",pid=1409579,fd=6),("nginx",pid=194603,fd=6))
+LISTEN 0      511                     0.0.0.0:443        0.0.0.0:*    users:(("nginx",pid=1409584,fd=8),("nginx",pid=1409583,fd=8),("nginx",pid=1409582,fd=8),("nginx",pid=1409581,fd=8),("nginx",pid=1409580,fd=8),("nginx",pid=1409579,fd=8),("nginx",pid=194603,fd=8))
+LISTEN 0      511                           *:3000             *:*    users:(("next-server (v1",pid=1409531,fd=18))                                                                                                                                                      
+LISTEN 0      50           [::ffff:127.0.0.1]:8080             *:*    users:(("java",pid=1339271,fd=153))                                                                                                                                                                
+LISTEN 0      511                        [::]:80            [::]:*    users:(("nginx",pid=1409584,fd=7),("nginx",pid=1409583,fd=7),("nginx",pid=1409582,fd=7),("nginx",pid=1409581,fd=7),("nginx",pid=1409580,fd=7),("nginx",pid=1409579,fd=7),("nginx",pid=194603,fd=7))
+LISTEN 0      511                        [::]:443           [::]:*    users:(("nginx",pid=1409584,fd=9),("nginx",pid=1409583,fd=9),("nginx",pid=1409582,fd=9),("nginx",pid=1409581,fd=9),("nginx",pid=1409580,fd=9),("nginx",pid=1409579,fd=9),("nginx",pid=194603,fd=9))
+LISTEN 0      128                       [::1]:5280          [::]:*    users:(("lua",pid=85639,fd=17))                                                                                                                                                                    
+LISTEN 0      512                       [::1]:5152          [::]:*    users:(("dotnet",pid=1409539,fd=304))
